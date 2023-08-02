@@ -1,0 +1,36 @@
+{
+  "name": "minimalist-vue3",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --mode dev",
+    "test": "vite --mode dev",
+    "prod": "vite --mode dev",
+    "build": "vite build",
+    "build:dev": "vite build --mode dev",
+    "build:test": "vite build --mode test",
+    "build:prod": "vite build --mode prod",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tinymce/tinymce-vue": "^5.1.0",
+    "@vueuse/core": "^10.1.2",
+    "@vueuse/integrations": "^10.1.2",
+    "axios": "^1.4.0",
+    "nprogress": "^0.2.0",
+    "pinia": "^2.0.36",
+    "tinymce": "^6.6.0",
+    "universal-cookie": "^4.0.4",
+    "vue": "^3.2.47",
+    "vue-cropper": "^1.0.9",
+    "vue-router": "^4.1.6"
+  },
+  "devDependencies": {
+    "@arco-design/web-vue": "^2.45.3",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "vite": "^4.3.2",
+    "vite-plugin-windicss": "^1.8.10",
+    "windicss": "^3.5.6"
+  }
+}

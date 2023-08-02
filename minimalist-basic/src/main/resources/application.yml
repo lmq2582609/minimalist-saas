@@ -1,0 +1,10 @@
+server:
+    port: 9090
+    servlet:
+        context-path: /minimalist
+        encoding:
+            charset: UTF-8
+            force: true
+spring:
+    profiles:
+        active: dev

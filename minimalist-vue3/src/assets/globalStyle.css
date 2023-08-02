@@ -1,0 +1,30 @@
+/* 全局样式 */
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+/* 过渡动画 -> 渐显/渐隐 */
+/* 进入之前 */
+.fade-enter-from {
+    @apply opacity-0;
+}
+/* 进入之后 */
+.fade-enter-to {
+    @apply opacity-100;
+}
+/* 离开之前 */
+.fade-leave-from {
+    @apply opacity-100;
+}
+/* 离开之后 */
+.fade-leave-to {
+    @apply opacity-0;
+}
+.fade-enter-active,.fade-leave-active {
+    @apply transition-all;
+}
+.fade-enter-active {
+    transition-delay: 0.4s;
+}
