@@ -13,9 +13,9 @@ import java.util.Scanner;
 
 public class MybatisPlusCodeGenerator {
 
-    private static final String url = "jdbc:mysql://117.50.179.102:12306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true";
+    private static final String url = "jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true";
     private static final String username = "root";
-    private static final String password = "iI483hP0PA3HhrBJ";
+    private static final String password = "123456";
 
     //读取控制台内容
     public static String scanner(String tip) {

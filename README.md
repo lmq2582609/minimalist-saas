@@ -10,11 +10,15 @@
 ## 项目简介
 极简多租户管理系统是一个基于数据库字段隔离的多租户管理系统，具备常规基础功能的单体应用。项目中只提供了一些基础功能，算是一个多租户系统的基础版，因为我也要用这个基础版，所以顺便将基础版代码开源，希望提供给有需要的人。
 
-## 在线体验
+## 项目地址
 
 演示地址：http://
 
 详细文档：http://
+
+Gitee：https://gitee.com/marlife/minimalist-saas
+
+Github：https://github.com/lmq2582609/minimalist-saas
 
 ## 技术体系
 
