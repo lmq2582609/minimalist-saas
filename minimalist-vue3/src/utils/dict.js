@@ -44,6 +44,8 @@ export const DICT = {
     deptList: 'dict-dept-list',
     //用户列表 -> 额外字典
     userList: 'dict-user-list',
+    //全部用户列表 -> 额外字典
+    userAllList: 'dict-user-all-list',
     //角色列表 -> 额外字典
     roleList: 'dict-role-list',
     //岗位列表 -> 额外字典

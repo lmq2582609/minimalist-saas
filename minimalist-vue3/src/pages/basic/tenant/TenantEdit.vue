@@ -12,7 +12,7 @@
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="userId" label="联系人" required>
                     <a-select v-model="form.userId" placeholder="联系人" allow-clear allow-search>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.userList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.userAllList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
@@ -51,7 +51,7 @@ import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.userList, proxy.DICT.tenantPackageList])
+const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.userAllList, proxy.DICT.tenantPackageList])
 //接收父组件参数
 const props = defineProps({
     params: {

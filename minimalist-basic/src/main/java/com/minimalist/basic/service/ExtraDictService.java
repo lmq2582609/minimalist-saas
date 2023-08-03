@@ -20,6 +20,12 @@ public interface ExtraDictService {
     DictCacheVO getUserDictData();
 
     /**
+     * 获取全部用户字典数据（额外字典数据）
+     * @return 字典数据列表
+     */
+    DictCacheVO getAllUserDictData();
+
+    /**
      * 获取租户套餐字典数据（额外字典数据）
      * @return 字典数据列表
      */

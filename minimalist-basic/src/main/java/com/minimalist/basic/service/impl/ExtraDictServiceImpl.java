@@ -3,6 +3,7 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.minimalist.basic.config.extraDict.ExtraDict;
 import com.minimalist.basic.config.extraDict.ExtraDictHandler;
+import com.minimalist.basic.config.tenant.IgnoreTenant;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.dict.DictCacheVO;
 import com.minimalist.basic.mapper.*;
@@ -67,22 +68,18 @@ public class ExtraDictServiceImpl implements ExtraDictService {
     @Override
     @ExtraDict(dictType = ExtraDictHandler.USER_LIST)
     public DictCacheVO getUserDictData() {
-        //返回结果
-        DictCacheVO dictCacheVO = new DictCacheVO();
-        dictCacheVO.setDictType(ExtraDictHandler.USER_LIST);
-        //查询用户列表
-        List<MUser> userList = userMapper.selectUserDict();
-        if (CollectionUtil.isNotEmpty(userList)) {
-            List<DictCacheVO.DictKV> dictKVList = userList.stream().map(dept -> {
-                DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
-                dictKV.setDictKey(dept.getUserId().toString());
-                dictKV.setDictValue(dept.getNickname());
-                dictKV.setDictType(ExtraDictHandler.USER_LIST);
-                return dictKV;
-            }).collect(Collectors.toList());
-            dictCacheVO.setDictList(dictKVList);
-        }
-        return dictCacheVO;
+        return getUserDictList(ExtraDictHandler.USER_LIST);
+    }
+
+    /**
+     * 获取全部用户字典数据（额外字典数据）
+     * @return 字典数据列表
+     */
+    @Override
+    @IgnoreTenant
+    @ExtraDict(dictType = ExtraDictHandler.USER_ALL_LIST)
+    public DictCacheVO getAllUserDictData() {
+        return getUserDictList(ExtraDictHandler.USER_ALL_LIST);
     }
 
     /**
@@ -153,6 +150,30 @@ public class ExtraDictServiceImpl implements ExtraDictService {
                 dictKV.setDictKey(post.getPostId().toString());
                 dictKV.setDictValue(post.getPostName());
                 dictKV.setDictType(ExtraDictHandler.POST_LIST);
+                return dictKV;
+            }).collect(Collectors.toList());
+            dictCacheVO.setDictList(dictKVList);
+        }
+        return dictCacheVO;
+    }
+
+    /**
+     * 获取用户字典数据
+     * @param dictType 字典类型
+     * @return 字典数据
+     */
+    private DictCacheVO getUserDictList(String dictType) {
+        //返回结果
+        DictCacheVO dictCacheVO = new DictCacheVO();
+        dictCacheVO.setDictType(dictType);
+        //查询用户列表
+        List<MUser> userList = userMapper.selectUserDict();
+        if (CollectionUtil.isNotEmpty(userList)) {
+            List<DictCacheVO.DictKV> dictKVList = userList.stream().map(dept -> {
+                DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
+                dictKV.setDictKey(dept.getUserId().toString());
+                dictKV.setDictValue(dept.getNickname());
+                dictKV.setDictType(dictType);
                 return dictKV;
             }).collect(Collectors.toList());
             dictCacheVO.setDictList(dictKVList);
