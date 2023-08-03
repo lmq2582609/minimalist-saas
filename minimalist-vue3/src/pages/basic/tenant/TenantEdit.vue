@@ -150,7 +150,7 @@ const loadTenantInfo = (tenantId) => {
 watch(() => props.params, (newVal, oldVal) => {
     //清空表单
     clearForm()
-    //部门ID
+    //租户ID
     if (props.params.tenantId) {
         //加载租户信息
         loadTenantInfo(props.params.tenantId)
