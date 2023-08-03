@@ -75,4 +75,14 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
                         .eqNotNull(MTenant::getStatus, queryVO.getStatus())
                 );
     }
+
+    /**
+     * 根据用户ID查询租户
+     * @param userId 用户ID
+     * @return 租户实体
+     */
+    default MTenant selectTenantByUserId(Long userId) {
+        return selectOne(new LambdaQueryWrapper<MTenant>().eq(MTenant::getUserId, userId));
+    }
+
 }

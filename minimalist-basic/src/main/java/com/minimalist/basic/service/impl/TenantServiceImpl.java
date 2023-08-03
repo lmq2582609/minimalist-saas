@@ -138,6 +138,18 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
+     * 根据用户ID查询租户
+     * @param userId 用户ID
+     * @return 租户数据
+     */
+    @Override
+    public TenantVO getTenantByUserId(Long userId) {
+        //根据用户ID查询租户
+        MTenant mTenant = tenantMapper.selectTenantByUserId(userId);
+        return BeanUtil.copyProperties(mTenant, TenantVO.class);
+    }
+
+    /**
      * 校验租户名是否存在，存在则抛出异常
      * @param tenantName 租户名
      */

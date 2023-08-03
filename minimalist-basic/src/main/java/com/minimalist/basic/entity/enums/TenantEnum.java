@@ -15,6 +15,7 @@ public class TenantEnum {
         USE_TENANT_PACKAGE("有租户正在使用该套餐，不能删除"),
         STATUS_TENANT_PACKAGE("选择的租户套餐已被禁用"),
         TENANT_USER_COUNT_LIMIT("租户下可创建的用户数已达上限"),
+        EX_TENANT("租户已过期，请联系管理员"),
         ;
         private final String desc;
     }
