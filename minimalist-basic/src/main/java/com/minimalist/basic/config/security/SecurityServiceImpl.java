@@ -50,7 +50,7 @@ public class SecurityServiceImpl implements UserDetailsService {
         //账户未绑定租户
         Assert.notNull(tenantVO, () -> new BusinessException(UserEnum.ErrorMsg.USER_UNBOUND_TENANT.getDesc()));
         //租户状态
-        Assert.isTrue(TenantEnum.TenantStatus.DEPT_STATUS_1.getCode().equals(tenantVO.getStatus().intValue()),
+        Assert.isTrue(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode().equals(tenantVO.getStatus().intValue()),
                 () -> new BusinessException(TenantEnum.ErrorMsg.DISABLED_TENANT.getDesc()));
         //获取当天最晚时间，23:59:59
         LocalDateTime localDateTime = LocalDateTimeUtil.endOfDay(LocalDateTime.now());

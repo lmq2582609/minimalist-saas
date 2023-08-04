@@ -165,7 +165,7 @@ public class TenantServiceImpl implements TenantService {
     private void checkTenantPackageStatus(Long tenantPackageId) {
         MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageId);
         Assert.notNull(mTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
-        Assert.isFalse(TenantEnum.TenantPackageStatus.DEPT_STATUS_0.getCode() == mTenantPackage.getStatus().intValue(),
+        Assert.isFalse(TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_0.getCode() == mTenantPackage.getStatus().intValue(),
                 () -> new BusinessException(TenantEnum.ErrorMsg.STATUS_TENANT_PACKAGE.getDesc()));
     }
 

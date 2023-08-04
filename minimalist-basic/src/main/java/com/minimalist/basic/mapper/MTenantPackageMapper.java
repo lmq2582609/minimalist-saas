@@ -68,7 +68,7 @@ public interface MTenantPackageMapper extends BaseMapper<MTenantPackage> {
      * @return 用户列表
      */
     default List<MTenantPackage> selectTenantPackageDict() {
-        return selectList(new LambdaQueryWrapper<MTenantPackage>().eq(MTenantPackage::getStatus, TenantEnum.TenantPackageStatus.DEPT_STATUS_1.getCode()));
+        return selectList(new LambdaQueryWrapper<MTenantPackage>().eq(MTenantPackage::getStatus, TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_1.getCode()));
     }
 
 }

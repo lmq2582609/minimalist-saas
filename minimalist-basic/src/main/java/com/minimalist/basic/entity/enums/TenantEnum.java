@@ -25,8 +25,8 @@ public class TenantEnum {
     @Getter
     @AllArgsConstructor
     public enum TenantStatus {
-        DEPT_STATUS_0(0, "禁用"),
-        DEPT_STATUS_1(1, "正常"),
+        TENANT_STATUS_0(0, "禁用"),
+        TENANT_STATUS_1(1, "正常"),
         ;
         private final Integer code;
         private final String desc;
@@ -36,8 +36,8 @@ public class TenantEnum {
     @Getter
     @AllArgsConstructor
     public enum TenantPackageStatus {
-        DEPT_STATUS_0(0, "禁用"),
-        DEPT_STATUS_1(1, "正常"),
+        TENANT_PACKAGE_STATUS_0(0, "禁用"),
+        TENANT_PACKAGE_STATUS_1(1, "正常"),
         ;
         private final Integer code;
         private final String desc;
