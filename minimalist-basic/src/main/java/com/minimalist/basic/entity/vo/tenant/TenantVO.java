@@ -63,6 +63,9 @@ public class TenantVO implements Serializable {
     @Schema(name = "accountCount", description = "可创建账号数量，表示这个租户下可以创建多少账号", type = "integer")
     private Integer accountCount;
 
+    @Schema(name = "storeCount", description = "可创建门店数量，表示这个租户下可以创建多少家门店或者店铺，若系统中没有门店或店铺的概念，可忽略此字段", type = "integer")
+    private Integer storeCount;
+
     @NotNull(message = "租户状态不能为空", groups = {Add.class, Update.class})
     @SchemaEnum(implementation = TenantEnum.TenantStatus.class)
     @Schema(name = "status", description = "租户状态", type = "integer")

@@ -56,9 +56,22 @@ public class MTenant extends BaseEntity {
     @TableField("account_count")
     private Integer accountCount;
 
+    /**
+     * 可创建门店数量
+     */
+    @TableField("store_count")
+    private Integer storeCount;
+
+    /**
+     * 状态
+     */
     @TableField("status")
     private Byte status;
 
+    /**
+     * 备注
+     */
     @TableField("remark")
     private String remark;
+
 }

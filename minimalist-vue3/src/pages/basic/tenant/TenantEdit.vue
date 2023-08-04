@@ -15,11 +15,14 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userAllList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
+                <a-form-item class="w-[49%]" field="expireTime" label="过期时间" required>
+                    <a-date-picker class="w-100" v-model="form.expireTime" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="过期时间" />
+                </a-form-item>
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="expireTime" label="过期时间" required>
-                    <a-date-picker class="w-100" v-model="form.expireTime" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="过期时间" />
+                <a-form-item class="w-[49%]" field="storeCount" label="门店额度" tooltip="默认1家门店，表示这个租户下可以创建多少家门店或者店铺，若系统中没有门店或店铺的概念，可忽略此字段">
+                    <a-input-number v-model="form.storeCount" :min="1" placeholder="门店额度" />
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="租户状态" required>
                     <a-select v-model="form.status" placeholder="租户状态" allow-clear>
@@ -77,6 +80,8 @@ const form = reactive({
     userId: null,
     //账号额度
     accountCount: null,
+    //门店额度
+    storeCount: null,
     //过期时间
     expireTime: null,
     //租户状态

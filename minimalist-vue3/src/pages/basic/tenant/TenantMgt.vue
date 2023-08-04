@@ -136,6 +136,7 @@ const datatable = reactive({
         {title: '联系人手机', dataIndex: 'phone', align: 'center', width: 125},
         {title: '联系人邮箱', dataIndex: 'email', align: 'center', ellipsis: true, tooltip: true},
         {title: '账号额度', dataIndex: 'accountCount', align: 'center', width: 90},
+        {title: '门店额度', dataIndex: 'storeCount', align: 'center', width: 90},
         {title: '过期时间', dataIndex: 'expireTime', align: 'center', width: 180},
         {title: '租户状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},
         {title: '操作', slotName: 'operation', align: 'center', width: 160}

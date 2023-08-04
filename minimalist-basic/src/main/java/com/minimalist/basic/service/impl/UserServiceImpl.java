@@ -48,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -379,9 +380,12 @@ public class UserServiceImpl implements UserService {
         Authentication authenticate;
         try {
             authenticate = authenticationManager.authenticate(authenticationToken);
-        } catch (Exception e) {
+        } catch (InternalAuthenticationServiceException e) {
             log.warn(e.getMessage(), e);
-            throw new BusinessException(UserEnum.ErrorMsg.U_OR_P_INCORRECT.getDesc());
+            throw new BusinessException(e.getMessage());
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new BusinessException(RespEnum.FAILED.getDesc());
         }
         Assert.notNull(authenticate, () -> new BusinessException(UserEnum.ErrorMsg.U_OR_P_INCORRECT.getDesc()));
         //认证成功

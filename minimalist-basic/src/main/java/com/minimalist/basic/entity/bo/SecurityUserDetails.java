@@ -104,8 +104,7 @@ public class SecurityUserDetails implements UserDetails {
      */
     @Override
     public boolean isEnabled() {
-        //账户被冻结
-        return !UserEnum.UserStatus.USER_STATUS_0.getCode().equals(user.getStatus());
+        return true;
     }
 
 }

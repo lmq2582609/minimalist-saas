@@ -24,6 +24,7 @@ public class UserEnum {
         OLD_PASSWORD_INCORRECT("旧密码输入错误"),
         USER_AVATAR_SIZE("头像大小需小于100kb"),
         LOGIN_USER_INCONSISTENT("获取的用户信息与当前登陆用户不一致"),
+        USER_UNBOUND_TENANT("该账户未绑定租户"),
 
         ;
         private final String desc;
