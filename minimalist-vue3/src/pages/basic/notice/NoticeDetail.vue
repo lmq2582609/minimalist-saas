@@ -104,12 +104,6 @@ const form = reactive({
     //创建时间
     createTime: null
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-}
 //加载公告详细信息
 const loadNoticeInfo = (noticeId) => {
     spinLoading.value = true
@@ -128,8 +122,6 @@ const loadNoticeInfo = (noticeId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //公告ID
     if (props.params.noticeId) {
         //查询数据

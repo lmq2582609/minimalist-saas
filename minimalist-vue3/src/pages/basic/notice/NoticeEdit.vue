@@ -205,25 +205,8 @@ const getDeptTree = () => {
         deptTree.value = res
     })
 }
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-    form.noticeTop = proxy.yesNo.no.key
-    form.noticeOutChain = proxy.yesNo.no.key
-    if (editorRef.value) {
-        //清空富文本数据
-        editorRef.value.setEditorContent()
-    }
-    //清空封面图
-    form.noticePic = null
-    noticePicList.value = []
-}
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //公告ID
     if (props.params.noticeId) {
         //加载公告信息

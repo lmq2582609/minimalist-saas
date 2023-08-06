@@ -171,15 +171,6 @@ const loadDictInfo = (dictType) => {
         spinLoading.value = false
     })
 }
-//清空字典表单
-const clearForm = () => {
-    form.dictName = null
-    form.dictType = null
-    form.dictDesc = null
-    let dictData = JSON.parse(JSON.stringify(emptyDictData))
-    dictData['rowKey'] = proxy.randomCode(18)
-    form.dictDataList = [dictData]
-}
 //确定 -> 点击
 const okBtnClick = () => {
     //添加
@@ -209,8 +200,6 @@ const cancelBtnClick = () => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //字典类型
     if (props.params.dictType) {
         loadDictInfo(props.params.dictType)

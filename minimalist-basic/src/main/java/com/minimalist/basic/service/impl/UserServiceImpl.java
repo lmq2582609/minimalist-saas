@@ -317,7 +317,11 @@ public class UserServiceImpl implements UserService {
         //用户岗位
         userInfoVO.setPostList(postService.getPostByUserId(userId));
         //用户所属部门
-        userInfoVO.setDeptList(deptService.getDeptByUserId(userId));
+        if (StrUtil.isNotBlank(user.getDeptIds())) {
+            List<Long> deptIds = StrUtil.split(user.getDeptIds(), ",")
+                    .stream().map(Long::parseLong).toList();
+            userInfoVO.setDeptList(deptService.getDeptByDeptIds(deptIds));
+        }
         return userInfoVO;
     }
 

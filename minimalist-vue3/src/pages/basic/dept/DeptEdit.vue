@@ -93,16 +93,6 @@ const rules = {
     email: [{required: true, message: '部门邮箱不能为空', trigger: 'submit'}],
     status: [{required: true, message: '部门状态不能为空', trigger: 'submit'}],
 }
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-    //上级部门ID
-    form.parentDeptId = '0'
-    //排序值
-    form.deptSort = 0
-}
 //确定 -> 点击
 const okBtnClick = () => {
     //表单验证
@@ -161,8 +151,6 @@ const loadDeptInfo = (deptId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //如果有deptId参数，则是 "修改"
     if (props.params.deptId) {
         loadDeptInfo(props.params.deptId)

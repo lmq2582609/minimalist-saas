@@ -59,12 +59,6 @@ const form = reactive({
     //部门状态
     status: null,
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-}
 //加载部门详细信息
 const loadDeptInfo = (roleId) => {
     spinLoading.value = true
@@ -83,8 +77,6 @@ const loadDeptInfo = (roleId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //部门ID
     if (props.params.deptId) {
         //查询数据

@@ -45,10 +45,10 @@ public interface DeptService {
     List<DeptVO> getEnableDeptList();
 
     /**
-     * 根据用户ID查询用户所属部门
-     * @param userId 用户ID
+     * 根据部门ID查询部门
+     * @param deptIds 部门ID列表
      * @return 用户所属部门列表
      */
-    List<DeptVO> getDeptByUserId(Long userId);
+    List<DeptVO> getDeptByDeptIds(List<Long> deptIds);
 
 }

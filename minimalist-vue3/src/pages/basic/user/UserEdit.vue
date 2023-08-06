@@ -92,6 +92,7 @@
 import { ref, reactive, getCurrentInstance, watch } from 'vue'
 import { getUserByUserIdApi, addUserApi, updateUserByUserIdApi } from "~/api/user.js";
 import { getEnableDeptListApi } from "~/api/dept.js";
+import { getAllTreeParentId } from "~/utils/sys.js";
 
 //全局实例
 const {proxy} = getCurrentInstance()
@@ -164,8 +165,10 @@ const rules = {
 const okBtnClick = () => {
     //获取部门 -> 全勾选+半勾选
     form.deptIds = getDeptTreeSelectData(true)
-    //获取部门 -> 全勾选
-    form.checkedDeptIds = getDeptTreeSelectData(false)
+    //获取部门 -> 全勾选 -> 用于回显，需剔除父节点ID
+    let checkedDeptIdArr = getDeptTreeSelectData(false)
+    //剔除父节点ID，只保留叶子节点的id
+    form.checkedDeptIds = checkedDeptIdArr.filter(deptId => !allParentDeptId.value.includes(deptId));
     //表单验证
     formRef.value.validate((valid) => {
         if (valid) {return false}
@@ -217,6 +220,8 @@ const getDeptTreeSelectData = (isGetHalf) => {
 const deptTreeData = ref([])
 //部门树加载
 const deptTreeSpinLoading = ref(false)
+//部门树所有父节点ID(只要有子集，就视为是父节点)
+const allParentDeptId = ref([])
 //部门树ref
 const treeRef = ref(null)
 //获取部门数据列表
@@ -225,19 +230,11 @@ const getDeptTree = () => {
     getEnableDeptListApi().then(res => {
         //部门树数据赋值
         deptTreeData.value = res
+        //获取所有父deptId
+        allParentDeptId.value = getAllTreeParentId(res, 'deptId')
     }).finally(() => {
         deptTreeSpinLoading.value = false
     })
-}
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-    form.roleIds = []
-    form.postIds = []
-    form.deptIds = []
-    form.checkedDeptIds = []
 }
 //加载用户详细信息
 const loadUserInfo = (userId) => {
@@ -257,8 +254,6 @@ const loadUserInfo = (userId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //部门ID
     if (props.params.userId) {
         //加载用户信息

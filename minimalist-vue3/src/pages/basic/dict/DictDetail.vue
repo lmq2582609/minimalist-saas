@@ -56,13 +56,6 @@ const form = reactive({
     //字典数据
     dictDataList: []
 })
-//清空数据
-const clearForm = () => {
-    form.dictName = null
-    form.dictType = null
-    form.dictDesc = null
-    form.dictDataList = []
-}
 //加载中...
 const spinLoading = ref(false)
 //根据字典类型加载字典数据
@@ -83,8 +76,6 @@ const loadDictInfo = (dictType) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //字典类型
     if (props.params.dictType) {
         //查询数据
