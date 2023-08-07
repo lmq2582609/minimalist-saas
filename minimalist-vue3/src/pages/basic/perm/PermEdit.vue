@@ -102,7 +102,7 @@ const form = reactive({
     //备注
     remark: null,
     //权限状态
-    status: permStatus["1"].key,
+    status: permStatus.enable.key,
 })
 //表单验证规则
 const rules = {
@@ -172,30 +172,12 @@ const okBtnClick = () => {
 const cancelBtnClick = () => {
     emits('cancel')
 }
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-    //上级权限ID
-    form.parentPermId = '0'
-    //排序值
-    form.permSort = 0
-    //权限类型
-    form.permType = permType.M.key
-    //权限状态
-    form.status = permStatus["1"].key
-    //是否可见
-    form.visible = proxy.yesNo.yes.key
-}
 //监听参数变化
 watch(() => form.permType, (newVal, oldVal) => {
     formName.value = form.permType === permType.M.key ? permType.M.value : '权限'
 }, { deep: true, immediate: true })
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //如果有permId参数，则是 "修改"
     if (props.params.permId) {
         loadPermInfo(props.params.permId)

@@ -88,15 +88,6 @@ const form = reactive({
     //部门 -> 全勾选
     checkedDeptIds: []
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-    form.roleIds = []
-    form.postIds = []
-    form.checkedDeptIds = []
-}
 //加载用户详细信息
 const loadUserInfo = (userId) => {
     spinLoading.value = true
@@ -129,8 +120,6 @@ const getDeptTree = () => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //角色ID
     if (props.params.userId) {
         //查询数据

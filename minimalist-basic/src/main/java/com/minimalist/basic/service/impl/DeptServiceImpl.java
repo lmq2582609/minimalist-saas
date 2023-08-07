@@ -104,18 +104,12 @@ public class DeptServiceImpl implements DeptService {
     }
 
     /**
-     * 根据用户ID查询用户所属部门
-     * @param userId 用户ID
+     * 根据部门ID查询部门
+     * @param deptIds 部门ID列表
      * @return 用户所属部门列表
      */
     @Override
-    public List<DeptVO> getDeptByUserId(Long userId) {
-        //查询用户与部门关联数据
-        List<MUserDept> userDeptList = userDeptMapper.selectUserDeptRelation(userId);
-        if (CollectionUtil.isEmpty(userDeptList)) {
-            return CollectionUtil.list(false);
-        }
-        List<Long> deptIds = userDeptList.stream().map(MUserDept::getDeptId).toList();
+    public List<DeptVO> getDeptByDeptIds(List<Long> deptIds) {
         List<MDept> deptList = deptMapper.selectDeptByDeptIds(deptIds);
         return BeanUtil.copyToList(deptList, DeptVO.class);
     }

@@ -45,6 +45,7 @@
 import { ref, reactive, getCurrentInstance, watch } from 'vue'
 import { addTenantPackageApi, updateTenantPackageByTenantPackageIdApi, getTenantPackageByTenantPackageIdApi } from "~/api/tenantPackage.js";
 import { getEnablePermListApi } from "~/api/perm.js";
+import { getAllTreeParentId } from "~/utils/sys.js";
 
 //全局实例
 const {proxy} = getCurrentInstance()
@@ -89,8 +90,10 @@ const rules = {
 const okBtnClick = () => {
     //获取权限 -> 全勾选+半勾选
     form.permissionsIds = getPermTreeSelectData(true)
-    //获取权限 -> 全勾选
-    form.checkedPermIds = getPermTreeSelectData(false)
+    //获取权限 -> 全勾选 -> 用于回显，需剔除父节点ID
+    let checkedPermIdArr = getPermTreeSelectData(false)
+    //剔除父节点ID，只保留叶子节点的id
+    form.checkedPermIds = checkedPermIdArr.filter(permId => !allParentPermId.value.includes(permId));
     //表单验证
     formRef.value.validate((valid) => {
         if (valid) {return false}
@@ -144,23 +147,19 @@ const permTreeData = ref([])
 const permTreeSpinLoading = ref(false)
 //权限树ref
 const treeRef = ref(null)
+//权限树所有父节点ID(只要有子集，就视为是父节点)
+const allParentPermId = ref([])
 //获取权限数据列表
 const getPermTree = () => {
     permTreeSpinLoading.value = true
     getEnablePermListApi().then(res => {
         //权限树数据赋值
         permTreeData.value = res
+        //获取所有父permId
+        allParentPermId.value = getAllPermId(res, 'permId')
     }).finally(() => {
         permTreeSpinLoading.value = false
     })
-}
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-    form.permissionsIds = []
-    form.checkedPermIds = []
 }
 //加载套餐详细信息
 const loadTenantPackageInfo = (packageId) => {
@@ -180,8 +179,6 @@ const loadTenantPackageInfo = (packageId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //租户套餐ID
     if (props.params.packageId) {
         //加载套餐信息

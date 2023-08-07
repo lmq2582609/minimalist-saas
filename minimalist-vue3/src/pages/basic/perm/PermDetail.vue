@@ -62,12 +62,6 @@ const form = reactive({
     //权限状态
     status: null,
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-}
 //加载权限数据
 const loadPermInfo = (permId) => {
     spinLoading.value = true
@@ -86,8 +80,6 @@ const loadPermInfo = (permId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //权限ID
     if (props.params.permId) {
         //查询数据

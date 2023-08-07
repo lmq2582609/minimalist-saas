@@ -34,12 +34,31 @@ export const operationType = {
     upload: {type: 'upload', success: '上传成功', error: '上传失败'}
 }
 
+/**
+ * 获取所有树中的父ID(只要有子集，就视为是父节点)
+ * @param allTree 树
+ * @param key 父ID的key名称
+ * @returns [] 父ID
+ */
+export const getAllTreeParentId = (allTree, key) => {
+    //所有父ID
+    let allId = []
+    const findAllTree = (arr) => {
+        arr.forEach(node => {
+            //如果包含子集，递归执行
+            if (node.children && node.children.length > 0) {
+                //有子集，放入返回结果
+                allId.push(node[key])
+                //递归
+                findAllTree(node.children)
+            }
+        })
+    }
+    findAllTree(allTree)
+    return allId
+}
 
-
-
-
-
-
+//0~9
 const characters = '0123456789';
 /**
  * 生成随机编码

@@ -58,13 +58,6 @@ const form = reactive({
     //套餐权限 -> 全勾选
     checkedPermIds: []
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-    form.checkedPermIds = []
-}
 //加载套餐详细信息
 const loadTenantPackageInfo = (packageId) => {
     spinLoading.value = true
@@ -97,8 +90,6 @@ const getPermTree = () => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //租户套餐ID
     if (props.params.packageId) {
         //查询数据

@@ -8,8 +8,8 @@ export const permType = {
 
 //权限状态
 export const permStatus = {
-    0: {key: 0, value: '禁用'},
-    1: {key: 1, value: '启用'}
+    disable: {key: 0, value: '禁用'},
+    enable: {key: 1, value: '启用'}
 }
 
 //添加权限

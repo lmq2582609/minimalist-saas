@@ -108,12 +108,6 @@ const okBtnClick = () => {
 const cancelBtnClick = () => {
     emits('cancel')
 }
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-}
 //加载部门详细信息
 const loadPostInfo = (postId) => {
     spinLoading.value = true
@@ -132,8 +126,6 @@ const loadPostInfo = (postId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //部门ID
     if (props.params.postId) {
         //加载部门信息

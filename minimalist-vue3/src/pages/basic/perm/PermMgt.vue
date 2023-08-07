@@ -65,6 +65,10 @@
                     <template #permIcon="{ record }">
                         <functional-icons :icon="record.permIcon" size="30"></functional-icons>
                     </template>
+                    <!-- 权限类型 -->
+                    <template #permType="{ record }">
+                        <dict-convert :dict-data="dicts[proxy.DICT.permType]" :dict-key="record.permType" />
+                    </template>
                     <!-- 状态数据转换 -->
                     <template #status="{ record }">
                         <dict-convert :dict-data="dicts[proxy.DICT.permStatus]" :dict-key="record.status" />
@@ -97,9 +101,9 @@
         </a-card>
 
         <!-- 添加/修改 -->
-        <a-modal v-model:visible="permModal.visible" width="50%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
-            <template #title>{{ permModal.title }}</template>
-            <component :is="permModal.component" :params="permModal.params" @ok="onOk" @cancel="onCancel"/>
+        <a-modal v-model:visible="modal.visible" width="50%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
+            <template #title>{{ modal.title }}</template>
+            <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
     </div>
 </template>
@@ -114,7 +118,7 @@ import {getPermListApi, deletePermByPermIdApi} from '~/api/perm'
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.permStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.permStatus, proxy.DICT.permType])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单
@@ -128,8 +132,9 @@ const searchForm = reactive({
 const datatable = reactive({
     //列配置
     columns: [
-        {title: '权限名称', dataIndex: 'permName', slotName: 'permName', align: 'left', width: 250, headerCellClass: 'w-[100%] flex justify-center'},
+        {title: '权限名称', dataIndex: 'permName', slotName: 'permName', align: 'left', width: 320, headerCellClass: 'w-[100%] flex justify-center'},
         {title: '权限图标', dataIndex: 'permIcon', slotName: 'permIcon', align: 'center', width: 100},
+        {title: '权限类型', dataIndex: 'permType', slotName: 'permType', align: 'center', width: 100},
         {title: '排序', dataIndex: 'permSort', align: 'center', width: 80},
         {title: '权限编码', dataIndex: 'permCode', align: 'center', ellipsis: true, tooltip: true},
         {title: '路由地址', dataIndex: 'permPath', align: 'center', ellipsis: true, tooltip: true},
@@ -143,7 +148,7 @@ const datatable = reactive({
     records: []
 })
 //公共模态框
-const permModal = reactive({
+const modal = reactive({
     //是否显示
     visible: false,
     //模态框标题
@@ -155,31 +160,31 @@ const permModal = reactive({
 });
 //添加按钮 -> 点击事件
 const addBtnClick = () => {
-    permModal.visible = true
-    permModal.title = '添加权限'
-    permModal.params = { operationType: proxy.operationType.add.type }
-    permModal.component = shallowRef(PermEdit)
+    modal.visible = true
+    modal.title = '添加权限'
+    modal.params = { operationType: proxy.operationType.add.type }
+    modal.component = shallowRef(PermEdit)
 }
 //表格行数据 "添加" -> 点击
 const addRowBtnClick = (record) => {
-    permModal.visible = true
-    permModal.title = '添加权限'
-    permModal.params = { operationType: proxy.operationType.add.type, parentPermId: record.permId }
-    permModal.component = shallowRef(PermEdit)
+    modal.visible = true
+    modal.title = '添加权限'
+    modal.params = { operationType: proxy.operationType.add.type, parentPermId: record.permId }
+    modal.component = shallowRef(PermEdit)
 }
 //表格行数据 "修改" -> 点击
 const updateBtnClick = (permId) => {
-    permModal.visible = true
-    permModal.title = '修改权限'
-    permModal.params = { operationType: proxy.operationType.update.type, permId: permId }
-    permModal.component = shallowRef(PermEdit)
+    modal.visible = true
+    modal.title = '修改权限'
+    modal.params = { operationType: proxy.operationType.update.type, permId: permId }
+    modal.component = shallowRef(PermEdit)
 }
 //表格行数据 "查看" -> 点击
 const detailBtnClick = (permId) => {
-    permModal.visible = true
-    permModal.title = '权限详细信息'
-    permModal.params = { operationType: proxy.operationType.detail.type, permId: permId }
-    permModal.component = shallowRef(PermDetail)
+    modal.visible = true
+    modal.title = '权限详细信息'
+    modal.params = { operationType: proxy.operationType.detail.type, permId: permId }
+    modal.component = shallowRef(PermDetail)
 }
 //表格行数据 "删除" -> 确认
 const deleteBtnOkClick = (record) => {
@@ -210,13 +215,13 @@ const getList = (isReset = false) => {
 }
 //模态框 -> 确认
 const onOk = () => {
-    permModal.visible = false
+    modal.visible = false
     //查询数据列表
     getList()
 }
 //模态框 -> 取消
 const onCancel = () => {
-    permModal.visible = false
+    modal.visible = false
 }
 
 //查询数据列表

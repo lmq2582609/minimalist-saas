@@ -62,13 +62,6 @@ const form = reactive({
     //角色权限 -> 全勾选
     checkedPermIds: []
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-    form.checkedPermIds = []
-}
 //加载角色详细信息
 const loadRoleInfo = (roleId) => {
     spinLoading.value = true
@@ -101,8 +94,6 @@ const getPermTree = () => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //角色ID
     if (props.params.roleId) {
         //查询数据

@@ -43,12 +43,6 @@ const form = reactive({
     //备注
     remark: null
 })
-//清空数据
-const clearForm = () => {
-    for (let key in form) {
-        form[key] = null
-    }
-}
 //加载岗位详细信息
 const loadPostInfo = (postId) => {
     spinLoading.value = true
@@ -67,8 +61,6 @@ const loadPostInfo = (postId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空数据
-    clearForm()
     //岗位ID
     if (props.params.postId) {
         //查询数据

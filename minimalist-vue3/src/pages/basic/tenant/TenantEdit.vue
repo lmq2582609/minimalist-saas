@@ -129,12 +129,6 @@ const okBtnClick = () => {
 const cancelBtnClick = () => {
     emits('cancel')
 }
-//清空表单
-const clearForm = () => {
-    if (formRef.value) {
-        formRef.value.resetFields()
-    }
-}
 //加载租户详细信息
 const loadTenantInfo = (tenantId) => {
     spinLoading.value = true
@@ -153,8 +147,6 @@ const loadTenantInfo = (tenantId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //清空表单
-    clearForm()
     //租户ID
     if (props.params.tenantId) {
         //加载租户信息

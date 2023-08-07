@@ -87,7 +87,7 @@
         <!-- 添加/修改 -->
         <a-modal v-model:visible="modal.visible" width="60%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
-            <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel"/>
+            <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
     </div>
 </template>
