@@ -16,7 +16,7 @@
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="expireTime" label="过期时间" required>
-                    <a-date-picker class="w-100" v-model="form.expireTime" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="过期时间" />
+                    <a-date-picker class="w-[100%]" v-model="form.expireTime" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="过期时间" />
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />

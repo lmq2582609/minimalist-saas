@@ -36,7 +36,7 @@
                     <a-input-number :min="0" v-model="form.noticeSort" placeholder="排序值" />
                 </a-form-item>
                 <a-form-item class="w-[33%]" field="noticeTimeInterval" label="延期发布" tooltip="表示想让此公告在何时发布，比如选择明天10点，则此公告将在明天10点发布。不选择将立即发布">
-                    <a-date-picker class="w-100" v-model="form.noticeTimeInterval" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="延期发布时间" />
+                    <a-date-picker class="w-[100%]" v-model="form.noticeTimeInterval" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="延期发布时间" />
                 </a-form-item>
                 <a-form-item class="w-[33%]" field="status" label="公告状态" required>
                     <a-select v-model="form.status" placeholder="公告状态" allow-clear>
