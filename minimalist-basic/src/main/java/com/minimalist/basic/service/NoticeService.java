@@ -1,10 +1,9 @@
 package com.minimalist.basic.service;
 
-
-import com.minimalist.basic.entity.mybatis.PageResp;
-import com.minimalist.basic.entity.mybatis.Pager;
 import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
 import com.minimalist.basic.entity.vo.notice.NoticeVO;
+import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.mybatis.bo.Pager;
 
 public interface NoticeService {
 

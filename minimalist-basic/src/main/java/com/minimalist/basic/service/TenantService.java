@@ -1,8 +1,8 @@
 package com.minimalist.basic.service;
 
-import com.minimalist.basic.entity.mybatis.PageResp;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
+import com.minimalist.common.mybatis.bo.PageResp;
 
 public interface TenantService {
 

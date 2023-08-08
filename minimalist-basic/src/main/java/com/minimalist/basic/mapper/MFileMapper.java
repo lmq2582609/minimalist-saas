@@ -4,10 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.config.mybatis.QueryCondition;
-import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.vo.file.FileQueryVO;
+import com.minimalist.common.mybatis.QueryCondition;
 
 import java.time.LocalDateTime;
 import java.util.List;

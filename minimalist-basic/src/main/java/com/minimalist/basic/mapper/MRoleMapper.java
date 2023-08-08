@@ -7,7 +7,8 @@ import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.po.MRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.common.mybatis.QueryCondition;
+
 import java.util.List;
 
 /**

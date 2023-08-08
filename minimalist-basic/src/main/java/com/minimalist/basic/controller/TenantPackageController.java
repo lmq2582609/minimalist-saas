@@ -1,11 +1,11 @@
 package com.minimalist.basic.controller;
 
-import com.minimalist.basic.entity.mybatis.PageResp;
-import com.minimalist.basic.entity.valid.Add;
-import com.minimalist.basic.entity.valid.Update;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.minimalist.basic.service.TenantPackageService;
+import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

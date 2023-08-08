@@ -11,6 +11,8 @@
 
     <modules>
         <module>minimalist-basic</module>
+        <module>minimalist-application</module>
+        <module>minimalist-common</module>
     </modules>
 
     <properties>
@@ -47,56 +49,6 @@
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
 
-    <dependencies>
-
-        <!-- lombok -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-
-        <!-- 参数校验 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-        </dependency>
-
-        <!-- spring-security -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-
-        <!-- hutool工具类 -->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-
-        <!-- https://mvnrepository.com/artifact/net.dreamlu/mica-xss -->
-        <dependency>
-            <groupId>net.dreamlu</groupId>
-            <artifactId>mica-xss</artifactId>
-            <version>${mica-xss.version}</version>
-        </dependency>
-
-        <!-- spring-boot-test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- TTL -->
-        <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>transmittable-thread-local</artifactId>
-            <version>${ttl.version}</version>
-        </dependency>
-
-    </dependencies>
-
     <dependencyManagement>
         <dependencies>
             <!-- springboot统一依赖管理 -->
@@ -124,7 +76,7 @@
                 </executions>
                 <configuration>
                     <!-- 打包指定启动类 -->
-                    <mainClass>com.minimalist.basic.MinimalistBasicApplication</mainClass>
+                    <mainClass>com.minimalist.application.MinimalistBasicApplication</mainClass>
                     <!-- 打包为可执行文件 -->
                     <classifier>exec</classifier>
                     <!-- 打包时忽略的包 -->

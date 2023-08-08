@@ -1,8 +1,8 @@
 package com.minimalist.basic.service;
 
-import com.minimalist.basic.entity.mybatis.PageResp;
 import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.entity.vo.user.*;
+import com.minimalist.common.mybatis.bo.PageResp;
 import org.springframework.stereotype.Service;
 
 @Service

@@ -2,7 +2,7 @@ package com.minimalist.basic.controller;
 
 import com.minimalist.basic.entity.vo.dict.*;
 import com.minimalist.basic.service.DictService;
-import com.minimalist.basic.entity.mybatis.PageResp;
+import com.minimalist.common.mybatis.bo.PageResp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

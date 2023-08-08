@@ -1,10 +1,10 @@
 package com.minimalist.basic.entity.vo.notice;
 
-import com.minimalist.basic.config.swagger.SchemaEnum;
 import com.minimalist.basic.entity.enums.NoticeEnum;
-import com.minimalist.basic.entity.mybatis.Pager;
-import com.minimalist.basic.entity.valid.Add;
-import com.minimalist.basic.entity.valid.Update;
+import com.minimalist.common.mybatis.bo.Pager;
+import com.minimalist.common.swagger.SchemaEnum;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

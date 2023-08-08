@@ -1,10 +1,10 @@
 package com.minimalist.basic.controller;
 
-import com.minimalist.basic.entity.valid.Add;
-import com.minimalist.basic.entity.valid.Update;
 import com.minimalist.basic.entity.vo.perm.PermQueryVO;
 import com.minimalist.basic.entity.vo.perm.PermVO;
 import com.minimalist.basic.service.PermService;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

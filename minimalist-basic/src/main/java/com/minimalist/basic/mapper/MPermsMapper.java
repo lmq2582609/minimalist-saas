@@ -2,11 +2,11 @@ package com.minimalist.basic.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.minimalist.basic.config.mybatis.QueryCondition;
 import com.minimalist.basic.entity.enums.PermEnum;
 import com.minimalist.basic.entity.po.MPerms;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.perm.PermQueryVO;
+import com.minimalist.common.mybatis.QueryCondition;
 
 import java.util.List;
 

@@ -1,10 +1,9 @@
 package com.minimalist.basic.entity.vo.perm;
 
 import com.minimalist.basic.entity.enums.PermEnum;
-import com.minimalist.basic.config.swagger.SchemaEnum;
+import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 

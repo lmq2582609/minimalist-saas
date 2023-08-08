@@ -1,9 +1,8 @@
 package com.minimalist.basic.entity.vo.dict;
 
-import com.minimalist.basic.entity.mybatis.Pager;
+import com.minimalist.common.mybatis.bo.Pager;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 

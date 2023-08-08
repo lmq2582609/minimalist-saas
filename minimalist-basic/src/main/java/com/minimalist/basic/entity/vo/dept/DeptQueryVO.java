@@ -1,7 +1,7 @@
 package com.minimalist.basic.entity.vo.dept;
 
 import com.minimalist.basic.entity.enums.DeptEnum;
-import com.minimalist.basic.config.swagger.SchemaEnum;
+import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;

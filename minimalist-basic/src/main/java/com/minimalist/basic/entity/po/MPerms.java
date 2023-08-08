@@ -3,7 +3,7 @@ package com.minimalist.basic.entity.po;
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.minimalist.basic.entity.mybatis.BaseEntity;
+import com.minimalist.common.mybatis.bo.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 

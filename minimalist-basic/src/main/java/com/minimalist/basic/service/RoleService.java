@@ -3,7 +3,7 @@ package com.minimalist.basic.service;
 import com.minimalist.basic.entity.po.MRole;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
 import com.minimalist.basic.entity.vo.role.RoleVO;
-import com.minimalist.basic.entity.mybatis.PageResp;
+import com.minimalist.common.mybatis.bo.PageResp;
 
 import java.util.List;
 

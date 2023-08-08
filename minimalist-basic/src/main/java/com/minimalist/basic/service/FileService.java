@@ -1,7 +1,8 @@
 package com.minimalist.basic.service;
 
-import com.minimalist.basic.entity.mybatis.PageResp;
 import com.minimalist.basic.entity.vo.file.*;
+import com.minimalist.common.mybatis.bo.PageResp;
+
 import java.util.List;
 
 public interface FileService {

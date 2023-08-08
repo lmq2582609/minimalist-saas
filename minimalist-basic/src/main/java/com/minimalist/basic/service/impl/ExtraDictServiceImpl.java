@@ -1,15 +1,13 @@
 package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
-import com.minimalist.basic.config.extraDict.ExtraDict;
-import com.minimalist.basic.config.extraDict.ExtraDictHandler;
-import com.minimalist.basic.config.tenant.IgnoreTenant;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.dict.DictCacheVO;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.ExtraDictService;
-import com.minimalist.basic.utils.SafetyUtil;
-import com.minimalist.basic.utils.SpringSecurityUtil;
+import com.minimalist.common.extraDict.ExtraDict;
+import com.minimalist.common.extraDict.ExtraDictHandler;
+import com.minimalist.common.tenant.IgnoreTenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;

@@ -1,12 +1,12 @@
 package com.minimalist.basic.controller;
 
-import com.minimalist.basic.config.tenant.IgnoreTenant;
-import com.minimalist.basic.entity.mybatis.PageResp;
 import com.minimalist.basic.entity.vo.user.*;
 import com.minimalist.basic.service.UserService;
-import com.minimalist.basic.utils.SpringSecurityUtil;
-import com.minimalist.basic.entity.valid.Add;
-import com.minimalist.basic.entity.valid.Update;
+import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.tenant.IgnoreTenant;
+import com.minimalist.common.utils.SpringSecurityUtil;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

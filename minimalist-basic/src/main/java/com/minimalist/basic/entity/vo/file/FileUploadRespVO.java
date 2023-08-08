@@ -2,7 +2,7 @@ package com.minimalist.basic.entity.vo.file;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.config.convert.FileSizeSerializer;
+import com.minimalist.common.convert.FileSizeSerializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;

@@ -6,10 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
-import com.minimalist.basic.entity.mybatis.PageResp;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
@@ -18,12 +15,14 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackageMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.service.TenantPackageService;
-import com.minimalist.basic.utils.SpringSecurityUtil;
-import com.minimalist.basic.utils.UnqIdUtil;
+import com.minimalist.common.enums.RespEnum;
+import com.minimalist.common.exception.BusinessException;
+import com.minimalist.common.mybatis.EntityService;
+import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service

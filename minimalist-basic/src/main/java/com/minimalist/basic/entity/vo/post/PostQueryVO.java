@@ -1,8 +1,8 @@
 package com.minimalist.basic.entity.vo.post;
 
 import com.minimalist.basic.entity.enums.PostEnum;
-import com.minimalist.basic.config.swagger.SchemaEnum;
-import com.minimalist.basic.entity.mybatis.Pager;
+import com.minimalist.common.mybatis.bo.Pager;
+import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;

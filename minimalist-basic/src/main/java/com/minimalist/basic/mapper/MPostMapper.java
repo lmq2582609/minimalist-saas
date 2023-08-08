@@ -7,7 +7,8 @@ import com.minimalist.basic.entity.enums.PostEnum;
 import com.minimalist.basic.entity.po.MPost;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.post.PostQueryVO;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.common.mybatis.QueryCondition;
+
 import java.util.List;
 
 /**

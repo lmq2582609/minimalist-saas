@@ -6,7 +6,8 @@ import com.minimalist.basic.entity.enums.DeptEnum;
 import com.minimalist.basic.entity.po.MDept;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.common.mybatis.QueryCondition;
+
 import java.util.List;
 
 /**

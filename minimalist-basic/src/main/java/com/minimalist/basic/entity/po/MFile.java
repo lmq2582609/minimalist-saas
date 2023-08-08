@@ -1,11 +1,8 @@
 package com.minimalist.basic.entity.po;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.minimalist.basic.entity.mybatis.BaseEntity;
-import java.io.Serializable;
+import com.minimalist.common.mybatis.bo.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -3,9 +3,9 @@ package com.minimalist.basic.controller;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
 import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.minimalist.basic.service.RoleService;
-import com.minimalist.basic.entity.valid.Add;
-import com.minimalist.basic.entity.mybatis.PageResp;
-import com.minimalist.basic.entity.valid.Update;
+import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,8 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Validated
 @RestController

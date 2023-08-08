@@ -1,12 +1,10 @@
 package com.minimalist.basic.controller;
 
-import com.minimalist.basic.config.swagger.SchemaEnum;
-import com.minimalist.basic.entity.enums.DeptEnum;
-import com.minimalist.basic.entity.valid.Add;
-import com.minimalist.basic.entity.valid.Update;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.service.DeptService;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;

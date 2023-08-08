@@ -2,7 +2,7 @@ package com.minimalist.basic.service;
 
 import com.minimalist.basic.entity.vo.post.PostQueryVO;
 import com.minimalist.basic.entity.vo.post.PostVO;
-import com.minimalist.basic.entity.mybatis.PageResp;
+import com.minimalist.common.mybatis.bo.PageResp;
 
 import java.util.List;
 
