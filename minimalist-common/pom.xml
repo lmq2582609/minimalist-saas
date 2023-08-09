@@ -91,12 +91,6 @@
             <artifactId>mica-xss</artifactId>
             <version>${mica-xss.version}</version>
         </dependency>
-        <!-- spring-boot-test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- TTL -->
         <dependency>
             <groupId>com.alibaba</groupId>
