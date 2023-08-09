@@ -47,7 +47,12 @@
             <artifactId>webp-imageio</artifactId>
             <version>0.2.2</version>
         </dependency>
-
+        <!-- spring-boot-test -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
