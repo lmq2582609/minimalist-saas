@@ -114,7 +114,6 @@ const logout = () => {
     logoutApi().then(res => {
         sysStore.userLogoutHandler()
         confirmModalVisible.value = false
-        proxy.$msg.success('退出成功')
         //跳转到登录页
         router.push('/login')
     })

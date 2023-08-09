@@ -1,9 +1,12 @@
 package com.minimalist.common.security;
 
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.minimalist.common.security.user.User;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.List;
@@ -16,6 +19,7 @@ public class SecurityUserDetails implements UserDetails {
      */
     private User user;
 
+    public SecurityUserDetails(){}
     public SecurityUserDetails(User user) {
         this.user = user;
     }
@@ -31,7 +35,22 @@ public class SecurityUserDetails implements UserDetails {
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return user.getGrantedAuthorities();
+        if (ObjectUtil.isNotNull(authorities)) {
+            return authorities;
+        }
+        //把"角色编码"和"权限编码"构建为GrantedAuthority对象存入authorities
+        List<GrantedAuthority> grantedAuthorityList = CollectionUtil.list(false);
+        if (CollectionUtil.isNotEmpty(user.getPerms())) {
+            user.getPerms().forEach(permCode -> {
+                grantedAuthorityList.add(new SimpleGrantedAuthority(permCode));
+            });
+        }
+        if (CollectionUtil.isNotEmpty(user.getRoles())) {
+            user.getRoles().forEach(roleCode -> {
+                grantedAuthorityList.add(new SimpleGrantedAuthority("ROLE_" + roleCode));
+            });
+        }
+        return grantedAuthorityList;
     }
 
     @Override

@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -66,10 +67,11 @@ public class SecurityServiceImpl implements UserDetailsService {
         long exHours = duration.toHours();
         Assert.isFalse(exHours <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.EX_TENANT.getDesc()));
         //构建用户权限
-        List<GrantedAuthority> grantedAuthorities = buildUserPermission(userService.getUserInfo(user.getUserId()));
+        UserInfoVO userInfo = userService.getUserInfo(user.getUserId());
         //封装UserDetails对象返回
         User userDetail = BeanUtil.copyProperties(user, User.class);
-        userDetail.setGrantedAuthorities(grantedAuthorities);
+        userDetail.setPerms(userInfo.getPerms());
+        userDetail.setRoles(userInfo.getRoles());
         return new SecurityUserDetails(userDetail);
     }
 

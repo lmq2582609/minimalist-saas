@@ -132,7 +132,7 @@ const editorRef = ref(null)
 const uploadRef = ref(null)
 //确定 -> 点击
 const okBtnClick = () => {
-    //公告封面图处理，多张图片URL逗号分割
+    //公告封面图处理，多张图片URL | 分割
     let noticePic = uploadRef.value.getUploadFileUrl()
     if (noticePic && noticePic.length > 0) {
         form.noticePic = noticePic.join("|")
