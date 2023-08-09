@@ -124,20 +124,15 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
-        //是否为管理员
-        boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
-        //不是管理员，添加用户需要校验额度
-        if (!isAdmin) {
-            //租户ID
-            Long tenantId = SpringSecurityUtil.getTenantId();
-            //查询租户
-            MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
-            Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
-            //查询该租户下的用户数量
-            long userCount = userMapper.selectUserCountByTenantId(tenantId);
-            Assert.isFalse(userCount >= mTenant.getAccountCount(),
-                    () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
-        }
+        //租户ID
+        Long tenantId = SpringSecurityUtil.getTenantId();
+        //查询租户
+        MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
+        Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
+        //查询该租户下的用户数量
+        long userCount = userMapper.selectUserCountByTenantId(tenantId);
+        Assert.isFalse(userCount >= mTenant.getAccountCount(),
+                () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
         //校验用户准确性
         checkUserAccuracy(null, userVO.getUsername(), userVO.getPhone(), userVO.getEmail());
         //拷贝
@@ -166,12 +161,8 @@ public class UserServiceImpl implements UserService {
         //查询用户
         MUser user = userMapper.selectUserByUserId(userId);
         Assert.notNull(user, () -> new UsernameNotFoundException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
-        //检查是否是管理员
-        boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
-        if (!isAdmin) {
-            //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
-            SafetyUtil.checkTenantIdIsTamperWithData(user.getTenantId());
-        }
+        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
+        SafetyUtil.checkTenantIdIsTamperWithData(user.getTenantId());
         //删除用户
         int deleteCount = userMapper.deleteUserByUserId(userId);
         Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
@@ -188,12 +179,8 @@ public class UserServiceImpl implements UserService {
     public void updateUserByUserId(UserVO userVO) {
         //校验用户数据准确性
         MUser user = checkUserAccuracy(userVO.getUserId(), userVO.getUsername(), userVO.getPhone(), userVO.getEmail());
-        //检查是否是管理员
-        boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
-        if (!isAdmin) {
-            //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
-            SafetyUtil.checkTenantIdIsTamperWithData(user.getTenantId());
-        }
+        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
+        SafetyUtil.checkTenantIdIsTamperWithData(user.getTenantId());
         //拷贝
         MUser newUser = BeanUtil.copyProperties(userVO, MUser.class);
         //是否需要修改密码

@@ -15,6 +15,7 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackageMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.service.TenantService;
+import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.bo.PageResp;
@@ -62,6 +63,7 @@ public class TenantServiceImpl implements TenantService {
      */
     @Override
     public void deleteTenantByTenantId(Long tenantId) {
+        Assert.isFalse(CommonConstant.ZERO == tenantId, () -> new BusinessException(TenantEnum.ErrorMsg.SYSTEM_TENANT.getDesc()));
         //根据租户ID查询租户
         MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));

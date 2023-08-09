@@ -15,6 +15,7 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackageMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.service.TenantPackageService;
+import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.EntityService;
@@ -71,6 +72,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
      */
     @Override
     public void deleteTenantPackageByTenantPackageId(Long tenantPackageId) {
+        Assert.isFalse(CommonConstant.ZERO == tenantPackageId, () -> new BusinessException(TenantEnum.ErrorMsg.SYSTEM_TENANT_PACKAGE.getDesc()));
         //查询租户套餐
         MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageId);
         Assert.notNull(mTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));

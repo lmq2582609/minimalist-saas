@@ -140,6 +140,7 @@ const loadTenantInfo = (tenantId) => {
                     form[key] = res[key]
                 }
             }
+            form.packageId = form.packageId === '0' ? Number(form.packageId) : String(form.packageId)
         }
     }).finally(() => {
         spinLoading.value = false

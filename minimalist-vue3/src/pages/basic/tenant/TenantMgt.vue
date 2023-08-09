@@ -63,7 +63,7 @@
                     </template>
                     <!-- 租户套餐 -->
                     <template #packageId="{ record }">
-                        <dict-convert :dict-data="dicts[proxy.DICT.tenantPackageList]" :dict-key="record.packageId" />
+                        <dict-convert :dict-data="dicts[proxy.DICT.tenantPackageList]" :dict-key="record.packageId === '0' ? Number(record.packageId) : String(record.packageId)" />
                     </template>
                     <!-- 租户状态 -->
                     <template #status="{ record }">
@@ -77,8 +77,8 @@
                             </template>
                             <template #default>修改</template>
                         </a-button>
-                        <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.tenantId)">
-                            <a-button type="text" status="danger" size="mini">
+                        <a-popconfirm content="删除租户会导致租户下的所有用户无法使用，确认要删除吗?" @ok="deleteBtnOkClick(record.tenantId)">
+                            <a-button type="text" status="danger" size="mini" v-if="record.tenantId !== '0'">
                                 <template #icon>
                                     <icon-delete />
                                 </template>

@@ -17,6 +17,8 @@ public class TenantEnum {
         TENANT_USER_COUNT_LIMIT("租户下可创建的用户数已达上限"),
         EX_TENANT("租户已过期，请联系管理员"),
         DISABLED_TENANT("租户已被禁用，请联系管理员"),
+        SYSTEM_TENANT("系统租户，不可删除"),
+        SYSTEM_TENANT_PACKAGE("系统租户套餐，不可删除"),
         ;
         private final String desc;
     }

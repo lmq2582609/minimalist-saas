@@ -156,7 +156,7 @@ const getPermTree = () => {
         //权限树数据赋值
         permTreeData.value = res
         //获取所有父permId
-        allParentPermId.value = getAllPermId(res, 'permId')
+        allParentPermId.value = getAllTreeParentId(res, 'permId')
     }).finally(() => {
         permTreeSpinLoading.value = false
     })
