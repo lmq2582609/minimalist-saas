@@ -21,8 +21,8 @@ public class FileEnum {
     @Getter
     @AllArgsConstructor
     public enum FileStatus {
-        NOTICE_STATUS_0(0, "未使用"),
-        NOTICE_STATUS_1(1, "已使用"),
+        FILE_STATUS_0(0, "未使用"),
+        FILE_STATUS_1(1, "已使用"),
         ;
         private final Integer code;
         private final String desc;

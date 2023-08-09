@@ -67,7 +67,7 @@ public class NoticeServiceImpl implements NoticeService {
         int insertCount = noticeMapper.insert(mNotice);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, noticeVO, FileEnum.FileStatus.NOTICE_STATUS_1.getCode().byteValue());
+        fileStatusHandler(null, noticeVO, FileEnum.FileStatus.FILE_STATUS_1.getCode().byteValue());
     }
 
     /**
@@ -81,7 +81,7 @@ public class NoticeServiceImpl implements NoticeService {
         MNotice mNotice = noticeMapper.selectNoticeByNoticeId(noticeId);
         Assert.notNull(mNotice, () -> new BusinessException(NoticeEnum.ErrorMsg.NONENTITY_NOTICE.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), FileEnum.FileStatus.NOTICE_STATUS_0.getCode().byteValue());
+        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), FileEnum.FileStatus.FILE_STATUS_0.getCode().byteValue());
         //删除公告
         int deleteCount = noticeMapper.deleteNoticeByNoticeId(noticeId);
         Assert.isTrue(deleteCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
@@ -239,7 +239,7 @@ public class NoticeServiceImpl implements NoticeService {
             }
             //将公告旧数据图片，更新为未使用
             if (CollectionUtil.isNotEmpty(oldImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), FileEnum.FileStatus.NOTICE_STATUS_0.getCode().byteValue(), oldImgUrlList);
+                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), FileEnum.FileStatus.FILE_STATUS_0.getCode().byteValue(), oldImgUrlList);
             }
             //公告新数据图片处理
             List<String> newImgUrlList = CollectionUtil.list(false);
@@ -255,7 +255,7 @@ public class NoticeServiceImpl implements NoticeService {
             }
             //将公告新数据图片，更新为已使用
             if (CollectionUtil.isNotEmpty(newImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), FileEnum.FileStatus.NOTICE_STATUS_1.getCode().byteValue(), newImgUrlList);
+                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), FileEnum.FileStatus.FILE_STATUS_1.getCode().byteValue(), newImgUrlList);
             }
         }
     }

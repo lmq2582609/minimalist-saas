@@ -81,7 +81,7 @@ public class FileServiceImpl implements FileService {
         MFile mFile = fileMapper.selectFileByFileId(fileId);
         Assert.notNull(mFile, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
         //文件已使用，不允许删除
-        Assert.isFalse(FileEnum.FileStatus.NOTICE_STATUS_1.getCode() == mFile.getStatus().intValue(),
+        Assert.isFalse(FileEnum.FileStatus.FILE_STATUS_1.getCode() == mFile.getStatus().intValue(),
                 () -> new BusinessException(FileEnum.ErrorMsg.FILE_USED.getDesc()));
         //文件信息
         FileInfo fileInfo = fileToFileInfo(mFile);
