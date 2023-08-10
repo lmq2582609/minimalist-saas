@@ -1,7 +1,7 @@
 package com.minimalist.common.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -51,6 +51,17 @@ public class TextUtil {
      */
     public static String decode(String text) {
         return URLUtil.decode(text);
+    }
+
+    /**
+     * 分割字符串，并使List<String>转为List<Long>
+     * @param str 字符串，逗号分割
+     * @return List<Long>
+     */
+    public static List<Long> splitAndListStrToListLong(String str) {
+        if (StrUtil.isBlank(str)) { return CollectionUtil.list(false); }
+        List<String> split = StrUtil.split(str, ",");
+        return split.stream().map(Long::parseLong).toList();
     }
 
 }

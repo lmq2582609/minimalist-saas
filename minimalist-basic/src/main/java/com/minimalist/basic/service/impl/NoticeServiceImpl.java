@@ -129,8 +129,7 @@ public class NoticeServiceImpl implements NoticeService {
         //汇总封面图文件ID
         List<Long> noticePicFileIdList = noticeVOS.stream().filter(n -> StrUtil.isNotBlank(n.getNoticePicFileId()))
                 .flatMap(n -> {
-                    List<String> picIdList = StrUtil.split(n.getNoticePicFileId(), ",");
-                    List<Long> fileIdList = picIdList.stream().map(Long::parseLong).toList();
+                    List<Long> fileIdList = TextUtil.splitAndListStrToListLong(n.getNoticePicFileId());
                     return Arrays.stream(fileIdList.toArray(Long[]::new));
                 }).toList();
         if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
@@ -143,8 +142,7 @@ public class NoticeServiceImpl implements NoticeService {
                 n.setNoticeContent(null);
                 //封面图文件处理
                 if (StrUtil.isNotBlank(n.getNoticePicFileId())) {
-                    List<String> picIdList = StrUtil.split(n.getNoticePicFileId(), ",");
-                    List<Long> fileIdList = picIdList.stream().map(Long::parseLong).toList();
+                    List<Long> fileIdList = TextUtil.splitAndListStrToListLong(n.getNoticePicFileId());
                     List<FileVO> fileVOList = CollectionUtil.list(false);
                     fileIdList.forEach(fileId -> {
                         if (fileMap.containsKey(fileId)) {
@@ -176,8 +174,7 @@ public class NoticeServiceImpl implements NoticeService {
         NoticeVO noticeVO = BeanUtil.copyProperties(mNotice, NoticeVO.class);
         //查询公告封面图
         if (StrUtil.isNotBlank(mNotice.getNoticePicFileId())) {
-            List<String> split = StrUtil.split(mNotice.getNoticePicFileId(), ",");
-            List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+            List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(mNotice.getNoticePicFileId());
             List<MFile> mFiles = fileMapper.selectFileByFileIds(noticePicFileIdList);
             List<FileVO> fileVOList = BeanUtil.copyToList(mFiles, FileVO.class);
             noticeVO.setNoticePicFile(fileVOList);
@@ -213,8 +210,7 @@ public class NoticeServiceImpl implements NoticeService {
             List<Long> fileIdList = CollectionUtil.list(false);
             //处理公告封面图片和富文本中的图片
             if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
-                List<String> split = StrUtil.split(newNotice.getNoticePicFileId(), ",");
-                List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+                List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(newNotice.getNoticePicFileId());
                 fileIdList.addAll(noticePicFileIdList);
             }
             //将公告封面图片的状态置为已使用
@@ -231,8 +227,7 @@ public class NoticeServiceImpl implements NoticeService {
             List<Long> oldNoticePicFileIdList = CollectionUtil.list(false);
             //旧公告所使用的封面图
             if (StrUtil.isNotBlank(oldNotice.getNoticePicFileId())) {
-                List<String> split = StrUtil.split(oldNotice.getNoticePicFileId(), ",");
-                List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+                List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(oldNotice.getNoticePicFileId());
                 oldNoticePicFileIdList.addAll(noticePicFileIdList);
             }
             //将旧公告封面图的状态置为未使用
@@ -248,8 +243,7 @@ public class NoticeServiceImpl implements NoticeService {
             //新公告封面图片文件ID
             List<Long> newNoticePicIdList = CollectionUtil.list(false);
             if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
-                List<String> split = StrUtil.split(newNotice.getNoticePicFileId(), ",");
-                List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+                List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(newNotice.getNoticePicFileId());
                 newNoticePicIdList.addAll(noticePicFileIdList);
             }
             //将新公告封面图的状态置为已使用
