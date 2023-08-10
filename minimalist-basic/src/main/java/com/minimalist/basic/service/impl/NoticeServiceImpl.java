@@ -67,7 +67,7 @@ public class NoticeServiceImpl implements NoticeService {
         int insertCount = noticeMapper.insert(mNotice);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, noticeVO, FileEnum.FileStatus.FILE_STATUS_1.getCode().byteValue());
+        fileStatusHandler(null, noticeVO, FileEnum.FileStatus.FILE_STATUS_1.getCode());
     }
 
     /**
@@ -81,7 +81,7 @@ public class NoticeServiceImpl implements NoticeService {
         MNotice mNotice = noticeMapper.selectNoticeByNoticeId(noticeId);
         Assert.notNull(mNotice, () -> new BusinessException(NoticeEnum.ErrorMsg.NONENTITY_NOTICE.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), FileEnum.FileStatus.FILE_STATUS_0.getCode().byteValue());
+        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), FileEnum.FileStatus.FILE_STATUS_0.getCode());
         //删除公告
         int deleteCount = noticeMapper.deleteNoticeByNoticeId(noticeId);
         Assert.isTrue(deleteCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
@@ -126,27 +126,29 @@ public class NoticeServiceImpl implements NoticeService {
         Page<MNotice> mNoticePage = noticeMapper.selectPageNoticeList(queryVO);
         //数据转换
         List<NoticeVO> noticeVOS = BeanUtil.copyToList(mNoticePage.getRecords(), NoticeVO.class);
-        //汇总封面图URL
-        List<String> urlList = noticeVOS.stream().filter(n -> StrUtil.isNotBlank(n.getNoticePic()))
+        //汇总封面图文件ID
+        List<Long> noticePicFileIdList = noticeVOS.stream().filter(n -> StrUtil.isNotBlank(n.getNoticePicFileId()))
                 .flatMap(n -> {
-                    List<String> picUrlList = StrUtil.split(n.getNoticePic(), "|");
-                    return Arrays.stream(picUrlList.toArray(String[]::new));
+                    List<String> picIdList = StrUtil.split(n.getNoticePicFileId(), ",");
+                    List<Long> fileIdList = picIdList.stream().map(Long::parseLong).toList();
+                    return Arrays.stream(fileIdList.toArray(Long[]::new));
                 }).toList();
-        if (CollectionUtil.isNotEmpty(urlList)) {
-            //根据url查询文件
-            List<MFile> fileList = fileMapper.selectFileByFileUrl(urlList);
-            //将文件按照URL转Map，key：url，value：文件实体
-            Map<String, MFile> fileMap = fileList.stream().collect(Collectors.toMap(MFile::getFileUrl, Function.identity(), (v1, v2) -> v1));
+        if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
+            //根据文件ID查询文件
+            List<MFile> fileList = fileMapper.selectFileByFileIds(noticePicFileIdList);
+            //将文件按照URL转Map，key：文件ID，value：文件实体
+            Map<Long, MFile> fileMap = fileList.stream().collect(Collectors.toMap(MFile::getFileId, Function.identity(), (v1, v2) -> v1));
             noticeVOS.forEach(n -> {
                 //内容清空
                 n.setNoticeContent(null);
                 //封面图文件处理
-                if (StrUtil.isNotBlank(n.getNoticePic())) {
-                    List<String> picUrlList = StrUtil.split(n.getNoticePic(), "|");
+                if (StrUtil.isNotBlank(n.getNoticePicFileId())) {
+                    List<String> picIdList = StrUtil.split(n.getNoticePicFileId(), ",");
+                    List<Long> fileIdList = picIdList.stream().map(Long::parseLong).toList();
                     List<FileVO> fileVOList = CollectionUtil.list(false);
-                    picUrlList.forEach(picUrl -> {
-                        if (fileMap.containsKey(picUrl)) {
-                            MFile mFile = fileMap.get(picUrl);
+                    fileIdList.forEach(fileId -> {
+                        if (fileMap.containsKey(fileId)) {
+                            MFile mFile = fileMap.get(fileId);
                             fileVOList.add(BeanUtil.copyProperties(mFile, FileVO.class));
                         }
                     });
@@ -172,14 +174,13 @@ public class NoticeServiceImpl implements NoticeService {
         //内容 -> 解码
         mNotice.setNoticeContent(TextUtil.decode(mNotice.getNoticeContent()));
         NoticeVO noticeVO = BeanUtil.copyProperties(mNotice, NoticeVO.class);
-        //封面图
-        if (StrUtil.isNotBlank(mNotice.getNoticePic())) {
-            //封面图URL
-            List<String> urlList = StrUtil.split(mNotice.getNoticePic(), "|");
-            //根据url查询文件
-            List<MFile> fileList = fileMapper.selectFileByFileUrl(urlList);
-            //封面图文件信息
-            noticeVO.setNoticePicFile(BeanUtil.copyToList(fileList, FileVO.class));
+        //查询公告封面图
+        if (StrUtil.isNotBlank(mNotice.getNoticePicFileId())) {
+            List<String> split = StrUtil.split(mNotice.getNoticePicFileId(), ",");
+            List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+            List<MFile> mFiles = fileMapper.selectFileByFileIds(noticePicFileIdList);
+            List<FileVO> fileVOList = BeanUtil.copyToList(mFiles, FileVO.class);
+            noticeVO.setNoticePicFile(fileVOList);
         }
         return noticeVO;
     }
@@ -201,61 +202,64 @@ public class NoticeServiceImpl implements NoticeService {
 
     /**
      * 修改公告相关的文件信息
-     * @param mNotice 公告信息(旧)
-     * @param noticeVO 公告信息(新)
+     * @param oldNotice 公告信息(旧)
+     * @param newNotice 公告信息(新)
+     * @param fileStatus 文件状态
      */
-    private void fileStatusHandler(MNotice mNotice, NoticeVO noticeVO, Byte status) {
+    private void fileStatusHandler(MNotice oldNotice, NoticeVO newNotice, Integer fileStatus) {
         //公告插入、删除的文件处理
-        if (ObjectUtil.isNull(mNotice)) {
-            //图片URL
-            List<String> urlList = CollectionUtil.list(false);
-            //处理公告封面图片和富文本中的图片，将这些图片的状态置为已使用
-            if (StrUtil.isNotBlank(noticeVO.getNoticePic())) {
-                //图片URL
-                urlList.addAll(StrUtil.split(noticeVO.getNoticePic(), "|"));
+        if (ObjectUtil.isNull(oldNotice)) {
+            //图片文件ID
+            List<Long> fileIdList = CollectionUtil.list(false);
+            //处理公告封面图片和富文本中的图片
+            if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
+                List<String> split = StrUtil.split(newNotice.getNoticePicFileId(), ",");
+                List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+                fileIdList.addAll(noticePicFileIdList);
             }
-            //处理富文本编辑器中的图片
-            String decodeOldContent = TextUtil.decode(noticeVO.getNoticeContent());
+            //将公告封面图片的状态置为已使用
+            fileMapper.updateFileStatusByFileIds(SpringSecurityUtil.getUserId(), fileIdList, fileStatus);
+            //处理富文本编辑器中的图片，富文本内容解码
+            String decodeOldContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> imgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
             if (CollectionUtil.isNotEmpty(imgUrlList)) {
-                urlList.addAll(imgUrlList);
-            }
-            //将数据库中的status更新成已使用
-            if (CollectionUtil.isNotEmpty(urlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), status, urlList);
+                //将富文本中的图片的状态置为已使用
+                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), imgUrlList, fileStatus);
             }
         } else {
-            //公告修改的文件处理，判断封面图是否有变化，判断富文本内容中的图片是否有变化
-            List<String> oldImgUrlList = CollectionUtil.list(false);
-            //更新前 -> 公告所使用的封面图
-            if (StrUtil.isNotBlank(mNotice.getNoticePic())) {
-                oldImgUrlList.addAll(StrUtil.split(mNotice.getNoticePic(), "|"));
+            //旧公告封面图片文件ID
+            List<Long> oldNoticePicFileIdList = CollectionUtil.list(false);
+            //旧公告所使用的封面图
+            if (StrUtil.isNotBlank(oldNotice.getNoticePicFileId())) {
+                List<String> split = StrUtil.split(oldNotice.getNoticePicFileId(), ",");
+                List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+                oldNoticePicFileIdList.addAll(noticePicFileIdList);
             }
-            //更新前 -> 公告富文本内容所使用的图片
-            String decodeOldContent = TextUtil.decode(mNotice.getNoticeContent());
+            //将旧公告封面图的状态置为未使用
+            fileMapper.updateFileStatusByFileIds(SpringSecurityUtil.getUserId(), oldNoticePicFileIdList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
+            //旧公告富文本中的图片
+            String decodeOldContent = TextUtil.decode(oldNotice.getNoticeContent());
             List<String> oldContentImgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
+            //将旧公告富文本中的图片状态置为未使用
             if (CollectionUtil.isNotEmpty(oldContentImgUrlList)) {
-                oldImgUrlList.addAll(oldContentImgUrlList);
+                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), oldContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
             }
-            //将公告旧数据图片，更新为未使用
-            if (CollectionUtil.isNotEmpty(oldImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), FileEnum.FileStatus.FILE_STATUS_0.getCode().byteValue(), oldImgUrlList);
+
+            //新公告封面图片文件ID
+            List<Long> newNoticePicIdList = CollectionUtil.list(false);
+            if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
+                List<String> split = StrUtil.split(newNotice.getNoticePicFileId(), ",");
+                List<Long> noticePicFileIdList = split.stream().map(Long::parseLong).toList();
+                newNoticePicIdList.addAll(noticePicFileIdList);
             }
-            //公告新数据图片处理
-            List<String> newImgUrlList = CollectionUtil.list(false);
-            //更新后 -> 公告所使用的封面图
-            if (StrUtil.isNotBlank(noticeVO.getNoticePic())) {
-                newImgUrlList.addAll(StrUtil.split(noticeVO.getNoticePic(), "|"));
-            }
-            //更新后 -> 公告富文本内容所使用的图片
-            String decodeNewContent = TextUtil.decode(noticeVO.getNoticeContent());
+            //将新公告封面图的状态置为已使用
+            fileMapper.updateFileStatusByFileIds(SpringSecurityUtil.getUserId(), newNoticePicIdList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
+            //新公告富文本中的图片
+            String decodeNewContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> newContentImgUrlList = TextUtil.getImgUrlByRichText(decodeNewContent);
+            //将新公告富文本中的图片状态置为已使用
             if (CollectionUtil.isNotEmpty(newContentImgUrlList)) {
-                newImgUrlList.addAll(newContentImgUrlList);
-            }
-            //将公告新数据图片，更新为已使用
-            if (CollectionUtil.isNotEmpty(newImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), FileEnum.FileStatus.FILE_STATUS_1.getCode().byteValue(), newImgUrlList);
+                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), newContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
             }
         }
     }

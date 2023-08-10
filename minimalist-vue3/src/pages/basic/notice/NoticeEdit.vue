@@ -43,7 +43,7 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.noticeStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[100%]" field="noticePic" label="公告封面图">
+                <a-form-item class="w-[100%]" field="noticePicFileId" label="公告封面图">
                     <upload-file :file-list="noticePicList" :file-source="fileSource.notice_cover_img.key" :accept="fileAccept.img" :multiple="true" :list-type="fileListType.pictureCard" :limit="5" ref="uploadRef" />
                 </a-form-item>
                 <a-form-item class="w-[100%]" field="noticeContent" label="公告内容" required>
@@ -100,7 +100,7 @@ const form = reactive({
     //系统公告内容
     noticeContent: null,
     //公告封面图
-    noticePic: null,
+    noticePicFileId: null,
     //是否置顶 -> 默认否
     noticeTop: proxy.yesNo.no.key,
     //延期发布时间
@@ -132,11 +132,8 @@ const editorRef = ref(null)
 const uploadRef = ref(null)
 //确定 -> 点击
 const okBtnClick = () => {
-    //公告封面图处理，多张图片URL | 分割
-    let noticePic = uploadRef.value.getUploadFileUrl()
-    if (noticePic && noticePic.length > 0) {
-        form.noticePic = noticePic.join("|")
-    }
+    //公告封面图
+    form.noticePicFileId = uploadRef.value.getUploadFileId()
     //获取富文本数据
     form.noticeContent = editorRef.value.getEditorContent()
     //表单验证
@@ -184,11 +181,13 @@ const loadNoticeInfo = (noticeId) => {
             //富文本内容
             editorRef.value.setEditorContent(res.noticeContent)
             //封面图回显
-            if (res.noticePic) {
-                let noticeArr = res.noticePic.split('|')
-                for (let i = 0; i < noticeArr.length; i++) {
+            if (res.noticePicFile && res.noticePicFile.length > 0) {
+                let noticePicFile = res.noticePicFile
+                for (let i = 0; i < noticePicFile.length; i++) {
+                    let file = noticePicFile[i]
                     noticePicList.value.push({
-                        url: noticeArr[i]
+                        url: file.fileUrl,
+                        response: file
                     })
                 }
             }

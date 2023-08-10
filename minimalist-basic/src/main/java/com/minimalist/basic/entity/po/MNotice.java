@@ -46,10 +46,10 @@ public class MNotice extends BaseEntity {
     private String noticeContent;
 
     /**
-     * 公告封面图地址
+     * 公告封面图文件ID，多张 , 分割
      */
-    @TableField("notice_pic")
-    private String noticePic;
+    @TableField("notice_pic_file_id")
+    private String noticePicFileId;
 
     /**
      * 是否置顶

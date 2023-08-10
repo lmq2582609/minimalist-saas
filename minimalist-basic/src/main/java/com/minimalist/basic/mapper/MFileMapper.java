@@ -28,9 +28,9 @@ public interface MFileMapper extends BaseMapper<MFile> {
      * @param urlList 文件url列表
      * @return 受影响行数
      */
-    default int updateStatusByFileUrl(Long userId, Byte status, List<String> urlList) {
+    default int updateStatusByFileUrl(Long userId, List<String> urlList, Integer status) {
         MFile file = new MFile();
-        file.setStatus(status);
+        file.setStatus(status.byteValue());
         file.setUpdateId(userId);
         file.setUpdateTime(LocalDateTime.now());
         return update(file, new LambdaUpdateWrapper<MFile>().in(MFile::getFileUrl, urlList));
@@ -66,6 +66,29 @@ public interface MFileMapper extends BaseMapper<MFile> {
      */
     default List<MFile> selectFileByFileUrl(List<String> urlList) {
         return selectList(new LambdaQueryWrapper<MFile>().in(MFile::getFileUrl, urlList));
+    }
+
+    /**
+     * 根据文件UID查询文件
+     * @param fileIdList 文件ID列表
+     * @return 文件列表
+     */
+    default List<MFile> selectFileByFileIds(List<Long> fileIdList) {
+        return selectList(new LambdaQueryWrapper<MFile>().in(MFile::getFileId, fileIdList));
+    }
+
+    /**
+     * 根据文件ID修改文件状态
+     * @param fileIdList 文件ID列表
+     * @param fileStatus 文件状态
+     * @return 受影响行数
+     */
+    default int updateFileStatusByFileIds(Long userId, List<Long> fileIdList, Integer fileStatus) {
+        MFile file = new MFile();
+        file.setStatus(fileStatus.byteValue());
+        file.setUpdateId(userId);
+        file.setUpdateTime(LocalDateTime.now());
+        return update(file, new LambdaUpdateWrapper<MFile>().in(MFile::getFileId, fileIdList));
     }
 
 }

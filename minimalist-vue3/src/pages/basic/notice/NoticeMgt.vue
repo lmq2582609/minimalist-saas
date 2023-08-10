@@ -79,7 +79,7 @@
                         <dict-convert :dict-data="dicts[proxy.DICT.deptList]" :dict-key="record.publishDeptId" />
                     </template>
                     <!-- 封面图 -->
-                    <template #noticePic="{ record }">
+                    <template #noticePicFile="{ record }">
                         <template v-if="record.noticePicFile && record.noticePicFile.length > 0">
                             <a-carousel :style="{width: '100%', height: '100px'}" :indicator-type="'never'">
                                 <a-carousel-item v-for="picFile in record.noticePicFile">
@@ -170,7 +170,7 @@ const datatable = reactive({
         {title: '公告类型', dataIndex: 'noticeType', slotName: 'noticeType', align: 'center', width: 100},
         {title: '发布人', dataIndex: 'publishAuthorId', slotName: 'publishAuthorId', align: 'center', width: 100},
         {title: '发布部门', dataIndex: 'publishDeptId', slotName: 'publishDeptId', align: 'center', width: 150, ellipsis: true, tooltip: true},
-        {title: '封面图', dataIndex: 'noticePic', slotName: 'noticePic', align: 'center', width: 200},
+        {title: '封面图', dataIndex: 'noticePicFile', slotName: 'noticePicFile', align: 'center', width: 200},
         {title: '是否置顶', dataIndex: 'noticeTop', slotName: 'noticeTop', align: 'center', width: 90},
         {title: '排序', dataIndex: 'noticeSort', align: 'center', width: 90},
         {title: '是否外链', dataIndex: 'noticeOutChain', slotName: 'noticeOutChain', align: 'center', width: 90},

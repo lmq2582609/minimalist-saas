@@ -44,10 +44,10 @@ public class NoticeVO implements Serializable {
     @Schema(name = "noticeContent", description = "公告内容", type = "string")
     private String noticeContent;
 
-    @Schema(name = "noticePic", description = "公告封面图地址，使用 | 分割", type = "string")
-    private String noticePic;
+    @Schema(name = "noticePicFileId", description = "公告封面图文件ID，多张 , 分割", type = "string")
+    private String noticePicFileId;
 
-    @Schema(name = "noticePicFile", description = "公告封面图文件信息", type = "array")
+    @Schema(name = "noticePicFile", description = "公告封面图文件信息，返回数据时填充该数据", type = "array")
     private List<FileVO> noticePicFile;
 
     @Schema(name = "noticeTop", description = "是否置顶", type = "string")

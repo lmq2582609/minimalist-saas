@@ -35,7 +35,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, watch, onMounted} from 'vue'
+import { ref, reactive, getCurrentInstance, watch } from 'vue'
 import { addPostApi, updatePostByPostIdApi, getPostByPostIdApi } from "~/api/post.js";
 
 //全局实例

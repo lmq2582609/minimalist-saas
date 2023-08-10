@@ -36,10 +36,10 @@
             </div>
             <div class="flex items-center justify-center">
                 封面图：
-                <template v-if="form.noticePic">
+                <template v-if="form.noticePicFile">
                     <a-image-preview-group infinite>
                         <a-space>
-                            <a-image v-for="(image, index) in form.noticePic.split('|')" :key="index" :src="image" width="200" class="cursor-pointer" />
+                            <a-image v-for="(image, index) in form.noticePicFile" :key="index" :src="image.fileUrl" width="200" class="cursor-pointer" />
                         </a-space>
                     </a-image-preview-group>
                 </template>
@@ -82,7 +82,7 @@ const form = reactive({
     //系统公告内容
     noticeContent: null,
     //公告封面图
-    noticePic: null,
+    noticePicFile: null,
     //是否置顶
     noticeTop: null,
     //排序值

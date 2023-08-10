@@ -8,7 +8,7 @@
 
 <script setup>
 //封面图
-import {getCurrentInstance, ref, watch} from "vue";
+import {getCurrentInstance, ref, watch, onMounted } from "vue";
 import { uploadFileApi } from "~/api/file.js";
 
 //全局实例
@@ -69,23 +69,19 @@ const customUploadFile = (option) => {
         proxy.$msg.error(proxy.operationType.upload.error)
     })
 }
-//获取上传文件的url
-const getUploadFileUrl = () => {
-    let uploadFileUrl = []
+//获取上传文件的ID，逗号分割
+const getUploadFileId = () => {
+    let uploadFileId = []
     //上传的文件有response属性，回显的图片只有url
     let fl = fileList.value
     for (let i = 0; i < fl.length; i++) {
-        //从response中取原始图片url
-        if (fl[i].response) {
-            uploadFileUrl.push(fl[i].response.fileUrl)
-        } else {
-            uploadFileUrl.push(fl[i].url)
-        }
+        //从response中取文件ID
+        uploadFileId.push(fl[i].response.fileId)
     }
-    return uploadFileUrl
+    return uploadFileId.join(",")
 }
 //暴露子组件
-defineExpose({getUploadFileUrl})
+defineExpose({getUploadFileId})
 //监听参数变化
 watch(() => props.fileList, (newVal, oldVal) => {
     //先清空文件列表
