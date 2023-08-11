@@ -25,20 +25,16 @@ public class IgnoreTenantAspect {
         if (ObjectUtil.isNull(it)) {
             return joinPoint.proceed();
         }
-        //是否为 系统租户
         boolean checkAdmin = it.checkAdmin();
+        //需要校验是否为 系统租户
         if (checkAdmin) {
-            //是系统租户，则忽略租户查询条件
+            //是系统租户，查询全部数据
             boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
-            if (isAdmin) {
-                SafetyUtil.setIgnoreTenant(true);
-            } else {
-                //不是系统租户，不忽略租户查询条件
-                SafetyUtil.setIgnoreTenant(false);
-            }
+            //不是系统租户，按租户查询
+            SafetyUtil.setIgnoreTenant(!isAdmin);
         } else {
-            //不忽略租户查询条件
-            SafetyUtil.setIgnoreTenant(false);
+            //忽略租户查询条件
+            SafetyUtil.setIgnoreTenant(true);
         }
         try {
             return joinPoint.proceed();

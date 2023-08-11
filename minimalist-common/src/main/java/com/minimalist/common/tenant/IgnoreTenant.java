@@ -13,8 +13,8 @@ public @interface IgnoreTenant {
 
     /**
      * 是否做管理员校验，默认false
-     * true时：如果有方法上加了该注解，并且设置为true，查询时不会添加租户查询条件(tenant_id = ?)
-     * false时：如果有方法加了该注解，不设置默认为false，查询时添加租户查询条件(tenant_id = ?)
+     * true时：如果有方法上加了该注解，并且设置为true，查询时会校验，如果为管理员查询全部数据，如果不是管理员，按租户查询
+     * false时：如果有方法加了该注解，默认为false，查询时会跳过租户查询条件
      */
     boolean checkAdmin() default false;
 
