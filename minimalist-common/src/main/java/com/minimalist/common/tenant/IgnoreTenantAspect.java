@@ -25,12 +25,25 @@ public class IgnoreTenantAspect {
         if (ObjectUtil.isNull(it)) {
             return joinPoint.proceed();
         }
-        //有@IgnoreTenant注解，忽略多租户
-        SafetyUtil.setIgnoreTenant(true);
+        //是否为 系统租户
+        boolean checkAdmin = it.checkAdmin();
+        if (checkAdmin) {
+            //是系统租户，则忽略租户查询条件
+            boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
+            if (isAdmin) {
+                SafetyUtil.setIgnoreTenant(true);
+            } else {
+                //不是系统租户，不忽略租户查询条件
+                SafetyUtil.setIgnoreTenant(false);
+            }
+        } else {
+            //不忽略租户查询条件
+            SafetyUtil.setIgnoreTenant(false);
+        }
         try {
             return joinPoint.proceed();
         } finally {
-            //清除忽略多租户
+            //清除
             SafetyUtil.clearIgnoreTenant();
         }
     }

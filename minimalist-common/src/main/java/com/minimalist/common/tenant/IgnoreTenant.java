@@ -10,4 +10,12 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface IgnoreTenant {
+
+    /**
+     * 是否做管理员校验，默认false
+     * true时：如果有方法上加了该注解，并且设置为true，查询时不会添加租户查询条件(tenant_id = ?)
+     * false时：如果有方法加了该注解，不设置默认为false，查询时添加租户查询条件(tenant_id = ?)
+     */
+    boolean checkAdmin() default false;
+
 }
