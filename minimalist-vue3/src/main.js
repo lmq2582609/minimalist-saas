@@ -7,7 +7,7 @@ import ArcoVueIcon from '@arco-design/web-vue/es/icon';
 import App from './App.vue'
 import Router from './router'
 import Msg from '~/utils/msg'
-import { randomCode, operationType, yesNo } from '~/utils/sys'
+import { randomCode, operationType, yesNo, hasPerm, hasRole } from '~/utils/sys'
 import { LoadDicts, DICT } from '~/utils/dict'
 import DictValue from '~/components/dictValue/index.vue'
 import Pagination from '~/components/pagination/index.vue'
@@ -29,7 +29,11 @@ app.config.globalProperties = {
     //字典枚举
     DICT: DICT,
     //加载字典
-    LoadDicts: LoadDicts
+    LoadDicts: LoadDicts,
+    //权限校验
+    hasPerm: hasPerm,
+    //角色校验
+    hasRole: hasRole
 }
 
 //状态管理
