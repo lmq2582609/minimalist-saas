@@ -1,4 +1,8 @@
+import pinia from '../store'
+import { useSysStore } from '../store/module/sys-store.js'
 
+//缓存
+const sysStore = useSysStore(pinia)
 //全局 - '是/否' 枚举
 export const yesNo = {
     yes: {key: true, value: '是'},
@@ -71,4 +75,40 @@ export const randomCode = (length) => {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
+}
+
+/**
+ * 检查权限，不止按照权限标识检查，若 userIdArr 中任意数据与当前登录用户一致，则放行
+ * @param permArr 权限标识数组
+ * @param userIdArr 放行的用户ID
+ */
+export const hasPerm = (permArr = [], userIdArr = []) => {
+    //当前登录用户ID
+    let currentLoginUserId = sysStore.user.userId
+    //当前用户如果是系统租户，则放行
+    if (currentLoginUserId === '0') { return true }
+    //传入的用户ID，与当前登录用户一致，则放行
+    let checkUser = userIdArr.includes(currentLoginUserId)
+    if (checkUser) { return true }
+    //当前登录用户权限列表
+    let perms = sysStore.user.perms
+    return permArr.some(elem => perms.includes(elem))
+}
+
+/**
+ * 检查角色，不止按照角色标识检查，若 userIdArr 中任意数据与当前登录用户一致，则放行
+ * @param roleArr 角色标识数组
+ * @param userIdArr 放行的用户ID
+ */
+export const hasRole = (roleArr = [], userIdArr = []) => {
+    //当前登录用户ID
+    let currentLoginUserId = sysStore.user.userId
+    //当前用户如果是系统租户，则放行
+    if (currentLoginUserId === '0') { return true }
+    //传入的用户ID，与当前登录用户一致，则放行
+    let checkUser = userIdArr.includes(currentLoginUserId)
+    if (checkUser) { return true }
+    //当前登录用户角色列表
+    let roles = sysStore.user.roles
+    return roleArr.some(elem => roles.includes(elem))
 }
