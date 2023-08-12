@@ -2,6 +2,7 @@ package com.minimalist.application.config;
 
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.enums.RespEnum;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.core.NestedExceptionUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -90,6 +92,15 @@ public class GlobalExceptionHandler {
         } else {
             return exception(e);
         }
+    }
+
+    /**
+     * 权限校验异常
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
+        log.warn(RespEnum.NO_OPERATION_PERMISSION.getDesc() + "：" + request.getRequestURI() + "，异常信息：" + e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(RespEnum.NO_OPERATION_PERMISSION.getDesc());
     }
 
     /**
