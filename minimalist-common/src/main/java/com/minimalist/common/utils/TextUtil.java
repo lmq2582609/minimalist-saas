@@ -2,7 +2,7 @@ package com.minimalist.common.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
+import cn.hutool.http.HtmlUtil;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,7 +41,7 @@ public class TextUtil {
      * @return 编码后的内容
      */
     public static String encode(String text) {
-        return URLUtil.encode(text);
+        return HtmlUtil.escape(text);
     }
 
     /**
@@ -50,7 +50,7 @@ public class TextUtil {
      * @return 解码后的内容
      */
     public static String decode(String text) {
-        return URLUtil.decode(text);
+        return HtmlUtil.unescape(text);
     }
 
     /**
