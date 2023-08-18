@@ -4,8 +4,11 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.minimalist.common.entity.BeanMethod;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -14,7 +17,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class ExtraDictHandler implements BeanPostProcessor {
+public class ExtraDictHandler {
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     /** 存储额外字典数据处理的方法 */
     public static final Map<String, BeanMethod<?>> dictMethodMap = MapUtil.newConcurrentHashMap();
@@ -37,13 +43,22 @@ public class ExtraDictHandler implements BeanPostProcessor {
     /** 租户套餐字典type */
     public static final String TENANT_PACKAGE_LIST = "tenant-package-list";
 
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        return bean;
+    @PostConstruct
+    public void init() {
+        //当前类名称
+        String currentClassName = getClass().getSimpleName().toLowerCase();
+        //获取beanDefinitionName
+        String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
+        //getBean，找到含有额外字典处理的注解方法
+        for (String beanDefinitionName : beanDefinitionNames) {
+            if (!currentClassName.equals(beanDefinitionName.toLowerCase())) {
+                Object bean = applicationContext.getBean(beanDefinitionName);
+                postProcessAfterInitialization(bean);
+            }
+        }
     }
 
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    public void postProcessAfterInitialization(Object bean) {
         //Spring代理类中的方法
         Method[] proxyMethods = bean.getClass().getDeclaredMethods();
         //Spring代理类中的方法转Map，key：方法名，value：代理方法
@@ -65,7 +80,6 @@ public class ExtraDictHandler implements BeanPostProcessor {
                 }
             }
         }
-        return bean;
     }
 
 }
