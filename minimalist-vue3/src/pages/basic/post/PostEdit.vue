@@ -108,7 +108,7 @@ const okBtnClick = () => {
 const cancelBtnClick = () => {
     emits('cancel')
 }
-//加载部门详细信息
+//加载岗位详细信息
 const loadPostInfo = (postId) => {
     spinLoading.value = true
     getPostByPostIdApi(postId).then(res => {
@@ -126,9 +126,9 @@ const loadPostInfo = (postId) => {
 }
 //监听参数变化
 watch(() => props.params, (newVal, oldVal) => {
-    //部门ID
+    //岗位ID
     if (props.params.postId) {
-        //加载部门信息
+        //加载岗位信息
         loadPostInfo(props.params.postId)
     }
 }, { deep: true, immediate: true })
