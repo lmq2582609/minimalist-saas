@@ -148,14 +148,15 @@ public class DeptServiceImpl implements DeptService {
                 if (node.getDeptId().equals(p.getParentDeptId())) {
                     childrenNodes.add(BeanUtil.copyProperties(p, DeptVO.class));
                 }
-                //递归
-                findChildren(deptList, childrenNodes);
-                //菜单显示排序
+                //显示排序
                 childrenNodes.sort(Comparator.comparing(DeptVO::getDeptSort));
             });
-            //将查询到的子节点挂在顶级节点上
+            //如果有关联的子节点
             if (CollectionUtil.isNotEmpty(childrenNodes)) {
+                //将查询到的子节点挂在顶级节点上
                 node.setChildren(childrenNodes);
+                //对子节点继续递归，查找子节点的下级
+                findChildren(deptList, childrenNodes);
             }
         });
     }

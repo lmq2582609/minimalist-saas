@@ -175,14 +175,15 @@ public class PermServiceImpl implements PermService {
                 if (node.getPermId().equals(p.getParentPermId())) {
                     childrenNodes.add(BeanUtil.copyProperties(p, PermVO.class));
                 }
-                //递归
-                findChildren(permsList, childrenNodes);
-                //菜单显示排序
+                //显示排序
                 childrenNodes.sort(Comparator.comparing(PermVO::getPermSort));
             });
-            //将查询到的子节点挂在顶级节点上
+            //如果有关联的子节点
             if (CollectionUtil.isNotEmpty(childrenNodes)) {
+                //将查询到的子节点挂在顶级节点上
                 node.setChildren(childrenNodes);
+                //对子节点继续递归，查找子节点的下级
+                findChildren(permsList, childrenNodes);
             }
         });
     }
