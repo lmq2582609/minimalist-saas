@@ -30,6 +30,8 @@ const commonRoutes = [
     {path: '/login', name: 'Login', component: Login, meta: {title: '登录'}},
     {path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound},
 ]
+//导入所有路由，动态加载
+const routeAll = import.meta.glob(`../pages/**/*.vue`);
 const router = createRouter({
     history: createWebHashHistory(),
     routes: commonRoutes
@@ -54,13 +56,17 @@ function dynamicAddRoutes(menus) {
             if (!item) {
                 //如果指定了组件路径，则添加路由
                 if (e.component) {
-                    //向外层路由中添加子路由
-                    router.addRoute('Container', {
-                        path: e.permPath,
-                        meta: {title: e.permName},
-                        component: () => import(/* @vite-ignore */ '../pages' + e.component)
-                    })
-                    hasNewRouter = true
+                    //查找路由
+                    let comp = findRouter(e.component)
+                    if (comp) {
+                        //向外层路由中添加子路由
+                        router.addRoute('Container', {
+                            path: e.permPath,
+                            meta: {title: e.permName},
+                            component: comp
+                        })
+                        hasNewRouter = true
+                    }
                 }
             }
             //如果包含子菜单，递归执行
@@ -71,6 +77,21 @@ function dynamicAddRoutes(menus) {
     }
     findAndAddRoutesByMenus(menus)
     return hasNewRouter
+}
+
+/**
+ * 查找路由
+ * @param component 路由
+ * @returns import的路由
+ */
+function findRouter(component) {
+    for (let key in routeAll) {
+        if (key.includes(component)) {
+            return routeAll[key]
+        }
+    }
+    //未找到路由
+    return null
 }
 
 //路由白名单 索引0为登录路由

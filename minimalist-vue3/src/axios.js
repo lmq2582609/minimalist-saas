@@ -4,7 +4,6 @@ import Msg from '~/utils/msg';
 const service = axios.create({
     //基础URL
     baseURL: import.meta.env.VITE_API_BASE_PREFIX,
-    //withCredentials: true,
     //请求超时30秒
     timeout: 30000
 })
