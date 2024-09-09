@@ -1,4 +1,4 @@
-package com.minimalist.common.extraDict;
+package com.minimalist.common.eDict;
 
 import java.lang.annotation.*;
 
@@ -8,7 +8,7 @@ import java.lang.annotation.*;
 @Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ExtraDict {
+public @interface EDict {
 
     /**
      * 字典类型

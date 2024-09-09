@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,6 @@ public class TenantController {
     private TenantService tenantService;
 
     @PostMapping("/addTenant")
-    @PreAuthorize("hasAuthority('basic:tenant:add')")
     @Operation(summary = "添加租户")
     public ResponseEntity<Void> addTenant(@RequestBody @Validated(Add.class) TenantVO tenantVO) {
         tenantService.addTenant(tenantVO);
@@ -34,7 +32,6 @@ public class TenantController {
     }
 
     @DeleteMapping("/deleteTenantByTenantId")
-    @PreAuthorize("hasAuthority('basic:tenant:delete')")
     @Operation(summary = "删除租户 -> 根据租户ID删除租户")
     public ResponseEntity<Void> deleteTenantByTenantId(@RequestParam("tenantId")
                                                                      @NotNull(message = "租户ID不能为空")
@@ -44,7 +41,6 @@ public class TenantController {
     }
 
     @PutMapping("/updateTenantByTenantId")
-    @PreAuthorize("hasAuthority('basic:tenant:update')")
     @Operation(summary = "修改租户 -> 根据租户ID修改")
     public ResponseEntity<Void> updateTenantByTenantId(@RequestBody @Validated(Update.class) TenantVO tenantVO) {
         tenantService.updateTenantByTenantId(tenantVO);
@@ -52,14 +48,12 @@ public class TenantController {
     }
 
     @GetMapping("/getPageTenantList")
-    @PreAuthorize("hasAuthority('basic:tenant:get')")
     @Operation(summary = "查询租户(分页)")
     public ResponseEntity<PageResp<TenantVO>> getPageTenantList(TenantQueryVO queryVO) {
         return ResponseEntity.ok(tenantService.getPageTenantList(queryVO));
     }
 
     @GetMapping("/getTenantByTenantId/{tenantId}")
-    @PreAuthorize("hasAuthority('basic:tenant:get')")
     @Operation(summary = "根据租户ID查询租户")
     public ResponseEntity<TenantVO> getTenantByTenantId(@PathVariable(value = "tenantId")
                                                                              @NotNull(message = "租户ID不能为空")

@@ -4,9 +4,9 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.dict.DictCacheVO;
 import com.minimalist.basic.mapper.*;
-import com.minimalist.basic.service.ExtraDictService;
-import com.minimalist.common.extraDict.ExtraDict;
-import com.minimalist.common.extraDict.ExtraDictHandler;
+import com.minimalist.basic.service.EDictService;
+import com.minimalist.common.eDict.EDict;
+import com.minimalist.common.eDict.EDictConstant;
 import com.minimalist.common.tenant.IgnoreTenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * 额外的字典数据，这些数据不会出现在字典管理表中，因为这些数据是来源于其他表
  */
 @Service
-public class ExtraDictServiceImpl implements ExtraDictService {
+public class EDictServiceImpl implements EDictService {
 
     @Autowired
     private MDeptMapper deptMapper;
@@ -39,11 +39,11 @@ public class ExtraDictServiceImpl implements ExtraDictService {
      * @return 字典数据列表
      */
     @Override
-    @ExtraDict(dictType = ExtraDictHandler.DEPT_LIST)
+    @EDict(dictType = EDictConstant.DEPT_LIST)
     public DictCacheVO getDeptDictData() {
         //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
-        dictCacheVO.setDictType(ExtraDictHandler.DEPT_LIST);
+        dictCacheVO.setDictType(EDictConstant.DEPT_LIST);
         //查询部门列表
         List<MDept> deptList = deptMapper.selectDeptDict();
         if (CollectionUtil.isNotEmpty(deptList)) {
@@ -51,7 +51,7 @@ public class ExtraDictServiceImpl implements ExtraDictService {
                 DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
                 dictKV.setDictKey(dept.getDeptId().toString());
                 dictKV.setDictValue(dept.getDeptName());
-                dictKV.setDictType(ExtraDictHandler.DEPT_LIST);
+                dictKV.setDictType(EDictConstant.DEPT_LIST);
                 return dictKV;
             }).collect(Collectors.toList());
             dictCacheVO.setDictList(dictKVList);
@@ -64,9 +64,9 @@ public class ExtraDictServiceImpl implements ExtraDictService {
      * @return 字典数据列表
      */
     @Override
-    @ExtraDict(dictType = ExtraDictHandler.USER_LIST)
+    @EDict(dictType = EDictConstant.USER_LIST)
     public DictCacheVO getUserDictData() {
-        return getUserDictList(ExtraDictHandler.USER_LIST);
+        return getUserDictList(EDictConstant.USER_LIST);
     }
 
     /**
@@ -75,9 +75,9 @@ public class ExtraDictServiceImpl implements ExtraDictService {
      */
     @Override
     @IgnoreTenant
-    @ExtraDict(dictType = ExtraDictHandler.USER_ALL_LIST)
+    @EDict(dictType = EDictConstant.USER_ALL_LIST)
     public DictCacheVO getAllUserDictData() {
-        return getUserDictList(ExtraDictHandler.USER_ALL_LIST);
+        return getUserDictList(EDictConstant.USER_ALL_LIST);
     }
 
     /**
@@ -85,11 +85,11 @@ public class ExtraDictServiceImpl implements ExtraDictService {
      * @return 字典数据列表
      */
     @Override
-    @ExtraDict(dictType = ExtraDictHandler.TENANT_PACKAGE_LIST)
+    @EDict(dictType = EDictConstant.TENANT_PACKAGE_LIST)
     public DictCacheVO getTenantPackageDictData() {
         //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
-        dictCacheVO.setDictType(ExtraDictHandler.TENANT_PACKAGE_LIST);
+        dictCacheVO.setDictType(EDictConstant.TENANT_PACKAGE_LIST);
         //查询所有租户套餐
         List<MTenantPackage> tenantPackageList = tenantPackageMapper.selectTenantPackageDict();
         if (CollectionUtil.isNotEmpty(tenantPackageList)) {
@@ -97,7 +97,7 @@ public class ExtraDictServiceImpl implements ExtraDictService {
                 DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
                 dictKV.setDictKey(dept.getPackageId().toString());
                 dictKV.setDictValue(dept.getPackageName());
-                dictKV.setDictType(ExtraDictHandler.TENANT_PACKAGE_LIST);
+                dictKV.setDictType(EDictConstant.TENANT_PACKAGE_LIST);
                 return dictKV;
             }).collect(Collectors.toList());
             dictCacheVO.setDictList(dictKVList);
@@ -110,11 +110,11 @@ public class ExtraDictServiceImpl implements ExtraDictService {
      * @return 字典数据列表
      */
     @Override
-    @ExtraDict(dictType = ExtraDictHandler.ROLE_LIST)
+    @EDict(dictType = EDictConstant.ROLE_LIST)
     public DictCacheVO getRoleDictData() {
         //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
-        dictCacheVO.setDictType(ExtraDictHandler.ROLE_LIST);
+        dictCacheVO.setDictType(EDictConstant.ROLE_LIST);
         //查询角色列表
         List<MRole> roleList = roleMapper.selectRoleDict();
         if (CollectionUtil.isNotEmpty(roleList)) {
@@ -122,7 +122,7 @@ public class ExtraDictServiceImpl implements ExtraDictService {
                 DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
                 dictKV.setDictKey(role.getRoleId().toString());
                 dictKV.setDictValue(role.getRoleName());
-                dictKV.setDictType(ExtraDictHandler.ROLE_LIST);
+                dictKV.setDictType(EDictConstant.ROLE_LIST);
                 return dictKV;
             }).collect(Collectors.toList());
             dictCacheVO.setDictList(dictKVList);
@@ -135,11 +135,11 @@ public class ExtraDictServiceImpl implements ExtraDictService {
      * @return 字典数据列表
      */
     @Override
-    @ExtraDict(dictType = ExtraDictHandler.POST_LIST)
+    @EDict(dictType = EDictConstant.POST_LIST)
     public DictCacheVO getPostDictData() {
         //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
-        dictCacheVO.setDictType(ExtraDictHandler.POST_LIST);
+        dictCacheVO.setDictType(EDictConstant.POST_LIST);
         //查询岗位列表
         List<MPost> postList = postMapper.selectPostDict();
         if (CollectionUtil.isNotEmpty(postList)) {
@@ -147,7 +147,7 @@ public class ExtraDictServiceImpl implements ExtraDictService {
                 DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
                 dictKV.setDictKey(post.getPostId().toString());
                 dictKV.setDictValue(post.getPostName());
-                dictKV.setDictType(ExtraDictHandler.POST_LIST);
+                dictKV.setDictType(EDictConstant.POST_LIST);
                 return dictKV;
             }).collect(Collectors.toList());
             dictCacheVO.setDictList(dictKVList);

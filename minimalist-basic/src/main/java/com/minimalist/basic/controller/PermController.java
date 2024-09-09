@@ -11,7 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -26,7 +25,6 @@ public class PermController {
     private PermService permService;
 
     @PostMapping("/addPerm")
-    @PreAuthorize("hasAuthority('basic:perm:add')")
     @Operation(summary = "添加权限")
     public ResponseEntity<Void> addPerm(@RequestBody @Validated(Add.class) PermVO permVO) {
         permService.addPerm(permVO);
@@ -34,7 +32,6 @@ public class PermController {
     }
 
     @DeleteMapping("/deletePermByPermId")
-    @PreAuthorize("hasAuthority('basic:perm:delete')")
     @Operation(summary = "删除权限 -> 根据权限ID删除")
     public ResponseEntity<Void> deletePermByPermId(@RequestParam("permId")
                                                    @NotNull(message = "权限ID不能为空")
@@ -44,7 +41,6 @@ public class PermController {
     }
 
     @PutMapping("/updatePermByPermId")
-    @PreAuthorize("hasAuthority('basic:perm:update')")
     @Operation(summary = "修改权限 -> 根据权限ID修改")
     public ResponseEntity<Void> updatePermByPermId(@RequestBody @Validated(Update.class) PermVO permVO) {
         permService.updatePermByPermId(permVO);
@@ -52,21 +48,18 @@ public class PermController {
     }
 
     @GetMapping("/getPermList")
-    @PreAuthorize("hasAuthority('basic:perm:get')")
     @Operation(summary = "查询权限列表(不分页，获取全部数据) -> 权限管理使用")
     public ResponseEntity<List<PermVO>> getPermList(PermQueryVO queryVO) {
         return ResponseEntity.ok(permService.getPermList(queryVO));
     }
 
     @GetMapping("/getEnablePermList")
-    @PreAuthorize("hasAuthority('basic:perm:get')")
     @Operation(summary = "查询权限列表 -> 只获取正常状态的权限")
     public ResponseEntity<List<PermVO>> getEnablePermList() {
         return ResponseEntity.ok(permService.getEnablePermList());
     }
 
     @GetMapping("/getPermByPermId/{permId}")
-    @PreAuthorize("hasAuthority('basic:perm:get')")
     @Operation(summary = "根据权限ID查询权限")
     public ResponseEntity<PermVO> getPermByPermId(@PathVariable(value = "permId")
                                                         @NotNull(message = "权限ID不能为空")

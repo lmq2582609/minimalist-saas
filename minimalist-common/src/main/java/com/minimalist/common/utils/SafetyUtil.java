@@ -1,11 +1,11 @@
 package com.minimalist.common.utils;
 
-import cn.hutool.core.lang.Assert;
+import cn.dev33.satoken.stp.StpUtil;
 import com.alibaba.ttl.TransmittableThreadLocal;
-import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.constant.CommonConstant;
-import com.minimalist.common.enums.RespEnum;
-import com.minimalist.common.security.user.User;
+import com.minimalist.common.tenant.IgnoreTenant;
+
+import java.util.Optional;
 
 /**
  * 安全校验
@@ -40,29 +40,14 @@ public class SafetyUtil {
     }
 
     /**
-     * 检查租户ID是否与登录人的租户ID一致
-     * @param tenantId 租户ID
-     */
-    public static void checkTenantIdIsTamperWithData(Long tenantId) {
-        User user = SpringSecurityUtil.getUser();
-        Assert.notNull(user, () -> new BusinessException(RespEnum.TAMPER_WITH_DATA.getDesc()));
-        Assert.isTrue(tenantId.equals(user.getTenantId()), () -> new BusinessException(RespEnum.TAMPER_WITH_DATA.getDesc()));
-    }
-
-    /**
      * 根据租户ID校验是否为管理员
      * @return true管理员 false租户
      */
     public static boolean checkIsAdminByTenantId() {
-        return CommonConstant.ZERO == SpringSecurityUtil.getTenantId().intValue();
+        Long tenantId = Optional.ofNullable(StpUtil.getSession().getString(IgnoreTenant.TENANT_ID))
+                .map(Long::valueOf)
+                .orElse(-1L);
+        return CommonConstant.ZERO == tenantId.intValue();
     }
 
-    /**
-     * 检查用户ID是否与登陆人的用户ID一致
-     * @param userId 用户ID
-     * @return true一致，false不一致
-     */
-    public static boolean checkUserId(Long userId) {
-        return SpringSecurityUtil.getUserId().equals(userId);
-    }
 }

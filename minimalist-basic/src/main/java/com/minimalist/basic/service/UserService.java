@@ -1,5 +1,6 @@
 package com.minimalist.basic.service;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
 import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.entity.vo.user.*;
 import com.minimalist.common.mybatis.bo.PageResp;
@@ -73,7 +74,7 @@ public interface UserService {
      * @param reqVO 用户登录信息
      * @return token
      */
-    String userLogin(UserLoginReqVO reqVO);
+    SaTokenInfo userLogin(UserLoginReqVO reqVO);
 
     /**
      * 退出登录
@@ -86,12 +87,6 @@ public interface UserService {
      * @param passwordVO 重置密码实体
      */
     void resetPassword(RePasswordVO passwordVO);
-
-    /**
-     * 校验和设置用户身份
-     * @param token 令牌
-     */
-    void checkAndSetAuthentication(String token);
 
     /**
      * 用户设置 -> 修改用户信息

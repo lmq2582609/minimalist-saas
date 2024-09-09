@@ -1,12 +1,12 @@
-package com.minimalist.common.extraDict;
+package com.minimalist.common.eDict;
 
-import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.minimalist.common.entity.BeanMethod;
-import jakarta.annotation.PostConstruct;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
@@ -15,45 +15,22 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * 额外字典处理，初始化加载字典处理方法
+ */
 @Component
-public class ExtraDictHandler {
+public class EDictInit implements ApplicationRunner {
 
     @Autowired
     private ApplicationContext applicationContext;
 
-    /** 存储额外字典数据处理的方法 */
-    public static final Map<String, BeanMethod<?>> dictMethodMap = MapUtil.newConcurrentHashMap();
-
-    /** 部门字典type */
-    public static final String DEPT_LIST = "dict-dept-list";
-
-    /** 岗位字典type */
-    public static final String POST_LIST = "dict-post-list";
-
-    /** 角色字典type */
-    public static final String ROLE_LIST = "dict-role-list";
-
-    /** 用户字典type */
-    public static final String USER_LIST = "dict-user-list";
-
-    /** 全部用户字典type */
-    public static final String USER_ALL_LIST = "dict-user-all-list";
-
-    /** 租户套餐字典type */
-    public static final String TENANT_PACKAGE_LIST = "tenant-package-list";
-
-    @PostConstruct
-    public void init() {
-        //当前类名称
-        String currentClassName = getClass().getSimpleName().toLowerCase();
-        //获取beanDefinitionName
+    @Override
+    public void run(ApplicationArguments args) throws Exception {
         String[] beanDefinitionNames = applicationContext.getBeanDefinitionNames();
         //getBean，找到含有额外字典处理的注解方法
         for (String beanDefinitionName : beanDefinitionNames) {
-            if (!currentClassName.equals(beanDefinitionName.toLowerCase())) {
-                Object bean = applicationContext.getBean(beanDefinitionName);
-                postProcessAfterInitialization(bean);
-            }
+            Object bean = applicationContext.getBean(beanDefinitionName);
+            postProcessAfterInitialization(bean);
         }
     }
 
@@ -82,14 +59,14 @@ public class ExtraDictHandler {
 
     private void cacheBeanMethod(Method method, Map<String, Method> proxyMethodMap, Object bean) {
         //获取自定义注解
-        ExtraDict extraDict = method.getDeclaredAnnotation(ExtraDict.class);
-        if (ObjectUtil.isNotNull(extraDict) && StrUtil.isNotBlank(extraDict.dictType())) {
+        EDict eDict = method.getDeclaredAnnotation(EDict.class);
+        if (ObjectUtil.isNotNull(eDict) && StrUtil.isNotBlank(eDict.dictType())) {
             //从代理方法中查找并缓存代理方法，如果代理方法不存在，则缓存代理目标类方法
             Method proxyMethod = proxyMethodMap.get(method.getName());
             if (ObjectUtil.isNotNull(proxyMethod)) {
-                dictMethodMap.put(extraDict.dictType(), new BeanMethod<>(bean, proxyMethod));
+                EDictConstant.dictMethodMap.put(eDict.dictType(), new BeanMethod<>(bean, proxyMethod));
             } else {
-                dictMethodMap.put(extraDict.dictType(), new BeanMethod<>(bean, method));
+                EDictConstant.dictMethodMap.put(eDict.dictType(), new BeanMethod<>(bean, method));
             }
         }
     }

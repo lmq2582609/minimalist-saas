@@ -44,6 +44,12 @@ public class MUser extends BaseEntity {
     private String password;
 
     /**
+     * 盐值
+     */
+    @TableField("salt")
+    private String salt;
+
+    /**
      * 用户昵称
      */
     @TableField("nickname")

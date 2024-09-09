@@ -1,14 +1,15 @@
-package com.minimalist.common.mybatis;
+package com.minimalist.common.tenant;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.minimalist.common.utils.SafetyUtil;
-import com.minimalist.common.utils.SpringSecurityUtil;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.schema.Column;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -26,7 +27,10 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public Expression getTenantId() {
-        return new LongValue(SpringSecurityUtil.getTenantId());
+        Long tenantId = Optional.ofNullable(StpUtil.getSession().getString(IgnoreTenant.TENANT_ID))
+                .map(Long::valueOf)
+                .orElse(-1L);
+        return new LongValue(tenantId);
     }
 
     /**
@@ -36,7 +40,7 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public String getTenantIdColumn() {
-        return "tenant_id";
+        return IgnoreTenant.TENANT_ID;
     }
 
     /**

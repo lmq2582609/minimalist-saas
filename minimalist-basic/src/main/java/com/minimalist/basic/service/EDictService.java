@@ -5,7 +5,7 @@ import com.minimalist.basic.entity.vo.dict.DictCacheVO;
 /**
  * 额外的字典数据，这些数据不会出现在字典管理表中，因为这些数据是来源于其他表
  */
-public interface ExtraDictService {
+public interface EDictService {
 
     /**
      * 获取部门字典数据（额外字典数据）

@@ -85,7 +85,7 @@ const loginSubmitClick = () => {
             //登录成功消息提示
             proxy.$msg.success('登陆成功')
             //存储token
-            setToken(res)
+            setToken(res.tokenValue)
             //跳转页面到后台首页
             router.push('/')
         }).catch(() => {

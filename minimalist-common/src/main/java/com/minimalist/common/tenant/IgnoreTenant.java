@@ -18,4 +18,6 @@ public @interface IgnoreTenant {
      */
     boolean checkAdmin() default false;
 
+    public static final String TENANT_ID = "tenant_id";
+
 }

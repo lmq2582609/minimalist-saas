@@ -69,6 +69,29 @@ spring:
             max-file-size: 100MB
             # 总文件大小
             max-request-size: 256MB
+    data:
+        # redis配置
+        redis:
+            # Redis数据库索引（默认为0）
+            database: 1
+            # Redis服务器地址
+            host: 127.0.0.1
+            # Redis服务器连接端口
+            port: 6379
+            # Redis服务器连接密码（默认为空）
+            password: 1
+            # 连接超时时间
+            timeout: 10s
+            lettuce:
+                pool:
+                    # 连接池最大连接数
+                    max-active: 200
+                    # 连接池最大阻塞等待时间（使用负值表示没有限制）
+                    max-wait: -1ms
+                    # 连接池中的最大空闲连接
+                    max-idle: 10
+                    # 连接池中的最小空闲连接
+                    min-idle: 0
     # 文件存储配置 更多配置请访问：http://spring-file-storage.xuyanwu.cn
     file-storage:
         # 默认使用的存储平台
@@ -80,9 +103,10 @@ spring:
                 domain: http://localhost:${server.port}${server.servlet.context-path}/files/ # 访问域名，例如：“http://127.0.0.1:8030/test/file/”，注意后面要和 path-patterns 保持一致，“/”结尾，本地存储建议使用相对路径，方便后期更换域名
                 base-path: ${user.dir}/files/ # 文件存储路径：${user.dir}/files中间不能写 + 拼接，会被当成字符串
                 path-patterns: "/**" # 访问路径，开启 enable-access 后，通过此路径可以访问到上传的文件
+
 redisson:
-    address: redis://localhost:6379
-    password: 123456
+    address: redis://${spring.data.redis.host}:${spring.data.redis.port}
+    password: ${spring.data.redis.password}
     database: 0
     pingInterval: 10000
     connectionPoolSize: 100
@@ -106,6 +130,24 @@ mica:
         # 需要放行的路由，可以配置，也可以使用 @XssCleanIgnore 注解对某个方法和类进行忽略
         # 若需要对实体类的某个字段忽略，使用 @JsonDeserialize(using = XssCleanDeserializer.class) 注解忽略
         path-exclude-patterns:
+
+############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
+sa-token:
+    # token 名称，默认：satoken
+    token-name: Authentication
+    # token 有效期（单位：秒） 604800秒=7天，默认2592000秒=30天，-1=永久有效
+    timeout: 604800
+    # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+    active-timeout: -1
+    # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+    is-concurrent: true
+    # 在多人登录同一账号时，是否共用一个 token （为 true 时所有登录共用一个 token, 为 false 时每次登录新建一个 token）
+    is-share: true
+    # token 风格（默认可取值：uuid、simple-uuid、random-32、random-64、random-128、tik）
+    token-style: simple-uuid
+    # 是否输出操作日志
+    is-log: true
+
 # 系统配置
 systemConfig:
     # jwt token密钥

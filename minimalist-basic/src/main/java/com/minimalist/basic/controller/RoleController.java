@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,6 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/addRole")
-    @PreAuthorize("hasAuthority('basic:role:add')")
     @Operation(summary = "添加角色")
     public ResponseEntity<Void> addRole(@RequestBody @Validated(Add.class) RoleVO roleVO) {
         roleService.addRole(roleVO);
@@ -34,7 +32,6 @@ public class RoleController {
     }
 
     @DeleteMapping("/deleteRoleByRoleId")
-    @PreAuthorize("hasAuthority('basic:role:delete')")
     @Operation(summary = "删除角色 -> 根据角色ID删除角色")
     public ResponseEntity<Void> deleteRoleByRoleId(@RequestParam("roleId")
                                                    @NotNull(message = "角色ID不能为空")
@@ -44,7 +41,6 @@ public class RoleController {
     }
 
     @PutMapping("/updateRoleByRoleId")
-    @PreAuthorize("hasAuthority('basic:role:update')")
     @Operation(summary = "修改角色 -> 根据角色ID修改")
     public ResponseEntity<Void> updateRoleByRoleId(@RequestBody @Validated(Update.class) RoleVO roleVO) {
         roleService.updateRoleByRoleId(roleVO);
@@ -52,14 +48,12 @@ public class RoleController {
     }
 
     @GetMapping("/getPageRoleList")
-    @PreAuthorize("hasAuthority('basic:role:get')")
     @Operation(summary = "查询角色(分页) -> 角色管理使用")
     public ResponseEntity<PageResp<RoleVO>> getPageRoleList(RoleQueryVO queryVO) {
         return ResponseEntity.ok(roleService.getPageRoleList(queryVO));
     }
 
     @GetMapping("/getRoleByRoleId/{roleId}")
-    @PreAuthorize("hasAuthority('basic:role:get')")
     @Operation(summary = "根据角色ID查询角色")
     public ResponseEntity<RoleVO> getRoleByRoleId(@PathVariable(value = "roleId")
                                                   @NotNull(message = "角色ID不能为空")

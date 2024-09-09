@@ -1,5 +1,6 @@
 package com.minimalist.basic.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
@@ -17,7 +18,6 @@ import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.utils.SafetyUtil;
-import com.minimalist.common.utils.SpringSecurityUtil;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -144,7 +144,10 @@ public class PermServiceImpl implements PermService {
             perms = permsMapper.getEnablePermList();
         } else {
             //租户查询，只查询租户套餐关联的权限
-            perms = tenantPackageService.getPermsByTenantId(SpringSecurityUtil.getTenantId());
+            long loginIdAsLong = StpUtil.getLoginIdAsLong();
+            //TODO
+
+            //perms = tenantPackageService.getPermsByTenantId();
         }
         return permsToTree(perms);
     }

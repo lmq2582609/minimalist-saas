@@ -1,5 +1,6 @@
 package com.minimalist.basic.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
@@ -20,7 +21,6 @@ import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.mybatis.bo.Pager;
-import com.minimalist.common.utils.SpringSecurityUtil;
 import com.minimalist.common.utils.TextUtil;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -214,13 +214,13 @@ public class NoticeServiceImpl implements NoticeService {
                 fileIdList.addAll(noticePicFileIdList);
             }
             //将公告封面图片的状态置为已使用
-            fileMapper.updateFileStatusByFileIds(SpringSecurityUtil.getUserId(), fileIdList, fileStatus);
+            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), fileIdList, fileStatus);
             //处理富文本编辑器中的图片，富文本内容解码
             String decodeOldContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> imgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
             if (CollectionUtil.isNotEmpty(imgUrlList)) {
                 //将富文本中的图片的状态置为已使用
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), imgUrlList, fileStatus);
+                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), imgUrlList, fileStatus);
             }
         } else {
             //旧公告封面图片文件ID
@@ -231,13 +231,13 @@ public class NoticeServiceImpl implements NoticeService {
                 oldNoticePicFileIdList.addAll(noticePicFileIdList);
             }
             //将旧公告封面图的状态置为未使用
-            fileMapper.updateFileStatusByFileIds(SpringSecurityUtil.getUserId(), oldNoticePicFileIdList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
+            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), oldNoticePicFileIdList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
             //旧公告富文本中的图片
             String decodeOldContent = TextUtil.decode(oldNotice.getNoticeContent());
             List<String> oldContentImgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
             //将旧公告富文本中的图片状态置为未使用
             if (CollectionUtil.isNotEmpty(oldContentImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), oldContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
+                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), oldContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
             }
 
             //新公告封面图片文件ID
@@ -247,13 +247,13 @@ public class NoticeServiceImpl implements NoticeService {
                 newNoticePicIdList.addAll(noticePicFileIdList);
             }
             //将新公告封面图的状态置为已使用
-            fileMapper.updateFileStatusByFileIds(SpringSecurityUtil.getUserId(), newNoticePicIdList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
+            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), newNoticePicIdList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
             //新公告富文本中的图片
             String decodeNewContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> newContentImgUrlList = TextUtil.getImgUrlByRichText(decodeNewContent);
             //将新公告富文本中的图片状态置为已使用
             if (CollectionUtil.isNotEmpty(newContentImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(SpringSecurityUtil.getUserId(), newContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
+                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), newContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
             }
         }
     }

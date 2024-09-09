@@ -14,12 +14,12 @@ import com.minimalist.basic.entity.po.MDict;
 import com.minimalist.basic.entity.vo.dict.*;
 import com.minimalist.basic.mapper.MDictMapper;
 import com.minimalist.basic.service.DictService;
-import com.minimalist.basic.service.ExtraDictService;
+import com.minimalist.basic.service.EDictService;
 import com.minimalist.common.constant.RedisKeyConstant;
 import com.minimalist.common.entity.BeanMethod;
 import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
-import com.minimalist.common.extraDict.ExtraDictHandler;
+import com.minimalist.common.eDict.EDictConstant;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.redis.RedisManager;
@@ -201,7 +201,7 @@ public class DictServiceImpl implements DictService {
         while (dictTypeIter.hasNext()) {
             String dictType = dictTypeIter.next();
             //如果该字典为额外字典数据
-            if (ExtraDictHandler.dictMethodMap.containsKey(dictType)) {
+            if (EDictConstant.dictMethodMap.containsKey(dictType)) {
                 extraDictTypeList.add(dictType);
                 dictTypeIter.remove();
             }
@@ -211,7 +211,7 @@ public class DictServiceImpl implements DictService {
         //额外字典获取
         if (CollectionUtil.isNotEmpty(extraDictTypeList)) {
             extraDictTypeList.forEach(ed -> {
-                BeanMethod<ExtraDictService> beanMethod = (BeanMethod<ExtraDictService>) ExtraDictHandler.dictMethodMap.get(ed);
+                BeanMethod<EDictService> beanMethod = (BeanMethod<EDictService>) EDictConstant.dictMethodMap.get(ed);
                 DictCacheVO dictCacheVO = ReflectUtil.invoke(beanMethod.getBean(), beanMethod.getMethod(), ed);
                 result.add(dictCacheVO);
             });

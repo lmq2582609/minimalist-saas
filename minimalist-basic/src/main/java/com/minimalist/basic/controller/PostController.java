@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,7 +25,6 @@ public class PostController {
     private PostService postService;
 
     @PostMapping("/addPost")
-    @PreAuthorize("hasAuthority('basic:post:add')")
     @Operation(summary = "添加岗位")
     public ResponseEntity<Void> addPost(@RequestBody @Validated(Add.class) PostVO postVO) {
         postService.addPost(postVO);
@@ -34,7 +32,6 @@ public class PostController {
     }
 
     @DeleteMapping("/deletePostByPostId")
-    @PreAuthorize("hasAuthority('basic:post:delete')")
     @Operation(summary = "删除岗位 -> 根据岗位ID删除")
     public ResponseEntity<Void> deletePostByPostId(@RequestParam("postId")
                                                    @NotNull(message = "岗位ID不能为空")
@@ -44,7 +41,6 @@ public class PostController {
     }
 
     @PutMapping("/updatePostByPostId")
-    @PreAuthorize("hasAuthority('basic:post:update')")
     @Operation(summary = "修改岗位 -> 根据岗位ID修改")
     public ResponseEntity<Void> updatePostByPostId(@RequestBody @Validated(Update.class) PostVO postVO) {
         postService.updatePostByPostId(postVO);
@@ -52,14 +48,12 @@ public class PostController {
     }
 
     @GetMapping("/getPagePostList")
-    @PreAuthorize("hasAuthority('basic:post:get')")
     @Operation(summary = "查询岗位列表(分页)")
     public ResponseEntity<PageResp<PostVO>> getPagePostList(PostQueryVO queryVO) {
         return ResponseEntity.ok(postService.getPagePostList(queryVO));
     }
 
     @GetMapping("/getPostByPostId/{postId}")
-    @PreAuthorize("hasAuthority('basic:post:get')")
     @Operation(summary = "根据岗位ID查询岗位")
     public ResponseEntity<PostVO> getPostByPostId(@PathVariable(value = "postId")
                                                   @NotNull(message = "岗位ID不能为空")

@@ -32,6 +32,8 @@
         <vec.version>2.3</vec.version>
         <!-- hutool工具包 -->
         <hutool.version>5.8.20</hutool.version>
+        <!-- sa-token -->
+        <satoken.version>1.39.0</satoken.version>
         <!-- servlet -->
         <servlet.version>4.0.1</servlet.version>
         <!-- knife4j -->
