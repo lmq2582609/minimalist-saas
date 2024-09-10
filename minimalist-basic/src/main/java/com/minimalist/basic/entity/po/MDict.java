@@ -71,6 +71,6 @@ public class MDict extends BaseEntity {
      * 状态  0禁用 1正常
      */
     @TableField("status")
-    private Byte status;
+    private Integer status;
 
 }

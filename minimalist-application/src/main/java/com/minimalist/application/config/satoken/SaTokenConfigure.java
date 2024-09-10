@@ -1,4 +1,4 @@
-package com.minimalist.basic.config.satoken;
+package com.minimalist.application.config.satoken;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import org.springframework.context.annotation.Configuration;

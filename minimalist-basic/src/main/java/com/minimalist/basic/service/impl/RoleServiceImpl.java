@@ -142,9 +142,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public PageResp<RoleVO> getPageRoleList(RoleQueryVO queryVO) {
-        //分页查询
         Page<MRole> mRolePage = roleMapper.selectPageRoleList(queryVO);
-        //数据转换
         List<RoleVO> roleVOList = BeanUtil.copyToList(mRolePage.getRecords(), RoleVO.class);
         return new PageResp<>(roleVOList, mRolePage.getTotal());
     }

@@ -64,12 +64,10 @@ public class DeptServiceImpl implements DeptService {
         //查询部门
         MDept mDept = deptMapper.selectDeptByDeptId(deptVO.getDeptId());
         Assert.notNull(mDept, () -> new BusinessException(DeptEnum.ErrorMsg.NONENTITY_DEPT.getDesc()));
-        MDept newDept = BeanUtil.copyProperties(deptVO, mDept.getClass());
+        MDept newDept = BeanUtil.copyProperties(deptVO, MDept.class);
         //乐观锁字段赋值
         newDept.updateBeforeSetVersion(mDept.getVersion());
-        //修改
-        int updateCount = deptMapper.updateDeptByDeptId(newDept);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        deptMapper.updateDeptByDeptId(newDept);
     }
 
     /**

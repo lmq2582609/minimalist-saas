@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.entity.vo.perm.PermVO;
 import com.minimalist.basic.entity.vo.post.PostVO;
-import com.minimalist.common.security.user.UserEnum;
+import com.minimalist.basic.entity.enums.UserEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

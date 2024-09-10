@@ -133,6 +133,8 @@ mica:
 
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
+    # token前缀
+    token-prefix: Bearer
     # token 名称，默认：satoken
     token-name: Authentication
     # token 有效期（单位：秒） 604800秒=7天，默认2592000秒=30天，-1=永久有效
@@ -150,8 +152,6 @@ sa-token:
 
 # 系统配置
 systemConfig:
-    # jwt token密钥
-    tokenSecret: Uatt5Q9bIwoy
     # 登录验证码是否开启
     loginCaptchaEnable: true
     # 用户头像大小限制 100kb

@@ -2,11 +2,12 @@ package com.minimalist.basic.entity.vo.dict;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.minimalist.basic.entity.enums.DictEnum;
+import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -36,8 +37,9 @@ public class DictDataVO implements Serializable {
     @Schema(name = "dictClass", description = "字典样式，对应前端Tag组件的type", type = "string")
     private String dictClass;
 
+    @SchemaEnum(implementation = DictEnum.Status.class)
     @NotNull(message = "字典状态不能为空")
     @Schema(name = "status", description = "字典状态", type = "integer")
-    private Byte status;
+    private Integer status;
 
 }

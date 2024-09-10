@@ -46,7 +46,7 @@ public class MybatisPlusCodeGenerator {
                             .outputDir(projectPath + "\\generator\\java"); // 指定输出目录
                 })
                 .packageConfig(builder -> {
-                    builder.parent("com.minimalist.mybatisextend") // 设置父包名
+                    builder.parent("com.minimalist.basic") // 设置父包名
                             .pathInfo(Collections.singletonMap(OutputFile.xml, projectPath + "/generator/resources/mappers")); // 设置mapperXml生成路径
                 })
                 .strategyConfig(builder -> {

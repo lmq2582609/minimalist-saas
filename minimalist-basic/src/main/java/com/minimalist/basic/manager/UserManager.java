@@ -2,12 +2,12 @@ package com.minimalist.basic.manager;
 
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.minimalist.basic.entity.po.MUser;
-import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.common.exception.BusinessException;
-import com.minimalist.common.security.user.UserEnum;
+import com.minimalist.basic.entity.enums.UserEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -27,43 +27,33 @@ public class UserManager {
      * @param salt 盐值
      * @return 加密后的密码
      */
-    public String passwordEncrypt(String password, String salt){
+    public String passwordEncrypt(String password, String salt) {
         return SecureUtil.md5(password + salt);
     }
 
     /**
      * 用户名唯一性校验
-     * @param userVO 用户信息
+     * 不同租户下，允许重复的用户名
+     * @param username 用户名
+     * @param tenantId 租户ID
      */
-    public void checkUsernameUniqueness(UserVO userVO) {
-        MUser mUser = userMapper.selectUserByUsername(userVO.getUsername());
-        //校验用户名唯一
+    public void checkUsernameUniqueness(String username, long tenantId) {
+        MUser mUser = userMapper.selectUserByUsername(username);
         if (ObjectUtil.isNotNull(mUser)) {
-            Assert.isTrue(mUser.getUserId().equals(userVO.getUserId()), () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
-        }
-    }
-
-    /**
-     * 用户手机唯一性校验
-     * @param userVO 用户信息
-     */
-    public void checkUserPhoneUniqueness(UserVO userVO) {
-        MUser mUser = userMapper.selectUserByPhone(userVO.getPhone());
-        //校验用户名唯一
-        if (ObjectUtil.isNotNull(mUser)) {
-            Assert.isTrue(mUser.getUserId().equals(userVO.getUserId()), () -> new BusinessException(UserEnum.ErrorMsg.PHONE_ACCOUNT.getDesc()));
+            //如果有重复的用户名，租户ID不一致允许重复的用户名
+            Assert.isFalse(mUser.getTenantId().equals(tenantId), () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
         }
     }
 
     /**
      * 用户邮箱唯一性校验
-     * @param userVO 用户信息
+     * 邮箱不允许重复
+     * @param email 用户邮箱
      */
-    public void checkUserEmailUniqueness(UserVO userVO) {
-        MUser mUser = userMapper.selectUserByPhone(userVO.getPhone());
-        //校验用户名唯一
-        if (ObjectUtil.isNotNull(mUser)) {
-            Assert.isTrue(mUser.getUserId().equals(userVO.getUserId()), () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
+    public void checkUserEmailUniqueness(String email) {
+        if (StrUtil.isNotBlank(email)) {
+            MUser mUser = userMapper.selectUserByPhone(email);
+            Assert.isNull(mUser, () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
         }
     }
 

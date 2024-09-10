@@ -1,4 +1,4 @@
-package com.minimalist.basic.config.satoken;
+package com.minimalist.application.config.satoken;
 
 import cn.dev33.satoken.stp.StpInterface;
 import com.minimalist.basic.manager.UserManager;

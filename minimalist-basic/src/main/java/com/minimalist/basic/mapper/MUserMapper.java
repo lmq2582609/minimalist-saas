@@ -7,7 +7,7 @@ import com.minimalist.basic.entity.po.MUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.user.UserQueryVO;
 import com.minimalist.common.mybatis.QueryCondition;
-import com.minimalist.common.security.user.UserEnum;
+import com.minimalist.basic.entity.enums.UserEnum;
 
 import java.util.List;
 

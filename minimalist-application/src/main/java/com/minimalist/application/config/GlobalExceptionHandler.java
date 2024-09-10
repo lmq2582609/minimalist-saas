@@ -2,7 +2,6 @@ package com.minimalist.application.config;
 
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.enums.RespEnum;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -92,15 +91,6 @@ public class GlobalExceptionHandler {
             return exception(e);
         }
     }
-
-//    /**
-//     * 权限校验异常
-//     */
-//    @ExceptionHandler(AccessDeniedException.class)
-//    public ResponseEntity<Object> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request) {
-//        log.warn(RespEnum.NO_OPERATION_PERMISSION.getDesc() + "：" + request.getRequestURI() + "，异常信息：" + e.getMessage(), e);
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(RespEnum.NO_OPERATION_PERMISSION.getDesc());
-//    }
 
     /**
      * 未知异常

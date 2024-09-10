@@ -1,6 +1,5 @@
 package com.minimalist.basic.service.impl;
 
-import cn.dev33.satoken.stp.SaLoginModel;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.captcha.CircleCaptcha;
@@ -18,7 +17,6 @@ import com.minimalist.basic.entity.enums.PermEnum;
 import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.MPerms;
-import com.minimalist.basic.entity.po.MTenant;
 import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.po.MUserPost;
@@ -32,8 +30,8 @@ import com.minimalist.basic.entity.vo.user.UserLoginReqVO;
 import com.minimalist.basic.entity.vo.user.UserQueryVO;
 import com.minimalist.basic.entity.vo.user.UserSettingVO;
 import com.minimalist.basic.entity.vo.user.UserVO;
+import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.manager.UserManager;
-import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MUserDeptMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.mapper.MUserPostMapper;
@@ -45,7 +43,7 @@ import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.redis.RedisManager;
-import com.minimalist.common.security.user.UserEnum;
+import com.minimalist.basic.entity.enums.UserEnum;
 import com.minimalist.common.tenant.IgnoreTenant;
 import com.minimalist.common.utils.SafetyUtil;
 import com.minimalist.common.utils.UnqIdUtil;
@@ -64,10 +62,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-
-    /** jwt token密钥 */
-    @Value("${systemConfig.tokenSecret}")
-    private String tokenSecret;
 
     /** 登录验证码是否开启 */
     @Value("${systemConfig.loginCaptchaEnable}")
@@ -102,9 +96,6 @@ public class UserServiceImpl implements UserService {
     private MUserPostMapper userPostMapper;
 
     @Autowired
-    private MTenantMapper tenantMapper;
-
-    @Autowired
     private PostService postService;
 
     @Autowired
@@ -116,6 +107,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private TenantService tenantService;
 
+    @Autowired
+    private TenantManager tenantManager;
+
     /**
      * 新增用户
      * @param userVO 用户实体
@@ -123,34 +117,24 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
-        //获取当前登录用户信息
-        MUser loginUser = userMapper.selectUserByUserId(StpUtil.getLoginIdAsLong());
-        Assert.notNull(loginUser, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
-        //获取当前登陆人的租户ID，与新增用户绑定关系
-        Long tenantId = loginUser.getTenantId();
-        //查询租户
-        MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
-        Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
-        //查询该租户下的用户数量
-        long userCount = userMapper.selectUserCountByTenantId(tenantId);
-        Assert.isFalse(userCount >= mTenant.getAccountCount(),
-                () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
-        //校验用户准确性
-        checkUserAccuracy(null, userVO.getUsername(), userVO.getPhone(), userVO.getEmail());
-        //拷贝
+        //校验用户名唯一
+        userManager.checkUsernameUniqueness(userVO.getUsername(), SafetyUtil.getLonginUserTenantId());
+        //校验邮箱唯一
+        userManager.checkUserEmailUniqueness(userVO.getEmail());
+        //当前登陆人的租户ID，用于和新增用户建立绑定关系
+        long tenantId = SafetyUtil.getLonginUserTenantId();
+        //新增用户时，校验该租户套餐是否满足条件
+        tenantManager.checkTenantPackage(tenantId);
         MUser user = BeanUtil.copyProperties(userVO, MUser.class);
-        user.setTenantId(tenantId);
-        //生成盐值
-        String salt = RandomUtil.randomString(6);
-        user.setSalt(salt);
-        //密码加密
-        user.setPassword(userManager.passwordEncrypt(userVO.getPassword(), salt));
-        //userId
         long userId = UnqIdUtil.uniqueId();
         user.setUserId(userId);
-        //处理部门
+        user.setTenantId(tenantId);
+        //生成盐值，密码加密
+        String salt = RandomUtil.randomString(6);
+        user.setSalt(salt);
+        user.setPassword(userManager.passwordEncrypt(userVO.getPassword(), salt));
+        //处理用户所在部门
         user.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
-        //新增用户
         int insertCount = userMapper.insert(user);
         Assert.isTrue(insertCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
         //新增用户关联信息
@@ -164,12 +148,8 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUserByUserId(Long userId) {
-        //查询用户
-        MUser user = userMapper.selectUserByUserId(userId);
-        Assert.notNull(user, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
-        //TODO 检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
-        //SafetyUtil.checkTenantIdIsTamperWithData(user.getTenantId());
-        //删除用户
+        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
+        tenantManager.checkTenantEqual(userId, StpUtil.getLoginIdAsLong());
         int deleteCount = userMapper.deleteUserByUserId(userId);
         Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
         //删除用户关联信息
@@ -183,35 +163,28 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserByUserId(UserVO userVO) {
-        //校验用户数据准确性
-        MUser user = userMapper.selectUserByUserId(userVO.getUserId());
-        Assert.notNull(user, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
         //校验用户名唯一
-        userManager.checkUsernameUniqueness(userVO);
-        //校验手机号唯一
-        userManager.checkUserPhoneUniqueness(userVO);
+        userManager.checkUsernameUniqueness(userVO.getUsername(), SafetyUtil.getLonginUserTenantId());
         //校验邮箱唯一
-        userManager.checkUserEmailUniqueness(userVO);
-        //TODO 检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
-        //SafetyUtil.checkTenantIdIsTamperWithData(user.getTenantId());
-        //拷贝
+        userManager.checkUserEmailUniqueness(userVO.getEmail());
+        //检查租户ID，要修改的用户的租户必须与本次操作人的租户一致
+        MUser optUser = tenantManager.checkTenantEqual(userVO.getUserId(), StpUtil.getLoginIdAsLong());
         MUser newUser = BeanUtil.copyProperties(userVO, MUser.class);
         //是否需要修改密码
         if (StrUtil.isNotBlank(userVO.getPassword())) {
             //密码加密
-            newUser.setPassword(userManager.passwordEncrypt(userVO.getPassword(), user.getSalt()));
+            newUser.setPassword(userManager.passwordEncrypt(userVO.getPassword(), optUser.getSalt()));
         }
         //乐观锁字段赋值
-        newUser.updateBeforeSetVersion(user.getVersion());
+        newUser.updateBeforeSetVersion(optUser.getVersion());
         //处理部门
         newUser.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
         //修改用户
-        int updateCount = userMapper.updateUserByUserId(newUser);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        userMapper.updateUserByUserId(newUser);
         //删除用户关联信息
-        deleteUserRelation(user.getUserId());
+        deleteUserRelation(optUser.getUserId());
         //新增用户关联信息
-        insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), user.getUserId());
+        insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), optUser.getUserId());
     }
 
     /**
@@ -529,46 +502,6 @@ public class UserServiceImpl implements UserService {
         }).toList();
         int userDeptInsertBatchCount = entityService.insertBatch(userDeptList);
         Assert.isTrue(deptIds.size() == userDeptInsertBatchCount, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-    }
-
-    /**
-     * 校验用户准确性
-     * @param username 用户名
-     * @param phone 手机号
-     * @param email 邮箱
-     */
-    private MUser checkUserAccuracy(Long userId, String username, String phone, String email) {
-        MUser userByUsername = userMapper.selectUserByUsername(username);
-        MUser userByPhone = userMapper.selectUserByPhone(phone);
-        MUser userByEmail = userMapper.selectUserByEmail(email);
-        //userId为空，新增数据前校验
-        if (ObjectUtil.isNull(userId)) {
-            //校验用户名唯一
-            Assert.isNull(userByUsername, () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
-            //校验手机号唯一
-            Assert.isNull(userByPhone, () -> new BusinessException(UserEnum.ErrorMsg.PHONE_ACCOUNT.getDesc()));
-            //校验邮箱唯一
-            Assert.isNull(userByEmail, () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
-        } else {
-            //修改数据前校验
-            //查询用户
-            MUser user = userMapper.selectUserByUserId(userId);
-            Assert.notNull(user, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
-            //校验手机号唯一
-            if (ObjectUtil.isNotNull(userByUsername)) {
-                Assert.isTrue(userByUsername.getUserId().equals(userId), () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
-            }
-            //校验手机号唯一
-            if (ObjectUtil.isNotNull(userByPhone)) {
-                Assert.isTrue(userByPhone.getUserId().equals(userId), () -> new BusinessException(UserEnum.ErrorMsg.PHONE_ACCOUNT.getDesc()));
-            }
-            //校验邮箱唯一
-            if (ObjectUtil.isNotNull(userByEmail)) {
-                Assert.isTrue(userByEmail.getUserId().equals(userId), () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
-            }
-            return user;
-        }
-        return null;
     }
 
 }

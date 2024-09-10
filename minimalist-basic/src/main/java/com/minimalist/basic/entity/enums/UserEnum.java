@@ -1,4 +1,4 @@
-package com.minimalist.common.security.user;
+package com.minimalist.basic.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +21,7 @@ public class UserEnum {
         PHONE_ACCOUNT("用户手机已存在"),
         EMAIL_ACCOUNT("用户邮箱已存在"),
         NONENTITY_ACCOUNT("用户不存在"),
+        NONENTITY_OPT_ACCOUNT("操作的用户不存在"),
         OLD_PASSWORD_INCORRECT("旧密码输入错误"),
         USER_AVATAR_SIZE("头像大小需小于100kb"),
         LOGIN_USER_INCONSISTENT("获取的用户信息与当前登陆用户不一致"),

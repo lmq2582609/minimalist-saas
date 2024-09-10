@@ -27,10 +27,7 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public Expression getTenantId() {
-        Long tenantId = Optional.ofNullable(StpUtil.getSession().getString(IgnoreTenant.TENANT_ID))
-                .map(Long::valueOf)
-                .orElse(-1L);
-        return new LongValue(tenantId);
+        return new LongValue(SafetyUtil.getLonginUserTenantId());
     }
 
     /**

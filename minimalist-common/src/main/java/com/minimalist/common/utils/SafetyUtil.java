@@ -44,10 +44,17 @@ public class SafetyUtil {
      * @return true管理员 false租户
      */
     public static boolean checkIsAdminByTenantId() {
-        Long tenantId = Optional.ofNullable(StpUtil.getSession().getString(IgnoreTenant.TENANT_ID))
+        return CommonConstant.ZERO == getLonginUserTenantId();
+    }
+
+    /**
+     * 获取当前登陆人的租户ID
+     * @return 租户ID
+     */
+    public static long getLonginUserTenantId() {
+        return Optional.ofNullable(StpUtil.getSession().getString(IgnoreTenant.TENANT_ID))
                 .map(Long::valueOf)
                 .orElse(-1L);
-        return CommonConstant.ZERO == tenantId.intValue();
     }
 
 }
