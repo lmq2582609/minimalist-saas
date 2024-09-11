@@ -35,7 +35,9 @@ export const operationType = {
     //删除
     delete: {type: 'delete', success: '删除成功', error: '删除失败'},
     //上传
-    upload: {type: 'upload', success: '上传成功', error: '上传失败'}
+    upload: {type: 'upload', success: '上传成功', error: '上传失败'},
+    //操作
+    operation: {type: 'operation', success: '操作成功', error: '操作失败'}
 }
 
 /**
