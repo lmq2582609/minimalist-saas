@@ -1,12 +1,12 @@
-package com.minimalist.basic.entity.vo.config;
+package com.minimalist.common.module.entity.vo.config;
 
-import com.minimalist.basic.entity.enums.ConfigEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
+import com.minimalist.common.module.entity.enums.ConfigEnum;
 
 @Data
 @Schema(name = "参数配置查询实体")

@@ -1,8 +1,8 @@
-package com.minimalist.basic.entity.vo.config;
+package com.minimalist.common.module.entity.vo.config;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.ConfigEnum;
+import com.minimalist.common.module.entity.enums.ConfigEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;

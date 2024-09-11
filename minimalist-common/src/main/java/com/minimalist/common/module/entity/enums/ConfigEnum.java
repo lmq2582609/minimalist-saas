@@ -1,4 +1,4 @@
-package com.minimalist.basic.entity.enums;
+package com.minimalist.common.module.entity.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

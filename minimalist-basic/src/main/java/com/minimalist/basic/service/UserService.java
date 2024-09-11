@@ -77,12 +77,6 @@ public interface UserService {
     SaTokenInfo userLogin(UserLoginReqVO reqVO);
 
     /**
-     * 退出登录
-     * @param userId 用户ID
-     */
-    void logout(Long userId);
-
-    /**
      * 重置密码
      * @param passwordVO 重置密码实体
      */

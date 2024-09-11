@@ -1,4 +1,4 @@
-package com.minimalist.basic.entity.po;
+package com.minimalist.common.module.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;

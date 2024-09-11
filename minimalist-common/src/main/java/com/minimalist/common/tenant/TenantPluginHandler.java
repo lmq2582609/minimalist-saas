@@ -1,25 +1,18 @@
 package com.minimalist.common.tenant;
 
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
 import com.minimalist.common.utils.SafetyUtil;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 import net.sf.jsqlparser.schema.Column;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 /**
  * 多租户插件
  */
 @Configuration
 public class TenantPluginHandler implements TenantLineHandler {
-
-    @Value("#{'${systemConfig.tenantIgnoreTable}'.split(',')}")
-    private Set<String> tenantIgnoreTable;
 
     /**
      * 获取租户 ID 值表达式，只支持单个 ID 值
@@ -48,8 +41,13 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public boolean ignoreTable(String tableName) {
-        //个别方法忽略 || 某张表忽略
-        return SafetyUtil.checkIgnoreTenant() || tenantIgnoreTable.contains(tableName);
+        //多租户开启
+        if (TenantPluginConfig.onOff) {
+            //个别方法忽略 || 某张表忽略
+            return SafetyUtil.checkIgnoreTenant() || TenantPluginConfig.tenantIgnoreTable.contains(tableName);
+        }
+        //多租户未开启，忽略
+        return true;
     }
 
     /**
@@ -60,7 +58,12 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public boolean ignoreInsert(List<Column> columns, String tenantIdColumn) {
-        return SafetyUtil.checkIgnoreTenant() || TenantLineHandler.super.ignoreInsert(columns, tenantIdColumn);
+        //多租户开启
+        if (TenantPluginConfig.onOff) {
+            return SafetyUtil.checkIgnoreTenant() || TenantLineHandler.super.ignoreInsert(columns, tenantIdColumn);
+        }
+        //多租户未开启，忽略
+        return true;
     }
 
 }

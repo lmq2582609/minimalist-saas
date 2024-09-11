@@ -1,8 +1,8 @@
-package com.minimalist.basic.service;
+package com.minimalist.common.module.service;
 
-import com.minimalist.basic.entity.vo.config.ConfigQueryVO;
-import com.minimalist.basic.entity.vo.config.ConfigVO;
 import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.module.entity.vo.config.ConfigQueryVO;
+import com.minimalist.common.module.entity.vo.config.ConfigVO;
 
 public interface ConfigService {
 
@@ -30,4 +30,24 @@ public interface ConfigService {
      * @return 参数配置列表
      */
     PageResp<ConfigVO> getPageConfigList(ConfigQueryVO queryVO);
+
+    /**
+     * 根据参数ID查询参数
+     * @param configId 参数ID
+     * @return 参数信息
+     */
+    ConfigVO getConfigByConfigId(Long configId);
+
+    /**
+     * 根据参数Key查询参数 - 状态为正常
+     * @param configKey 参数Key
+     * @return 参数信息
+     */
+    ConfigVO getConfigByConfigKey(String configKey);
+
+    /**
+     * 刷新配置缓存
+     */
+    void refreshConfigCache();
+
 }

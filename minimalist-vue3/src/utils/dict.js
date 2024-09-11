@@ -49,7 +49,9 @@ export const DICT = {
     //角色列表 -> 额外字典
     roleList: 'dict-role-list',
     //岗位列表 -> 额外字典
-    postList: 'dict-post-list'
+    postList: 'dict-post-list',
+    //参数状态
+    configStatus: 'config-status',
 }
 
 //缓存

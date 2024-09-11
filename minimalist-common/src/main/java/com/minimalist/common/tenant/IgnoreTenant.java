@@ -18,6 +18,7 @@ public @interface IgnoreTenant {
      */
     boolean checkAdmin() default false;
 
-    public static final String TENANT_ID = "tenant_id";
+    /** 多租户字段 */
+    String TENANT_ID = "tenant_id";
 
 }

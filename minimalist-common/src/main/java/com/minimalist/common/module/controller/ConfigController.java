@@ -1,9 +1,9 @@
-package com.minimalist.basic.controller;
+package com.minimalist.common.module.controller;
 
-import com.minimalist.basic.entity.vo.config.ConfigQueryVO;
-import com.minimalist.basic.entity.vo.config.ConfigVO;
-import com.minimalist.basic.service.ConfigService;
 import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.module.entity.vo.config.ConfigQueryVO;
+import com.minimalist.common.module.entity.vo.config.ConfigVO;
+import com.minimalist.common.module.service.ConfigService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +32,7 @@ public class ConfigController {
     @DeleteMapping("/deleteConfigByConfigId")
     @Operation(summary = "删除参数 -> 根据参数ID删除")
     public ResponseEntity<Void> deleteConfigByConfigId(@RequestParam("configId")
-                                                    @NotNull(message = "字典ID不能为空")
+                                                    @NotNull(message = "参数ID不能为空")
                                                     @Parameter(name = "configId", required = true, description = "参数ID") Long configId) {
         configService.deleteConfigByConfigId(configId);
         return ResponseEntity.ok().build();
@@ -51,18 +51,19 @@ public class ConfigController {
         return ResponseEntity.ok(configService.getPageConfigList(queryVO));
     }
 
-//    @GetMapping("/getDictByDictType/{dictType}")
-//    @Operation(summary = "根据字典类型查询字典 -> 用于字典管理页面")
-//    public ResponseEntity<DictInfoVO> getDictByDictType(@PathVariable(value = "dictType")
-//                                            @Parameter(name = "dictType", description = "字典类型", required = true) String dictType) {
-//        return ResponseEntity.ok(dictService.getDictByDictType(dictType));
-//    }
-//
-//    @GetMapping("/getDictList/{dictTypes}")
-//    @Operation(summary = "根据字典类型查询字典 -> 用于下拉框数据展示或编码转换")
-//    public ResponseEntity<List<DictCacheVO>> getDictList(@PathVariable(value = "dictTypes", required = false)
-//                                         @Parameter(name = "dictTypes", description = "字典类型列表，为空则查询所有字典数据") List<String> dictType) {
-//        return ResponseEntity.ok(dictService.getDictList(dictType));
-//    }
+    @GetMapping("/getConfigByConfigId/{configId}")
+    @Operation(summary = "根据参数ID查询参数")
+    public ResponseEntity<ConfigVO> getConfigByConfigId(@PathVariable(value = "configId")
+                                                  @NotNull(message = "参数ID不能为空")
+                                                  @Parameter(name = "configId", description = "参数ID", required = true) Long configId) {
+        return ResponseEntity.ok(configService.getConfigByConfigId(configId));
+    }
+
+    @GetMapping("/refreshConfigCache")
+    @Operation(summary = "刷新配置缓存")
+    public ResponseEntity<Void> refreshConfigCache() {
+        configService.refreshConfigCache();
+        return ResponseEntity.ok().build();
+    }
 
 }

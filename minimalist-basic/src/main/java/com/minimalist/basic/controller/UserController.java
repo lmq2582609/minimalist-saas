@@ -89,7 +89,7 @@ public class UserController {
     @PostMapping("/logout")
     @Operation(summary = "退出登录")
     public ResponseEntity<Void> logout() {
-        userService.logout(StpUtil.getLoginIdAsLong());
+        StpUtil.logout();
         return ResponseEntity.ok().build();
     }
 

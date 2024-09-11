@@ -37,9 +37,12 @@ import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
 import com.minimalist.basic.service.*;
+import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.constant.RedisKeyConstant;
 import com.minimalist.common.enums.RespEnum;
+import com.minimalist.common.module.entity.vo.config.ConfigVO;
+import com.minimalist.common.module.service.ConfigService;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.redis.RedisManager;
@@ -49,7 +52,6 @@ import com.minimalist.common.utils.SafetyUtil;
 import com.minimalist.common.utils.UnqIdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -62,14 +64,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-
-    /** 登录验证码是否开启 */
-    @Value("${systemConfig.loginCaptchaEnable}")
-    private boolean loginCaptchaEnable;
-
-    /** 用户头像大小限制 */
-    @Value("${systemConfig.userAvatarSize}")
-    private Long userAvatarSize;
 
     @Autowired
     private MUserMapper userMapper;
@@ -109,6 +103,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private TenantManager tenantManager;
+
+    @Autowired
+    private ConfigService configService;
 
     /**
      * 新增用户
@@ -305,6 +302,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public ImageCaptchaVO getImageCaptcha() {
+        ConfigVO config = configService.getConfigByConfigKey(CommonConstant.SYSTEM_CONFIG_CAPTCHA_ENABLE);
+        boolean loginCaptchaEnable = Boolean.parseBoolean(config.getConfigValue());
         ImageCaptchaVO imageCaptchaVO = new ImageCaptchaVO();
         imageCaptchaVO.setEnable(loginCaptchaEnable);
         if (!loginCaptchaEnable) {
@@ -346,6 +345,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public SaTokenInfo userLogin(UserLoginReqVO reqVO) {
+        ConfigVO config = configService.getConfigByConfigKey(CommonConstant.SYSTEM_CONFIG_CAPTCHA_ENABLE);
+        boolean loginCaptchaEnable = Boolean.parseBoolean(config.getConfigValue());
         //校验验证码是否正确
         if (loginCaptchaEnable) {
             Assert.isTrue(StringUtils.hasText(reqVO.getCaptcha()), () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_ID_EMPTY.getDesc()));
@@ -379,16 +380,6 @@ public class UserServiceImpl implements UserService {
         // 在登录时缓存参数
         StpUtil.getSession().set(IgnoreTenant.TENANT_ID, loginUser.getTenantId());
         return StpUtil.getTokenInfo();
-    }
-
-    /**
-     * 退出登录
-     * @param userId 用户ID
-     */
-    @Override
-    public void logout(Long userId) {
-        String key = StrUtil.indexedFormat(RedisKeyConstant.USERLOGIN_CACHE_KEY, userId.toString());
-        redisManager.delete(key);
     }
 
     /**
@@ -441,6 +432,8 @@ public class UserServiceImpl implements UserService {
         Long userId = StpUtil.getLoginIdAsLong();
         //校验头像大小
         byte[] base64Decode = Base64.decode(userAvatar);
+        ConfigVO config = configService.getConfigByConfigKey(CommonConstant.SYSTEM_CONFIG_USER_AVATAR_SIZE);
+        long userAvatarSize = Long.parseLong(config.getConfigValue());
         Assert.isFalse(base64Decode.length > userAvatarSize, () -> new BusinessException(UserEnum.ErrorMsg.USER_AVATAR_SIZE.getDesc()));
         //查询用户
         MUser user = userMapper.selectUserByUserId(userId);

@@ -1,12 +1,12 @@
-package com.minimalist.basic.mapper;
+package com.minimalist.common.module.mapper;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.po.MConfig;
-import com.minimalist.basic.entity.vo.config.ConfigQueryVO;
+import com.minimalist.common.module.entity.po.MConfig;
+import com.minimalist.common.module.entity.vo.config.ConfigQueryVO;
 import com.minimalist.common.mybatis.QueryCondition;
 
 /**
