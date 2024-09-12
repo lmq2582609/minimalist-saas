@@ -4,12 +4,12 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.enums.DeptEnum;
 import com.minimalist.basic.entity.po.MDept;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.mapper.MDeptMapper;
-import com.minimalist.basic.mapper.MUserDeptMapper;
 import com.minimalist.basic.service.DeptService;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
@@ -17,17 +17,17 @@ import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DeptServiceImpl implements DeptService {
 
     @Autowired
     private MDeptMapper deptMapper;
-
-    @Autowired
-    private MUserDeptMapper userDeptMapper;
 
     /**
      * 添加部门
@@ -37,6 +37,14 @@ public class DeptServiceImpl implements DeptService {
     public void addDept(DeptVO deptVO) {
         MDept mDept = BeanUtil.copyProperties(deptVO, MDept.class);
         mDept.setDeptId(UnqIdUtil.uniqueId());
+        if (CommonConstant.ZERO != deptVO.getParentDeptId()) {
+            MDept parentDept = deptMapper.selectDeptByDeptId(deptVO.getParentDeptId());
+            //祖级列表
+            String ancestors = Optional.ofNullable(parentDept.getAncestors())
+                    .map(a -> a + ",")
+                    .orElse("") + parentDept.getDeptId();
+            mDept.setAncestors(ancestors);
+        }
         //新增
         int insertCount = deptMapper.insert(mDept);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
@@ -60,14 +68,50 @@ public class DeptServiceImpl implements DeptService {
      * @param deptVO 部门数据
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateDeptByDeptId(DeptVO deptVO) {
-        //查询部门
-        MDept mDept = deptMapper.selectDeptByDeptId(deptVO.getDeptId());
-        Assert.notNull(mDept, () -> new BusinessException(DeptEnum.ErrorMsg.NONENTITY_DEPT.getDesc()));
-        MDept newDept = BeanUtil.copyProperties(deptVO, MDept.class);
+        //查询本级部门
+        MDept currentDept = deptMapper.selectDeptByDeptId(deptVO.getDeptId());
+        Assert.notNull(currentDept, () -> new BusinessException(DeptEnum.ErrorMsg.NONENTITY_DEPT.getDesc()));
+        MDept updateDept = BeanUtil.copyProperties(deptVO, MDept.class);
+        //如果不是顶级部门，查询上级部门
+        if (CommonConstant.ZERO != deptVO.getParentDeptId()) {
+            MDept parentDept = deptMapper.selectDeptByDeptId(deptVO.getParentDeptId());
+            //祖级列表
+            String ancestors = Optional.ofNullable(parentDept.getAncestors())
+                    .map(a -> a + ",")
+                    .orElse("") + parentDept.getDeptId();
+            updateDept.setAncestors(ancestors);
+            //修改当前部门所有下级
+            updateChildrenDeptAncestors(deptVO.getDeptId(), currentDept.getAncestors(), ancestors);
+        } else {
+            //修改当前部门所有下级
+            updateChildrenDeptAncestors(deptVO.getDeptId(), currentDept.getAncestors(), "");
+        }
         //乐观锁字段赋值
-        newDept.updateBeforeSetVersion(mDept.getVersion());
-        deptMapper.updateDeptByDeptId(newDept);
+        updateDept.updateBeforeSetVersion(currentDept.getVersion());
+        deptMapper.updateDeptByDeptId(updateDept);
+    }
+
+    /**
+     * 根据部门ID修改下级部门的祖级
+     * @param deptId 部门ID
+     * @param oldAncestors 旧的祖级
+     * @param newAncestors 新的祖级
+     */
+    private void updateChildrenDeptAncestors(Long deptId, String oldAncestors, String newAncestors) {
+        //修改当前部门所有下级
+        List<MDept> children = deptMapper.selectChildrenDeptByDeptId(deptId);
+        for (MDept child : children) {
+            if (StrUtil.isBlank(oldAncestors)) {
+                if (StrUtil.isNotBlank(newAncestors)) {
+                    child.setAncestors(newAncestors);
+                }
+            } else {
+                child.setAncestors(child.getAncestors().replaceFirst(oldAncestors, newAncestors));
+            }
+            deptMapper.updateDeptByDeptId(child);
+        }
     }
 
     /**

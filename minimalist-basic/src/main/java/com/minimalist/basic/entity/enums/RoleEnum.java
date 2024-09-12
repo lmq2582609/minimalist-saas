@@ -5,6 +5,9 @@ import lombok.Getter;
 
 public class RoleEnum {
 
+    public static final String TENANT_ROLE_NAME = "租户管理员";
+    public static final String TENANT_ROLE_CODE = "tenant_admin";
+
     /** 角色处理异常信息 */
     @Getter
     @AllArgsConstructor

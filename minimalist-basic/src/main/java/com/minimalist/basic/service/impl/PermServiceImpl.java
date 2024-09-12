@@ -13,7 +13,6 @@ import com.minimalist.basic.entity.vo.perm.PermVO;
 import com.minimalist.basic.mapper.MPermsMapper;
 import com.minimalist.basic.mapper.MRolePermMapper;
 import com.minimalist.basic.service.PermService;
-import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
@@ -32,10 +31,6 @@ public class PermServiceImpl implements PermService {
 
     @Autowired
     private MRolePermMapper rolePermMapper;
-
-    @Autowired
-    private TenantPackageService tenantPackageService;
-
 
     /**
      * 根据角色ID获取权限

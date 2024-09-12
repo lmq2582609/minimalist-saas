@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -79,7 +80,7 @@ public class RoleServiceImpl implements RoleService {
         MRole mRole = roleMapper.selectRoleByRoleCode(roleVO.getRoleCode());
         Assert.isNull(mRole, () -> new BusinessException(RoleEnum.ErrorMsg.EXISTS_ROLE.getDesc()));
         //角色ID
-        long roleId = UnqIdUtil.uniqueId();
+        long roleId = Optional.ofNullable(roleVO.getRoleId()).orElse(UnqIdUtil.uniqueId());
         mRole = BeanUtil.copyProperties(roleVO, MRole.class);
         //角色ID赋值
         mRole.setRoleId(roleId);

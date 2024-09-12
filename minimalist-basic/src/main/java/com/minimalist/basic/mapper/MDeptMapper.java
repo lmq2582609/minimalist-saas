@@ -91,4 +91,16 @@ public interface MDeptMapper extends BaseMapper<MDept> {
         return selectList(queryWrapper);
     }
 
+    /**
+     * 根据部门ID查询所有子集部门
+     * @param deptId 部门ID
+     * @return 子集部门列表
+     */
+    default List<MDept> selectChildrenDeptByDeptId(Long deptId) {
+        return selectList(
+                new LambdaQueryWrapper<MDept>()
+                        .apply("FIND_IN_SET("  + deptId +", ancestors)")
+        );
+    }
+
 }

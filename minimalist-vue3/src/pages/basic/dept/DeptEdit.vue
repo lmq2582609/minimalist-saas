@@ -14,7 +14,7 @@
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="deptLeader" label="部门负责人" required>
                     <a-select v-model="form.deptLeader" placeholder="部门负责人" allow-clear allow-search>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.userList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.userList]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="phone" label="部门电话" required>
@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance, watch } from 'vue'
+import {ref, reactive, getCurrentInstance, watch, onMounted} from 'vue'
 import { getDeptListApi, getDeptByDeptIdApi, addDeptApi, updateDeptByDeptIdApi } from '~/api/dept'
 
 //全局实例

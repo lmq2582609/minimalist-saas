@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.minimalist.basic.entity.enums.TenantEnum;
+import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -30,17 +31,16 @@ public class TenantVO implements Serializable {
     private Long tenantId;
 
     @JsonSerialize(using = ToStringSerializer.class)
-    @NotNull(message = "用户ID不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "userId", description = "用户ID", type = "string")
+    @Schema(name = "userId", description = "用户ID，与租户绑定", type = "string")
     private Long userId;
 
-    @Schema(name = "contactName", description = "联系人昵称，新增租户不传", type = "string")
+    @Schema(name = "contactName", description = "联系人昵称，回显联系人使用", type = "string")
     private String contactName;
 
-    @Schema(name = "email", description = "联系人邮箱，新增租户不传", type = "string")
+    @Schema(name = "email", description = "联系人邮箱，回显联系人使用", type = "string")
     private String email;
 
-    @Schema(name = "phone", description = "联系人号码，新增租户不传", type = "string")
+    @Schema(name = "phone", description = "联系人号码，回显联系人使用", type = "string")
     private String phone;
 
     @JsonSerialize(using = ToStringSerializer.class)
@@ -62,9 +62,6 @@ public class TenantVO implements Serializable {
     @Schema(name = "accountCount", description = "可创建账号数量，表示这个租户下可以创建多少账号", type = "integer")
     private Integer accountCount;
 
-    @Schema(name = "storeCount", description = "可创建门店数量，表示这个租户下可以创建多少家门店或者店铺，若系统中没有门店或店铺的概念，可忽略此字段", type = "integer")
-    private Integer storeCount;
-
     @NotNull(message = "租户状态不能为空", groups = {Add.class, Update.class})
     @SchemaEnum(implementation = TenantEnum.TenantStatus.class)
     @Schema(name = "status", description = "租户状态", type = "integer")
@@ -72,5 +69,8 @@ public class TenantVO implements Serializable {
 
     @Schema(name = "remark", description = "备注", type = "string")
     private String remark;
+
+    @Schema(name = "user", description = "租户的用户信息，新增时填充", type = "string")
+    private UserVO user;
 
 }

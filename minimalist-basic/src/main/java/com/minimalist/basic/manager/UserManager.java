@@ -6,8 +6,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.crypto.SecureUtil;
 import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.mapper.MUserMapper;
+import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.basic.entity.enums.UserEnum;
+import com.minimalist.common.module.entity.enums.ConfigEnum;
+import com.minimalist.common.module.entity.po.MConfig;
+import com.minimalist.common.module.mapper.MConfigMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -21,6 +25,9 @@ public class UserManager {
     @Autowired
     private MUserMapper userMapper;
 
+    @Autowired
+    private MConfigMapper configMapper;
+
     /**
      * 用户密码加密
      * @param password 密码
@@ -28,7 +35,9 @@ public class UserManager {
      * @return 加密后的密码
      */
     public String passwordEncrypt(String password, String salt) {
-        return SecureUtil.md5(password + salt);
+        String p1 = SecureUtil.md5(password + salt);
+        MConfig config = configMapper.selectConfigByConfigKey(CommonConstant.SYSTEM_CONFIG_PASSWORD_SALT, ConfigEnum.Status.STATUS_1.getCode());
+        return SecureUtil.md5(p1 + config.getConfigValue());
     }
 
     /**

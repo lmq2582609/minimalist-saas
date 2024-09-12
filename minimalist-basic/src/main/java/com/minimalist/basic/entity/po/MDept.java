@@ -32,6 +32,12 @@ public class MDept extends BaseEntity {
     private Long parentDeptId;
 
     /**
+     * 祖级列表
+     */
+    @TableField("ancestors")
+    private String ancestors;
+
+    /**
      * 部门名称
      */
     @TableField("dept_name")

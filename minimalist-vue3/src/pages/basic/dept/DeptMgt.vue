@@ -38,6 +38,11 @@
                         <template #icon><icon-plus /></template>
                         <template #default>添加</template>
                     </a-button>
+                    <!-- 展开/折叠 -->
+                    <a-button size="small" @click="treeExpand = !treeExpand">
+                        <template #icon><icon-swap /></template>
+                        <template #default>展开/折叠</template>
+                    </a-button>
                 </a-space>
                 <a-space>
                     <!-- 刷新 -->
@@ -105,7 +110,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
+import {ref, reactive, getCurrentInstance, shallowRef, watch} from 'vue'
 import DeptEdit from "~/pages/basic/dept/DeptEdit.vue";
 import DeptDetail from "~/pages/basic/dept/DeptDetail.vue";
 import {getDeptListApi, deleteDeptByDeptIdApi} from '~/api/dept'
@@ -123,6 +128,8 @@ const searchForm = reactive({
     //部门状态
     status: null
 })
+//表格
+const tableRef = ref()
 //数据列表
 const datatable = reactive({
     //列配置
@@ -130,8 +137,8 @@ const datatable = reactive({
         {title: '部门名称', dataIndex: 'deptName', slotName: 'deptName', align: 'left', width: 250, headerCellClass: 'w-[100%] flex justify-center'},
         {title: '负责人', dataIndex: 'deptLeader', slotName: 'deptLeader', align: 'center'},
         {title: '排序', dataIndex: 'deptSort', align: 'center', width: 80},
-        {title: '电话', dataIndex: 'phone', align: 'center', tooltip: true},
-        {title: '邮箱', dataIndex: 'email', align: 'center', tooltip: true},
+        {title: '电话', dataIndex: 'phone', align: 'center', ellipsis: true, tooltip: true},
+        {title: '邮箱', dataIndex: 'email', align: 'center', ellipsis: true, tooltip: true},
         {title: '部门状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},
         {title: '操作', slotName: 'operation', align: 'center', width: 200}
     ],
@@ -173,6 +180,15 @@ const addBtnClick = () => {
     modal.params = { operationType: proxy.operationType.add.type }
     modal.component = shallowRef(DeptEdit)
 }
+//展开/折叠 - 默认折叠
+const treeExpand = ref(false)
+//监听展开/折叠
+watch(() => treeExpand.value, (newVal, oldVal) => {
+    if (tableRef.value) {
+        tableRef.value.expandAll(treeExpand.value)
+    }
+}, { deep: true, immediate: true })
+
 //表格行数据 "添加" -> 点击
 const addRowBtnClick = (record) => {
     modal.visible = true

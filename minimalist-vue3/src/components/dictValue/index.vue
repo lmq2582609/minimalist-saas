@@ -33,7 +33,7 @@ const findDictByDictKey = () => {
     let dictList = props.dictData
     if (dictList && dictList.length > 0) {
         for (let i = 0;i < dictList.length;i++) {
-            if (dictList[i].dictKey === props.dictKey) {
+            if (dictList[i].dictKey == props.dictKey) {
                 return dictList[i]
             }
         }

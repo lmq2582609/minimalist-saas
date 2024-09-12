@@ -10,19 +10,17 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.tenantPackageList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="userId" label="联系人" required>
-                    <a-select v-model="form.userId" placeholder="联系人" allow-clear allow-search>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.userAllList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
                 <a-form-item class="w-[49%]" field="expireTime" label="过期时间" required>
                     <a-date-picker class="w-[100%]" v-model="form.expireTime" show-time format="YYYY-MM-DD HH:mm:ss" disabled-input placeholder="过期时间" />
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="storeCount" label="门店额度" tooltip="默认1家门店，表示这个租户下可以创建多少家门店或者店铺，若系统中没有门店或店铺的概念，可忽略此字段">
-                    <a-input-number v-model="form.storeCount" :min="1" placeholder="门店额度" />
+                <!-- 修改时，回显用户信息，不允许操作 -->
+                <a-form-item class="w-[49%]" field="userId" label="联系人" required v-if="props.params.operationType === proxy.operationType.update.type">
+                    <a-select class="w-[100%]" v-model="form.userId" placeholder="联系人" allow-clear allow-search :disabled="props.params.operationType === proxy.operationType.update.type">
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.userAllList]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
+                    </a-select>
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="租户状态" required>
                     <a-select v-model="form.status" placeholder="租户状态" allow-clear>
@@ -31,6 +29,41 @@
                 </a-form-item>
                 <a-form-item class="w-[100%]" field="remark" label="备注">
                     <a-textarea v-model="form.remark" placeholder="备注" />
+                </a-form-item>
+
+                <!-- 租户与用户绑定 -->
+                <a-divider orientation="left" v-if="props.params.operationType === proxy.operationType.add.type">
+                    租户的用户信息
+                </a-divider>
+
+                <!-- 新增时，添加用户信息 -->
+                <a-form-item class="w-[49%]" field="username" label="用户账号" required tooltip="用户登录系统使用的账号" v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-input v-model="form.user.username" placeholder="用户账号" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="password" label="用户密码" required v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-input-password v-model="form.user.password" placeholder="用户密码" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="nickname" label="用户昵称" required tooltip="用户的网名" v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-input v-model="form.user.nickname" placeholder="用户昵称" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="userRealName" label="用户真实姓名" required v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-input v-model="form.user.userRealName" placeholder="用户真实姓名" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="phone" label="手机号" required v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-input v-model="form.user.phone" placeholder="手机号" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="email" label="邮箱" v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-input v-model="form.user.email" placeholder="邮箱" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="userSex" label="用户性别" required v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-select v-model="form.user.userSex" placeholder="用户性别" allow-clear allow-search>
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.userSex]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                    </a-select>
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="status" label="用户状态" required v-if="props.params.operationType === proxy.operationType.add.type">
+                    <a-select v-model="form.user.status" placeholder="用户状态" allow-clear allow-search>
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.userStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                    </a-select>
                 </a-form-item>
             </div>
         </a-form>
@@ -48,13 +81,13 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, watch} from 'vue'
+import {ref, reactive, getCurrentInstance, watch, onMounted} from 'vue'
 import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from "~/api/tenant.js";
 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.userAllList, proxy.DICT.tenantPackageList])
+const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.userAllList, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.userStatus])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -80,20 +113,36 @@ const form = reactive({
     userId: null,
     //账号额度
     accountCount: null,
-    //门店额度
-    storeCount: null,
     //过期时间
     expireTime: null,
     //租户状态
     status: null,
     //备注
-    remark: null
+    remark: null,
+    //用户信息，新增租户时填充数据
+    user: {
+        //用户账号
+        username: null,
+        //用户密码
+        password: null,
+        //用户昵称
+        nickname: null,
+        //用户真实姓名
+        userRealName: null,
+        //手机号
+        phone: null,
+        //邮箱
+        email: null,
+        //用户性别
+        userSex: null,
+        //用户状态
+        status: null
+    }
 })
 //表单校验规则
 const rules = {
     tenantName: [{required: true, message: '租户名称不能为空', trigger: 'submit'}],
     packageId: [{required: true, message: '租户套餐不能为空', trigger: 'submit'}],
-    userId: [{required: true, message: '联系人不能为空', trigger: 'submit'}],
     accountCount: [{required: true, message: '账号额度不能为空', trigger: 'submit'}],
     expireTime: [{required: true, message: '过期时间不能为空', trigger: 'submit'}],
     status: [{required: true, message: '租户状态不能为空', trigger: 'submit'}]

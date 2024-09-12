@@ -58,6 +58,7 @@ import org.springframework.util.StringUtils;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -114,16 +115,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
+        //租户ID，用于和新增用户建立绑定关系
+        Long tenantId = Optional.ofNullable(userVO.getTenantId()).orElse(SafetyUtil.getLonginUserTenantId());
         //校验用户名唯一
-        userManager.checkUsernameUniqueness(userVO.getUsername(), SafetyUtil.getLonginUserTenantId());
+        userManager.checkUsernameUniqueness(userVO.getUsername(), tenantId);
         //校验邮箱唯一
         userManager.checkUserEmailUniqueness(userVO.getEmail());
-        //当前登陆人的租户ID，用于和新增用户建立绑定关系
-        long tenantId = SafetyUtil.getLonginUserTenantId();
         //新增用户时，校验该租户套餐是否满足条件
         tenantManager.checkTenantPackage(tenantId);
         MUser user = BeanUtil.copyProperties(userVO, MUser.class);
-        long userId = UnqIdUtil.uniqueId();
+        long userId = Optional.ofNullable(userVO.getUserId()).orElse(UnqIdUtil.uniqueId());
         user.setUserId(userId);
         user.setTenantId(tenantId);
         //生成盐值，密码加密

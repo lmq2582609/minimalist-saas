@@ -1,6 +1,8 @@
 package com.minimalist.common.tenant;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.handler.TenantLineHandler;
+import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.utils.SafetyUtil;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
@@ -43,6 +45,10 @@ public class TenantPluginHandler implements TenantLineHandler {
     public boolean ignoreTable(String tableName) {
         //多租户开启
         if (TenantPluginConfig.onOff) {
+            //如果是系统用户，则忽略，用户ID <= 0 表示系统用户
+            if (StpUtil.getLoginIdAsLong() <= CommonConstant.ZERO) {
+                return true;
+            }
             //个别方法忽略 || 某张表忽略
             return SafetyUtil.checkIgnoreTenant() || TenantPluginConfig.tenantIgnoreTable.contains(tableName);
         }

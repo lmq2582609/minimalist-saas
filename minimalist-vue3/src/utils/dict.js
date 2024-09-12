@@ -102,8 +102,12 @@ export const LoadDicts = (dictTypeList) => {
                                 //数字超过13位，转字符串
                                 d.dictKey = String(d.dictKey)
                             } else {
-                                //转数字
-                                d.dictKey = Number(d.dictKey)
+                                if (d.dictKey instanceof String) {
+                                    d.dictKey = String(d.dictKey)
+                                } else {
+                                    //转数字
+                                    d.dictKey = Number(d.dictKey)
+                                }
                             }
                         }
                     })

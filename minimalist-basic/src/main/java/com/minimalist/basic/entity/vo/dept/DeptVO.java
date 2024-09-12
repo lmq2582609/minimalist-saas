@@ -31,6 +31,9 @@ public class DeptVO implements Serializable {
     @JsonSerialize(using = ToStringSerializer.class)
     private Long parentDeptId;
 
+    @Schema(name = "ancestors", description = "祖级列表", type = "string")
+    private String ancestors;
+
     @NotBlank(message = "部门名称不能为空", groups = {Add.class, Update.class})
     @Schema(name = "deptName", description = "部门名称", type = "string")
     private String deptName;
