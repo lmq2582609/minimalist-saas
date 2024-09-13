@@ -67,4 +67,7 @@ public class DeptVO implements Serializable {
     @Schema(name = "children", description = "部门子集", type = "array")
     private List<DeptVO> children;
 
+    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
+    private Boolean allowDelete;
+
 }

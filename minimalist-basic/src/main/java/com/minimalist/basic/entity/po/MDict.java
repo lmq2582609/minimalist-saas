@@ -73,4 +73,8 @@ public class MDict extends BaseEntity {
     @TableField("status")
     private Integer status;
 
+    /** 该数据是否可以被删除 0否 1是 */
+    @TableField(value = "allow_delete")
+    private Boolean allowDelete;
+
 }

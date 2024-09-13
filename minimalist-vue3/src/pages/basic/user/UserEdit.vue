@@ -42,7 +42,7 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userSex]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="用户状态" required>
+                <a-form-item class="w-[49%]" field="status" label="用户状态" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="用户状态" allow-clear allow-search>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
@@ -55,12 +55,12 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.roleList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="postIds" label="用户岗位" required>
+                <a-form-item class="w-[49%]" field="postIds" label="用户岗位">
                     <a-select v-model="form.postIds" placeholder="用户岗位" multiple :max-tag-count="2" allow-clear allow-search>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.postList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[100%]" field="checkedDeptIds" label="所在部门" required>
+                <a-form-item class="w-[100%]" field="checkedDeptIds" label="所在部门">
                     <a-spin class="w-[100%]" :size="35" :loading="deptTreeSpinLoading" tip="正在处理, 请稍候...">
                         <a-scrollbar class="w-[100%] max-h-[250px] overflow-auto border" :outer-style="{width: '100%'}" type="track">
                             <a-tree v-model:checked-keys="form.checkedDeptIds" :data="deptTreeData" ref="treeRef" v-if="deptTreeData.length > 0"
@@ -155,11 +155,7 @@ const rules = {
     userRealName: [{required: true, message: '用户真实姓名不能为空', trigger: 'submit'}],
     phone: [{required: true, message: '用户手机号不能为空', trigger: 'submit'}],
     userSex: [{required: true, message: '用户性别不能为空', trigger: 'submit'}],
-    status: [{required: true, message: '用户状态不能为空', trigger: 'submit'}],
-    roleIds: [{required: true, message: '用户角色不能为空', trigger: 'submit'}],
-    postIds: [{required: true, message: '用户岗位不能为空', trigger: 'submit'}],
-    deptIds: [{required: true, message: '用户所在部门不能为空', trigger: 'submit'}],
-    checkedDeptIds: [{required: true, message: '用户所在部门不能为空', trigger: 'submit'}]
+    roleIds: [{required: true, message: '用户角色不能为空', trigger: 'submit'}]
 }
 //确定 -> 点击
 const okBtnClick = () => {

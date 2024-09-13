@@ -14,6 +14,7 @@ import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.service.PostService;
 import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
+import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private MUserPostMapper userPostMapper;
+
+    @Autowired
+    private EntityService entityService;
 
     /**
      * 添加岗位
@@ -53,8 +57,9 @@ public class PostServiceImpl implements PostService {
     @Override
     public void deletePostByPostId(Long postId) {
         //删除岗位
-        int deleteCount = postMapper.deletePostByPostId(postId);
-        Assert.isTrue(deleteCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        postMapper.deletePostByPostId(postId);
+        //删除岗位与用户关联关系
+        entityService.delete(MUserPost::getPostId, postId);
     }
 
     /**

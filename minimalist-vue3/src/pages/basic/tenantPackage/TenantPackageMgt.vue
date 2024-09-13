@@ -74,7 +74,7 @@
                             <template #default>修改</template>
                         </a-button>
                         <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.packageId)">
-                            <a-button type="text" status="danger" size="mini" v-if="record.packageId !== '0'">
+                            <a-button type="text" status="danger" size="mini" v-if="record.allowDelete">
                                 <template #icon>
                                     <icon-delete />
                                 </template>

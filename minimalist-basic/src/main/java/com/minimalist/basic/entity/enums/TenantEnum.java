@@ -19,6 +19,13 @@ public class TenantEnum {
         DISABLED_TENANT("租户已被禁用，请联系管理员"),
         SYSTEM_TENANT("系统租户，不可删除"),
         SYSTEM_TENANT_PACKAGE("系统租户套餐，不可删除"),
+        ADD_TENANT_USER_NULL("添加租户时用户信息不能为空"),
+        ADD_TENANT_USERNAME_NULL("添加租户时用户账号不能为空"),
+        ADD_TENANT_PASSWORD_NULL("添加租户时用户密码不能为空"),
+        ADD_TENANT_NICKNAME_NULL("添加租户时用户昵称不能为空"),
+        ADD_TENANT_REALNAME_NULL("添加租户时用户真实姓名不能为空"),
+        ADD_TENANT_PHONE_NULL("添加租户时用户手机号不能为空"),
+        ADD_TENANT_USERSEX_NULL("添加租户时用户性别不能为空"),
         ;
         private final String desc;
     }

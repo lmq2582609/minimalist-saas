@@ -126,4 +126,16 @@ public interface MUserMapper extends BaseMapper<MUser> {
                         .eqNotNull(MUser::getStatus, queryVO.getStatus()));
     }
 
+    /**
+     * 根据部门ID列表，查询用户数
+     * @param deptIds 部门ID
+     * @return 用户数
+     */
+    default long selectUserCountByDeptIds(List<Long> deptIds) {
+        long result = 0;
+        for (Long deptId : deptIds) {
+            result += selectCount(new LambdaQueryWrapper<MUser>().apply("FIND_IN_SET("  + deptId +", ancestors)"));
+        }
+        return result;
+    }
 }

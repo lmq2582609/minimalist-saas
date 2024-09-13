@@ -81,7 +81,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, watch, onMounted} from 'vue'
+import {ref, reactive, getCurrentInstance, watch} from 'vue'
 import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from "~/api/tenant.js";
 
 //全局实例

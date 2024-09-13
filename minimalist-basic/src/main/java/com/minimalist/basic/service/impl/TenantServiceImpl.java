@@ -68,71 +68,26 @@ public class TenantServiceImpl implements TenantService {
         MTenant mTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
         //生成租户ID
         long tenantId = UnqIdUtil.uniqueId();
-        mTenant.setTenantId(tenantId);
 
         //为租户创建数据
         UserVO userInfo = tenantVO.getUser();
-        checkTenantUser(userInfo);
-
+        checkAddTenantUser(userInfo);
         //为租户创建角色
         long roleId = UnqIdUtil.uniqueId();
-        RoleVO roleVO = new RoleVO();
-        roleVO.setRoleId(roleId);
-        roleVO.setRoleName(RoleEnum.TENANT_ROLE_NAME);
-        roleVO.setRoleCode(RoleEnum.TENANT_ROLE_CODE);
-        roleVO.setRoleSort(CommonConstant.ZERO);
-        roleVO.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
-        roleVO.setRemark("添加租户系统自动创建角色");
-        roleVO.setTenantId(tenantId);
-        List<String> checkedPermIds = Arrays.asList(tenantPackage.getPermIds().split(","));
-        roleVO.setCheckedPermIds(checkedPermIds);
-        //租户角色和权限关联关系
-        List<MTenantPackagePerm> mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackage.getPackageId());
-        List<Long> permissionsIds = mTenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-        roleVO.setPermissionsIds(permissionsIds);
-        roleService.addRole(roleVO);
+        addTenantRole(roleId, tenantId, tenantPackage.getPackageId(), tenantPackage.getPermIds());
         //为租户创建用户
         long userId = UnqIdUtil.uniqueId();
-        MUser user = new MUser();
-        user.setUserId(userId);
-        user.setUsername(userInfo.getUsername());
-        user.setPassword(userInfo.getPassword());
-        user.setNickname(userInfo.getNickname());
-        user.setUserRealName(userInfo.getUserRealName());
-        user.setEmail(userInfo.getEmail());
-        user.setPhone(userInfo.getPhone());
-        user.setUserSex(userInfo.getUserSex());
-        user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
-        user.setTenantId(tenantId);
-        user.setNickname(tenantVO.getTenantName());
-        //生成盐值，密码加密
-        String salt = RandomUtil.randomString(6);
-        user.setSalt(salt);
-        //默认密码
-        user.setPassword(userManager.passwordEncrypt("123456qwerty", salt));
-        userMapper.insert(user);
+        userInfo.setUserId(userId);
+        addTenantUser(userInfo, tenantId);
 
         //用户与角色关联关系
-        MUserRole userRole = new MUserRole();
-        userRole.setUserId(userId);
-        userRole.setRoleId(roleId);
-        int insertUserRoleCount = userRoleMapper.insert(userRole);
-        Assert.isTrue(insertUserRoleCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        addTenantUserRole(userId, roleId);
+
         //插入租户数据
         mTenant.setUserId(userId);
+        mTenant.setTenantId(tenantId);
         int insertCount = tenantMapper.insert(mTenant);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-    }
-
-    /**
-     * 校验租户的用户信息
-     * @param user 用户信息
-     */
-    private void checkTenantUser(UserVO user) {
-        Assert.notNull(user, () -> new BusinessException(""));
-
-
-
     }
 
     /**
@@ -165,6 +120,13 @@ public class TenantServiceImpl implements TenantService {
         newTenant.updateBeforeSetVersion(tenant.getVersion());
         //更新租户
         tenantMapper.updateTenantByTenantId(newTenant);
+        //如果租户套餐变更，则修改租户套餐
+        if (!tenantVO.getPackageId().equals(tenant.getPackageId())) {
+
+
+
+
+        }
     }
 
     /**
@@ -245,6 +207,64 @@ public class TenantServiceImpl implements TenantService {
         Assert.isFalse(TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_0.getCode() == mTenantPackage.getStatus().intValue(),
                 () -> new BusinessException(TenantEnum.ErrorMsg.STATUS_TENANT_PACKAGE.getDesc()));
         return mTenantPackage;
+    }
+
+    /**
+     * 校验租户的用户信息
+     * @param user 用户信息
+     */
+    private void checkAddTenantUser(UserVO user) {
+        Assert.notNull(user, () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_USER_NULL.getDesc()));
+        Assert.notBlank(user.getUsername(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_USERNAME_NULL.getDesc()));
+        Assert.notBlank(user.getPassword(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_PASSWORD_NULL.getDesc()));
+        Assert.notBlank(user.getNickname(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_NICKNAME_NULL.getDesc()));
+        Assert.notBlank(user.getUserRealName(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_REALNAME_NULL.getDesc()));
+        Assert.notBlank(user.getPhone(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_PHONE_NULL.getDesc()));
+        Assert.notNull(user.getUserSex(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_USERSEX_NULL.getDesc()));
+    }
+
+    private void addTenantRole(Long roleId, Long tenantId, Long tenantPackageId, String permIds) {
+        RoleVO roleVO = new RoleVO();
+        roleVO.setRoleId(roleId);
+        roleVO.setRoleName(RoleEnum.TENANT_ROLE_NAME);
+        roleVO.setRoleCode(RoleEnum.TENANT_ROLE_CODE);
+        roleVO.setRoleSort(CommonConstant.ZERO);
+        roleVO.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
+        roleVO.setRemark("添加租户系统自动创建角色");
+        roleVO.setTenantId(tenantId);
+        List<String> checkedPermIds = Arrays.asList(permIds.split(","));
+        roleVO.setCheckedPermIds(checkedPermIds);
+        //租户角色和权限关联关系
+        List<MTenantPackagePerm> mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
+        List<Long> permissionsIds = mTenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+        roleVO.setPermissionsIds(permissionsIds);
+        roleService.addRole(roleVO);
+    }
+
+    private void addTenantUser(UserVO userInfo, Long tenantId) {
+        MUser user = new MUser();
+        user.setUserId(userInfo.getUserId());
+        user.setUsername(userInfo.getUsername());
+        user.setNickname(userInfo.getNickname());
+        user.setUserRealName(userInfo.getUserRealName());
+        user.setEmail(userInfo.getEmail());
+        user.setPhone(userInfo.getPhone());
+        user.setUserSex(userInfo.getUserSex());
+        //生成盐值，密码加密
+        String salt = RandomUtil.randomString(6);
+        user.setSalt(salt);
+        user.setPassword(userManager.passwordEncrypt(userInfo.getPassword(), salt));
+        user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
+        user.setTenantId(tenantId);
+        userMapper.insert(user);
+    }
+
+    private void addTenantUserRole(Long userId, Long roleId) {
+        MUserRole userRole = new MUserRole();
+        userRole.setUserId(userId);
+        userRole.setRoleId(roleId);
+        int insertUserRoleCount = userRoleMapper.insert(userRole);
+        Assert.isTrue(insertUserRoleCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
     }
 
 }

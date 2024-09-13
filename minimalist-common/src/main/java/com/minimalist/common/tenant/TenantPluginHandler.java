@@ -43,14 +43,18 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public boolean ignoreTable(String tableName) {
+        //多租户忽略
+        if (SafetyUtil.checkIgnoreTenant()) {
+            return true;
+        }
         //多租户开启
         if (TenantPluginConfig.onOff) {
             //如果是系统用户，则忽略，用户ID <= 0 表示系统用户
             if (StpUtil.getLoginIdAsLong() <= CommonConstant.ZERO) {
                 return true;
             }
-            //个别方法忽略 || 某张表忽略
-            return SafetyUtil.checkIgnoreTenant() || TenantPluginConfig.tenantIgnoreTable.contains(tableName);
+            //某张表忽略
+            return TenantPluginConfig.tenantIgnoreTable.contains(tableName);
         }
         //多租户未开启，忽略
         return true;

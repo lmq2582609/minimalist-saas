@@ -25,11 +25,15 @@ public class TenantManager {
     private MUserMapper userMapper;
 
     public void checkTenantPackage(long tenantId) {
+        //检查租户下用户数是否满足套餐
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
         long userCount = userMapper.selectUserCountByTenantId(tenantId);
         Assert.isFalse(userCount >= mTenant.getAccountCount(),
                 () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
+        //检查租户状态
+        Assert.isTrue(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode().equals(mTenant.getStatus()),
+                () -> new BusinessException(TenantEnum.ErrorMsg.DISABLED_TENANT.getDesc()));
     }
 
     /**

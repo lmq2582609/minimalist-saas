@@ -48,4 +48,7 @@ public class TenantPackageVO implements Serializable {
     @Schema(name = "permissionsIds", description = "租户套餐权限编码集合", type = "array")
     private List<Long> permissionsIds;
 
+    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
+    private Boolean allowDelete;
+
 }

@@ -92,4 +92,7 @@ public class UserVO implements Serializable {
     @Schema(name = "checkedPermIds", description = "用户部门编码集合，全勾选的节点", type = "array")
     private List<String> checkedDeptIds;
 
+    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
+    private Boolean allowDelete;
+
 }

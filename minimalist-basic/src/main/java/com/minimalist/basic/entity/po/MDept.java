@@ -78,4 +78,8 @@ public class MDept extends BaseEntity {
      */
     @TableField("tenant_id")
     private Long tenantId;
+
+    /** 该数据是否可以被删除 0否 1是 */
+    @TableField(value = "allow_delete")
+    private Boolean allowDelete;
 }

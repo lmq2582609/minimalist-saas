@@ -116,27 +116,36 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
         //租户ID，用于和新增用户建立绑定关系
-        Long tenantId = Optional.ofNullable(userVO.getTenantId()).orElse(SafetyUtil.getLonginUserTenantId());
+        long tenantId = SafetyUtil.getLonginUserTenantId();
         //校验用户名唯一
-        userManager.checkUsernameUniqueness(userVO.getUsername(), tenantId);
+        userManager.checkUsernameUniqueness(userVO.getUsername(), null);
         //校验邮箱唯一
-        userManager.checkUserEmailUniqueness(userVO.getEmail());
-        //新增用户时，校验该租户套餐是否满足条件
+        userManager.checkUserEmailUniqueness(userVO.getEmail(), null);
+        //校验该租户套餐是否满足条件
         tenantManager.checkTenantPackage(tenantId);
+
+        //新增用户数据
         MUser user = BeanUtil.copyProperties(userVO, MUser.class);
-        long userId = Optional.ofNullable(userVO.getUserId()).orElse(UnqIdUtil.uniqueId());
+        long userId = UnqIdUtil.uniqueId();
         user.setUserId(userId);
         user.setTenantId(tenantId);
+        user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
         //生成盐值，密码加密
         String salt = RandomUtil.randomString(6);
         user.setSalt(salt);
-        user.setPassword(userManager.passwordEncrypt(userVO.getPassword(), salt));
+        if (StrUtil.isNotBlank(userVO.getPassword())) {
+            user.setPassword(userManager.passwordEncrypt(userVO.getPassword(), salt));
+        } else {
+            //设置默认密码
+            user.setPassword(userManager.passwordEncrypt("123456qwerty", salt));
+        }
         //处理用户所在部门
-        user.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
-        int insertCount = userMapper.insert(user);
-        Assert.isTrue(insertCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        if (CollectionUtil.isNotEmpty(userVO.getCheckedDeptIds())) {
+            user.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
+        }
+        userMapper.insert(user);
         //新增用户关联信息
-        insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userId);
+        userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userId);
     }
 
     /**
@@ -148,10 +157,9 @@ public class UserServiceImpl implements UserService {
     public void deleteUserByUserId(Long userId) {
         //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
         tenantManager.checkTenantEqual(userId, StpUtil.getLoginIdAsLong());
-        int deleteCount = userMapper.deleteUserByUserId(userId);
-        Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        userMapper.deleteUserByUserId(userId);
         //删除用户关联信息
-        deleteUserRelation(userId);
+        userManager.deleteUserRelation(userId);
     }
 
     /**
@@ -162,11 +170,15 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserByUserId(UserVO userVO) {
         //校验用户名唯一
-        userManager.checkUsernameUniqueness(userVO.getUsername(), SafetyUtil.getLonginUserTenantId());
+        userManager.checkUsernameUniqueness(userVO.getUsername(), userVO.getUserId());
         //校验邮箱唯一
-        userManager.checkUserEmailUniqueness(userVO.getEmail());
+        userManager.checkUserEmailUniqueness(userVO.getEmail(), userVO.getUserId());
+        //校验该租户套餐是否满足条件
+        tenantManager.checkTenantPackage(SafetyUtil.getLonginUserTenantId());
         //检查租户ID，要修改的用户的租户必须与本次操作人的租户一致
         MUser optUser = tenantManager.checkTenantEqual(userVO.getUserId(), StpUtil.getLoginIdAsLong());
+
+        //修改用户信息
         MUser newUser = BeanUtil.copyProperties(userVO, MUser.class);
         //是否需要修改密码
         if (StrUtil.isNotBlank(userVO.getPassword())) {
@@ -175,14 +187,16 @@ public class UserServiceImpl implements UserService {
         }
         //乐观锁字段赋值
         newUser.updateBeforeSetVersion(optUser.getVersion());
-        //处理部门
-        newUser.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
+        //处理用户所在部门
+        if (CollectionUtil.isNotEmpty(userVO.getCheckedDeptIds())) {
+            newUser.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
+        }
         //修改用户
         userMapper.updateUserByUserId(newUser);
         //删除用户关联信息
-        deleteUserRelation(optUser.getUserId());
+        userManager.deleteUserRelation(optUser.getUserId());
         //新增用户关联信息
-        insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), optUser.getUserId());
+        userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), optUser.getUserId());
     }
 
     /**
@@ -447,55 +461,6 @@ public class UserServiceImpl implements UserService {
         updateUser.updateBeforeSetVersion(user.getVersion());
         int updateCount = userMapper.updateUserByUserId(updateUser);
         Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-    }
-
-    /**
-     * 删除用户角色、岗位关联信息
-     * @param userId 用户ID
-     */
-    private void deleteUserRelation(Long userId) {
-        //删除用户与角色关联关系 -> 真实删除
-        entityService.delete(MUserRole::getUserId, userId);
-        //删除用户与岗位关联关系 -> 真实删除
-        entityService.delete(MUserPost::getUserId, userId);
-        //删除用户与部门关联关系 -> 真实删除
-        entityService.delete(MUserDept::getUserId, userId);
-    }
-
-    /**
-     * 新增用户角色、岗位关联信息
-     * @param roleIds 角色ID列表
-     * @param postIds 岗位ID列表
-     * @param deptIds 部门ID列表
-     */
-    private void insertUserRelation(Set<Long> roleIds, Set<Long> postIds, Set<Long> deptIds, Long userId) {
-        //插入用户与角色关联关系
-        List<MUserRole> userRoleList = roleIds.stream().map(r -> {
-            MUserRole userRole = new MUserRole();
-            userRole.setUserId(userId);
-            userRole.setRoleId(r);
-            return userRole;
-        }).toList();
-        int userRoleInsertBatchCount = entityService.insertBatch(userRoleList);
-        Assert.isTrue(roleIds.size() == userRoleInsertBatchCount, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-        //插入用户与岗位关联关系
-        List<MUserPost> userPostList = postIds.stream().map(p -> {
-            MUserPost userPost = new MUserPost();
-            userPost.setUserId(userId);
-            userPost.setPostId(p);
-            return userPost;
-        }).toList();
-        int userPostInsertBatchCount = entityService.insertBatch(userPostList);
-        Assert.isTrue(postIds.size() == userPostInsertBatchCount, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-        //插入用户与部门关联关系
-        List<MUserDept> userDeptList = deptIds.stream().map(d -> {
-            MUserDept userDept = new MUserDept();
-            userDept.setUserId(userId);
-            userDept.setDeptId(d);
-            return userDept;
-        }).toList();
-        int userDeptInsertBatchCount = entityService.insertBatch(userDeptList);
-        Assert.isTrue(deptIds.size() == userDeptInsertBatchCount, () -> new BusinessException(RespEnum.FAILED.getDesc()));
     }
 
 }

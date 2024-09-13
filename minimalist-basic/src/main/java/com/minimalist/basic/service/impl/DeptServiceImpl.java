@@ -7,27 +7,35 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.enums.DeptEnum;
 import com.minimalist.basic.entity.po.MDept;
+import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.mapper.MDeptMapper;
+import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.service.DeptService;
 import com.minimalist.common.constant.CommonConstant;
-import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
+import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DeptServiceImpl implements DeptService {
 
     @Autowired
+    private MUserMapper userMapper;
+
+    @Autowired
     private MDeptMapper deptMapper;
+
+    @Autowired
+    private EntityService entityService;
 
     /**
      * 添加部门
@@ -37,6 +45,7 @@ public class DeptServiceImpl implements DeptService {
     public void addDept(DeptVO deptVO) {
         MDept mDept = BeanUtil.copyProperties(deptVO, MDept.class);
         mDept.setDeptId(UnqIdUtil.uniqueId());
+        //如果不是顶级
         if (CommonConstant.ZERO != deptVO.getParentDeptId()) {
             MDept parentDept = deptMapper.selectDeptByDeptId(deptVO.getParentDeptId());
             //祖级列表
@@ -46,8 +55,7 @@ public class DeptServiceImpl implements DeptService {
             mDept.setAncestors(ancestors);
         }
         //新增
-        int insertCount = deptMapper.insert(mDept);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        deptMapper.insert(mDept);
     }
 
     /**
@@ -55,12 +63,22 @@ public class DeptServiceImpl implements DeptService {
      * @param deptId 部门ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteDeptByDeptId(Long deptId) {
         //检查是否包含下级，包含下级不允许删除
         long childrenCount = deptMapper.selectChildrenCountByDeptId(deptId);
         Assert.isFalse(childrenCount > 0, () -> new BusinessException(DeptEnum.ErrorMsg.CONTAIN_CHILDREN.getDesc()));
-        int deleteCount = deptMapper.deleteDeptByDeptId(deptId);
-        Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        //检查是否有用户在该部门，有用户在该部门不允许删除
+        List<MDept> deptList = deptMapper.selectChildrenDeptByDeptId(deptId);
+        if (CollectionUtil.isNotEmpty(deptList)) {
+            List<Long> deptIds = deptList.stream().map(MDept::getDeptId).toList();
+            long userDeptCount = userMapper.selectUserCountByDeptIds(deptIds);
+            Assert.isFalse(userDeptCount > 0, () -> new BusinessException(DeptEnum.ErrorMsg.USER_DEPT_CHILDREN.getDesc()));
+        }
+        //删除部门
+        deptMapper.deleteDeptByDeptId(deptId);
+        //删除部门和用户关联关系
+        entityService.delete(MUserDept::getDeptId, deptId);
     }
 
     /**

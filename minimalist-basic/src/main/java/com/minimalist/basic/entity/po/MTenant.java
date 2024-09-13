@@ -60,7 +60,7 @@ public class MTenant extends BaseEntity {
      * 状态
      */
     @TableField("status")
-    private Byte status;
+    private Integer status;
 
     /**
      * 备注

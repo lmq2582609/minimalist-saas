@@ -26,9 +26,10 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 下级数量
      */
     default long selectChildrenCountByDeptId(Long deptId) {
-        LambdaQueryWrapper<MDept> pQuery = new LambdaQueryWrapper<>();
-        pQuery.eq(MDept::getParentDeptId, deptId);
-        return selectCount(pQuery);
+        return selectCount(
+                new LambdaQueryWrapper<MDept>()
+                        .apply("FIND_IN_SET("  + deptId +", ancestors)")
+        );
     }
 
     /**
