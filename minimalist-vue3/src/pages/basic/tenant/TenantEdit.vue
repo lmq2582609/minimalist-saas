@@ -16,12 +16,6 @@
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />
                 </a-form-item>
-                <!-- 修改时，回显用户信息，不允许操作 -->
-                <a-form-item class="w-[49%]" field="userId" label="联系人" v-if="props.params.operationType === proxy.operationType.update.type">
-                    <a-select class="w-[100%]" v-model="form.userId" placeholder="联系人" allow-clear allow-search :disabled="props.params.operationType === proxy.operationType.update.type">
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.userAllList]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="租户状态" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="租户状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.tenantStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -87,7 +81,7 @@ import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.userAllList, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.userStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.userStatus])
 //接收父组件参数
 const props = defineProps({
     params: {

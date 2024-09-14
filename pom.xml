@@ -21,7 +21,7 @@
         <!-- jwt版本 -->
         <jwt.version>0.9.1</jwt.version>
         <!-- redisson版本 -->
-        <redisson.version>3.23.0</redisson.version>
+        <redisson.version>3.36.0</redisson.version>
         <!-- mysql驱动版本 -->
         <mysql.version>8.0.33</mysql.version>
         <!-- mybatis-plus版本 -->

@@ -70,17 +70,6 @@ public class EDictServiceImpl implements EDictService {
     }
 
     /**
-     * 获取全部用户字典数据（额外字典数据）
-     * @return 字典数据列表
-     */
-    @Override
-    @IgnoreTenant
-    @EDict(dictType = EDictConstant.USER_ALL_LIST)
-    public DictCacheVO getAllUserDictData() {
-        return getUserDictList(EDictConstant.USER_ALL_LIST);
-    }
-
-    /**
      * 获取租户套餐字典数据（额外字典数据）
      * @return 字典数据列表
      */

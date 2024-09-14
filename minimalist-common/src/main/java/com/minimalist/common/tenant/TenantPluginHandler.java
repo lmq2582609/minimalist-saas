@@ -49,10 +49,6 @@ public class TenantPluginHandler implements TenantLineHandler {
         }
         //多租户开启
         if (TenantPluginConfig.onOff) {
-            //如果是系统用户，则忽略，用户ID <= 0 表示系统用户
-            if (StpUtil.getLoginIdAsLong() <= CommonConstant.ZERO) {
-                return true;
-            }
             //某张表忽略
             return TenantPluginConfig.tenantIgnoreTable.contains(tableName);
         }
@@ -68,9 +64,13 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public boolean ignoreInsert(List<Column> columns, String tenantIdColumn) {
+        //多租户忽略
+        if (SafetyUtil.checkIgnoreTenant()) {
+            return true;
+        }
         //多租户开启
         if (TenantPluginConfig.onOff) {
-            return SafetyUtil.checkIgnoreTenant() || TenantLineHandler.super.ignoreInsert(columns, tenantIdColumn);
+            return TenantLineHandler.super.ignoreInsert(columns, tenantIdColumn);
         }
         //多租户未开启，忽略
         return true;

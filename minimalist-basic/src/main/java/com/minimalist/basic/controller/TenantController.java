@@ -4,6 +4,7 @@ import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.service.TenantService;
 import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.tenant.IgnoreTenant;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ public class TenantController {
     @Autowired
     private TenantService tenantService;
 
+    @IgnoreTenant
     @PostMapping("/addTenant")
     @Operation(summary = "添加租户")
     public ResponseEntity<Void> addTenant(@RequestBody @Validated(Add.class) TenantVO tenantVO) {
@@ -31,6 +33,7 @@ public class TenantController {
         return ResponseEntity.ok().build();
     }
 
+    @IgnoreTenant
     @DeleteMapping("/deleteTenantByTenantId")
     @Operation(summary = "删除租户 -> 根据租户ID删除租户")
     public ResponseEntity<Void> deleteTenantByTenantId(@RequestParam("tenantId")
@@ -40,6 +43,7 @@ public class TenantController {
         return ResponseEntity.ok().build();
     }
 
+    @IgnoreTenant
     @PutMapping("/updateTenantByTenantId")
     @Operation(summary = "修改租户 -> 根据租户ID修改")
     public ResponseEntity<Void> updateTenantByTenantId(@RequestBody @Validated(Update.class) TenantVO tenantVO) {
@@ -47,12 +51,14 @@ public class TenantController {
         return ResponseEntity.ok().build();
     }
 
+    @IgnoreTenant
     @GetMapping("/getPageTenantList")
     @Operation(summary = "查询租户(分页)")
     public ResponseEntity<PageResp<TenantVO>> getPageTenantList(TenantQueryVO queryVO) {
         return ResponseEntity.ok(tenantService.getPageTenantList(queryVO));
     }
 
+    @IgnoreTenant
     @GetMapping("/getTenantByTenantId/{tenantId}")
     @Operation(summary = "根据租户ID查询租户")
     public ResponseEntity<TenantVO> getTenantByTenantId(@PathVariable(value = "tenantId")
