@@ -11,7 +11,7 @@
                 <a-form-item class="w-[49%]" field="roleSort" label="排序值" required>
                     <a-input-number :min="0" v-model="form.roleSort" placeholder="排序值" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="角色状态" required>
+                <a-form-item class="w-[49%]" field="status" label="角色状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="角色状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.roleStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
@@ -94,7 +94,6 @@ const rules = {
     roleName: [{required: true, message: '角色名称不能为空', trigger: 'submit'}],
     roleCode: [{required: true, message: '角色编码不能为空', trigger: 'submit'}],
     roleSort: [{required: true, message: '排序值不能为空', trigger: 'submit'}],
-    status: [{required: true, message: '角色状态不能为空', trigger: 'submit'}],
     permissionsIds: [{required: true, message: '角色权限不能为空', trigger: 'submit'}],
     checkedPermIds: [{required: true, message: '角色权限不能为空', trigger: 'submit'}]
 }

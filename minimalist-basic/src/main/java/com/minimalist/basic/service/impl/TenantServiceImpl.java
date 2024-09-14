@@ -86,6 +86,7 @@ public class TenantServiceImpl implements TenantService {
         //插入租户数据
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
+        mTenant.setStatus(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode());
         int insertCount = tenantMapper.insert(mTenant);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
     }
@@ -177,18 +178,6 @@ public class TenantServiceImpl implements TenantService {
     }
 
     /**
-     * 根据用户ID查询租户
-     * @param userId 用户ID
-     * @return 租户数据
-     */
-    @Override
-    public TenantVO getTenantByUserId(Long userId) {
-        //根据用户ID查询租户
-        MTenant mTenant = tenantMapper.selectTenantByUserId(userId);
-        return BeanUtil.copyProperties(mTenant, TenantVO.class);
-    }
-
-    /**
      * 校验租户名是否存在，存在则抛出异常
      * @param tenantName 租户名
      */
@@ -226,12 +215,13 @@ public class TenantServiceImpl implements TenantService {
     private void addTenantRole(Long roleId, Long tenantId, Long tenantPackageId, String permIds) {
         RoleVO roleVO = new RoleVO();
         roleVO.setRoleId(roleId);
-        roleVO.setRoleName(RoleEnum.TENANT_ROLE_NAME);
-        roleVO.setRoleCode(RoleEnum.TENANT_ROLE_CODE);
+        roleVO.setRoleCode(RoleEnum.Role.ADMIN.getCode());
+        roleVO.setRoleName(RoleEnum.Role.ADMIN.getName());
         roleVO.setRoleSort(CommonConstant.ZERO);
         roleVO.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
         roleVO.setRemark("添加租户系统自动创建角色");
         roleVO.setTenantId(tenantId);
+        roleVO.setAllowDelete(false);   //该角色不允许被删除
         List<String> checkedPermIds = Arrays.asList(permIds.split(","));
         roleVO.setCheckedPermIds(checkedPermIds);
         //租户角色和权限关联关系
@@ -256,6 +246,7 @@ public class TenantServiceImpl implements TenantService {
         user.setPassword(userManager.passwordEncrypt(userInfo.getPassword(), salt));
         user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
         user.setTenantId(tenantId);
+        user.setAllowDelete(false); //该用户不可被删除，在删除租户的时候，会删除该用户
         userMapper.insert(user);
     }
 

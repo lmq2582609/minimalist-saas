@@ -63,33 +63,18 @@ const sysStore = useSysStore(pinia)
  * @return 返回一个对象，key是字典类型，value是字典数据列表
  */
 export const LoadDicts = (dictTypeList) => {
-    const dicts = reactive({});
-    //返回结果
     let result = {}
-    //待获取的字典类型
-    let arr = []
-    //检查缓存中是否已有数据
-    dictTypeList.forEach(dictType => {
-        if (sysStore.dictData[dictType]) {
-            //缓存中已有，存储到返回结果
-            result[dictType] = sysStore.dictData[dictType]
-        } else {
-            arr.push(dictType)
-        }
-    })
-    //如果不需要从后端获取字典，直接返回
-    if (arr.length === 0) {
-        Object.assign(dicts, result);
-        return dicts;
+    if (!dictTypeList || dictTypeList.length === 0) {
+        return result;
     }
     //获取字典
     onMounted(async () => {
-        await getDictByDictTypeListApi(arr).then(res => {
+        await getDictByDictTypeListApi(dictTypeList).then(res => {
             //处理数据
             if (res && res.length > 0) {
                 res.forEach(dict => {
                     let dictType = dict.dictType
-                    let dictList = dict.dictList
+                    let dictList = dict.dictList || []
                     dictList.forEach(d => {
                         if (/^true|false$/.test(d.dictKey)) {
                             //转布尔
@@ -111,15 +96,11 @@ export const LoadDicts = (dictTypeList) => {
                             }
                         }
                     })
-                    //存储到缓存
-                    sysStore.setDictData(dictType, dictList)
                     //存储到返回结果
                     result[dictType] = dictList
                 })
-                //合并对象
-                Object.assign(dicts, result)
             }
         })
     });
-    return dicts
+    return result
 }

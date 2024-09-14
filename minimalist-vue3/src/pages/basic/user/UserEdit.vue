@@ -70,6 +70,7 @@
                                         title: 'deptName',
                                         children: 'children'
                                     }" />
+                            <a-empty v-else />
                         </a-scrollbar>
                     </a-spin>
                 </a-form-item>
@@ -197,13 +198,16 @@ const cancelBtnClick = () => {
 //获取部门树的节点 isGetHalf：是否获取半勾选节点ID
 const getDeptTreeSelectData = (isGetHalf) => {
     //选中的节点
-    let checkedKeys = treeRef.value.getCheckedNodes()
-    if (checkedKeys && checkedKeys.length > 0) {
-        checkedKeys = [...new Set(checkedKeys.map(node => node.deptId))]
+    let checkedKeys = []
+    if (treeRef.value) {
+        checkedKeys = treeRef.value.getCheckedNodes()
+        if (checkedKeys && checkedKeys.length > 0) {
+            checkedKeys = [...new Set(checkedKeys.map(node => node.deptId))]
+        }
     }
     //半选中的节点
     let halfCheckedKeys = []
-    if (isGetHalf) {
+    if (isGetHalf && treeRef.value) {
         halfCheckedKeys = treeRef.value.getHalfCheckedNodes()
         if (halfCheckedKeys && halfCheckedKeys.length > 0) {
             halfCheckedKeys = [...new Set(halfCheckedKeys.map(node => node.deptId))]

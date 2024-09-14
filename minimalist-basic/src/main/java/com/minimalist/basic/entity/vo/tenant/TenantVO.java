@@ -31,6 +31,7 @@ public class TenantVO implements Serializable {
     private Long tenantId;
 
     @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "租户联系人不能为空", groups = {Update.class})
     @Schema(name = "userId", description = "用户ID，与租户绑定", type = "string")
     private Long userId;
 
@@ -62,7 +63,7 @@ public class TenantVO implements Serializable {
     @Schema(name = "accountCount", description = "可创建账号数量，表示这个租户下可以创建多少账号", type = "integer")
     private Integer accountCount;
 
-    @NotNull(message = "租户状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "租户状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = TenantEnum.TenantStatus.class)
     @Schema(name = "status", description = "租户状态", type = "integer")
     private Byte status;
@@ -72,5 +73,8 @@ public class TenantVO implements Serializable {
 
     @Schema(name = "user", description = "租户的用户信息，新增时填充", type = "string")
     private UserVO user;
+
+    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
+    private Boolean allowDelete;
 
 }

@@ -23,7 +23,7 @@
                 <a-form-item class="w-[49%]" field="email" label="部门邮箱">
                     <a-input v-model="form.email" placeholder="部门邮箱" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="部门状态" required>
+                <a-form-item class="w-[49%]" field="status" label="部门状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="部门状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.deptStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
@@ -91,7 +91,6 @@ const rules = {
     deptLeader: [{required: true, message: '部门负责人不能为空', trigger: 'submit'}],
     phone: [{required: true, message: '部门电话不能为空', trigger: 'submit'}],
     email: [{required: true, message: '部门邮箱不能为空', trigger: 'submit'}],
-    status: [{required: true, message: '部门状态不能为空', trigger: 'submit'}],
 }
 //确定 -> 点击
 const okBtnClick = () => {

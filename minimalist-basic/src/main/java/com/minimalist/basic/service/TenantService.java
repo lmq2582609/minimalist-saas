@@ -38,11 +38,4 @@ public interface TenantService {
      */
     TenantVO getTenantByTenantId(Long tenantId);
 
-    /**
-     * 根据用户ID查询租户
-     * @param userId 用户ID
-     * @return 租户数据
-     */
-    TenantVO getTenantByUserId(Long userId);
-
 }

@@ -17,12 +17,12 @@
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />
                 </a-form-item>
                 <!-- 修改时，回显用户信息，不允许操作 -->
-                <a-form-item class="w-[49%]" field="userId" label="联系人" required v-if="props.params.operationType === proxy.operationType.update.type">
+                <a-form-item class="w-[49%]" field="userId" label="联系人" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select class="w-[100%]" v-model="form.userId" placeholder="联系人" allow-clear allow-search :disabled="props.params.operationType === proxy.operationType.update.type">
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userAllList]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="租户状态" required>
+                <a-form-item class="w-[49%]" field="status" label="租户状态" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="租户状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.tenantStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
@@ -37,30 +37,30 @@
                 </a-divider>
 
                 <!-- 新增时，添加用户信息 -->
-                <a-form-item class="w-[49%]" field="username" label="用户账号" required tooltip="用户登录系统使用的账号" v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="username" label="用户账号" tooltip="用户登录系统使用的账号" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-input v-model="form.user.username" placeholder="用户账号" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="password" label="用户密码" required v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="password" label="用户密码" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-input-password v-model="form.user.password" placeholder="用户密码" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="nickname" label="用户昵称" required tooltip="用户的网名" v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="nickname" label="用户昵称" tooltip="用户的网名" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-input v-model="form.user.nickname" placeholder="用户昵称" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="userRealName" label="用户真实姓名" required v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="userRealName" label="用户真实姓名" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-input v-model="form.user.userRealName" placeholder="用户真实姓名" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="phone" label="手机号" required v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="phone" label="手机号" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-input v-model="form.user.phone" placeholder="手机号" />
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="email" label="邮箱" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-input v-model="form.user.email" placeholder="邮箱" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="userSex" label="用户性别" required v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="userSex" label="用户性别" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-select v-model="form.user.userSex" placeholder="用户性别" allow-clear allow-search>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userSex]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="用户状态" required v-if="props.params.operationType === proxy.operationType.add.type">
+                <a-form-item class="w-[49%]" field="status" label="用户状态" v-if="props.params.operationType === proxy.operationType.add.type">
                     <a-select v-model="form.user.status" placeholder="用户状态" allow-clear allow-search>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
@@ -145,7 +145,6 @@ const rules = {
     packageId: [{required: true, message: '租户套餐不能为空', trigger: 'submit'}],
     accountCount: [{required: true, message: '账号额度不能为空', trigger: 'submit'}],
     expireTime: [{required: true, message: '过期时间不能为空', trigger: 'submit'}],
-    status: [{required: true, message: '租户状态不能为空', trigger: 'submit'}]
 }
 //确定 -> 点击
 const okBtnClick = () => {

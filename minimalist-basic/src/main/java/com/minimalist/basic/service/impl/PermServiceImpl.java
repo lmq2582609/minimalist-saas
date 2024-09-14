@@ -6,12 +6,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import com.minimalist.basic.entity.enums.PermEnum;
-import com.minimalist.basic.entity.po.MPerms;
-import com.minimalist.basic.entity.po.MRolePerm;
+import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.perm.PermQueryVO;
 import com.minimalist.basic.entity.vo.perm.PermVO;
-import com.minimalist.basic.mapper.MPermsMapper;
-import com.minimalist.basic.mapper.MRolePermMapper;
+import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.PermService;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
@@ -31,6 +29,15 @@ public class PermServiceImpl implements PermService {
 
     @Autowired
     private MRolePermMapper rolePermMapper;
+
+    @Autowired
+    private MTenantMapper tenantMapper;
+
+    @Autowired
+    private MTenantPackageMapper tenantPackageMapper;
+
+    @Autowired
+    private MTenantPackagePermMapper tenantPackagePermMapper;
 
     /**
      * 根据角色ID获取权限
@@ -139,10 +146,13 @@ public class PermServiceImpl implements PermService {
             perms = permsMapper.getEnablePermList();
         } else {
             //租户查询，只查询租户套餐关联的权限
-            long loginIdAsLong = StpUtil.getLoginIdAsLong();
-            //TODO
-
-            //perms = tenantPackageService.getPermsByTenantId();
+            long tenantId = SafetyUtil.getLonginUserTenantId();
+            //查询租户
+            MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
+            //查询租户套餐权限
+            List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
+            List<Long> permIds = tenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+            perms = permsMapper.selectPermsByPermsIds(permIds);
         }
         return permsToTree(perms);
     }

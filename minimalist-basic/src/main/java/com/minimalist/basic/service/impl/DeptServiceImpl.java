@@ -45,6 +45,7 @@ public class DeptServiceImpl implements DeptService {
     public void addDept(DeptVO deptVO) {
         MDept mDept = BeanUtil.copyProperties(deptVO, MDept.class);
         mDept.setDeptId(UnqIdUtil.uniqueId());
+        mDept.setStatus(DeptEnum.DeptStatus.DEPT_STATUS_1.getCode());
         //如果不是顶级
         if (CommonConstant.ZERO != deptVO.getParentDeptId()) {
             MDept parentDept = deptMapper.selectDeptByDeptId(deptVO.getParentDeptId());

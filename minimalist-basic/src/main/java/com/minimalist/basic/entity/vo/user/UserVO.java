@@ -64,7 +64,7 @@ public class UserVO implements Serializable {
     @Schema(name = "remark", description = "备注", type = "string")
     private String remark;
 
-    @NotNull(message = "用户状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "用户状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = UserEnum.UserStatus.class)
     @Schema(name = "status", description = "用户状态", type = "integer")
     private Integer status;
@@ -79,16 +79,13 @@ public class UserVO implements Serializable {
     private Set<Long> roleIds;
 
     @JsonSerialize(using = LongArrJsonSerializer.class)
-    @NotEmpty(message = "岗位不能为空", groups = {Add.class, Update.class})
     @Schema(name = "postIds", description = "岗位ID集合", type = "array")
     private Set<Long> postIds;
 
     @JsonSerialize(using = LongArrJsonSerializer.class)
-    @NotEmpty(message = "部门不能为空", groups = {Add.class, Update.class})
     @Schema(name = "deptIds", description = "部门ID集合", type = "array")
     private Set<Long> deptIds;
 
-    @NotEmpty(message = "部门不能为空", groups = {Add.class, Update.class})
     @Schema(name = "checkedPermIds", description = "用户部门编码集合，全勾选的节点", type = "array")
     private List<String> checkedDeptIds;
 

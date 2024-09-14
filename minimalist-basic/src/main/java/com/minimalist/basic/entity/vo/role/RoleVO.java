@@ -40,7 +40,7 @@ public class RoleVO implements Serializable {
     @Schema(name = "roleSort", description = "排序", type = "integer")
     private Integer roleSort;
 
-    @NotNull(message = "角色状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "角色状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = RoleEnum.RoleStatus.class)
     @Schema(name = "status", description = "角色状态", type = "integer")
     private Integer status;

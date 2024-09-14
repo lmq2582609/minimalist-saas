@@ -18,14 +18,8 @@ export const useSysStore = defineStore('sysStore', {
         siderMaxWidth: 200,
         //sider缩起时的宽度
         siderMinWidth: 48,
-        //字典数据 -> key: dictType-字典类型，value: []-字典数据列表
-        dictData: {}
     }),
     actions: {
-        //设置字典数据
-        setDictData(dictType, dictList) {
-            this.dictData[dictType] = dictList
-        },
         //修改用户头像
         updateUserAvatar(userAvatar) {
             this.user.userAvatar = userAvatar

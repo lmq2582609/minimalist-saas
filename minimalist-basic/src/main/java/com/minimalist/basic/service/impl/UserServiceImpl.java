@@ -190,6 +190,11 @@ public class UserServiceImpl implements UserService {
         //处理用户所在部门
         if (CollectionUtil.isNotEmpty(userVO.getCheckedDeptIds())) {
             newUser.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
+        } else {
+            //此处需要set一个null值，因为上面copyProperties拷贝时，
+            //vo中的deptIds是Set类型，user实体中的deptIds是String类型
+            //如果vo中deptIds是空集合，会导致拷贝后user实体中的deptIds="[]"
+            newUser.setDeptIds(null);
         }
         //修改用户
         userMapper.updateUserByUserId(newUser);
@@ -378,7 +383,7 @@ public class UserServiceImpl implements UserService {
         Assert.isTrue(UserEnum.UserStatus.USER_STATUS_1.getCode().equals(loginUser.getStatus()),
                 () -> new BusinessException(UserEnum.ErrorMsg.USER_FROZEN.getDesc()));
         //根据用户ID查询租户
-        TenantVO tenantVO = tenantService.getTenantByUserId(loginUser.getUserId());
+        TenantVO tenantVO = tenantService.getTenantByTenantId(loginUser.getTenantId());
         //账户未绑定租户
         Assert.notNull(tenantVO, () -> new BusinessException(UserEnum.ErrorMsg.USER_UNBOUND_TENANT.getDesc()));
         //租户状态

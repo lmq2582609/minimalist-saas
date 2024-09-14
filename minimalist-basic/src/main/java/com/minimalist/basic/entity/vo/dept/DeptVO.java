@@ -56,7 +56,7 @@ public class DeptVO implements Serializable {
     private String email;
 
     @SchemaEnum(implementation = DeptEnum.DeptStatus.class)
-    @NotNull(message = "部门状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "部门状态不能为空", groups = {Update.class})
     @Schema(name = "status", description = "部门状态", type = "integer")
     private Integer status;
 
