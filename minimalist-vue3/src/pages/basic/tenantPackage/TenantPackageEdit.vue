@@ -1,32 +1,30 @@
 <template>
     <a-spin class="w-[100%]" :size="35" :loading="spinLoading" tip="正在处理, 请稍候...">
         <a-form :model="form" ref="formRef" layout="vertical" :rules="rules" auto-label-width>
-            <div class="flex justify-between" style="flex-wrap: wrap;">
-                <a-form-item class="w-[49%]" field="packageName" label="套餐名称" required>
-                    <a-input v-model="form.packageName" placeholder="套餐名称" />
-                </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="套餐状态" required>
-                    <a-select v-model="form.status" placeholder="套餐状态" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.tenantPackageStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
-                <a-form-item class="w-[100%]" field="remark" label="备注">
-                    <a-textarea v-model="form.remark" placeholder="备注" />
-                </a-form-item>
-                <a-form-item class="w-[100%]" field="checkedPermIds" label="套餐权限" required>
-                    <a-spin class="w-[100%]" :size="35" :loading="permTreeSpinLoading" tip="正在处理, 请稍候...">
-                        <a-scrollbar class="w-[100%] max-h-[250px] overflow-auto border" :outer-style="{width: '100%'}" type="track">
-                            <a-tree v-model:checked-keys="form.checkedPermIds" :data="permTreeData" ref="treeRef" v-if="permTreeData.length > 0"
-                                    show-line multiple checkable blockNode action-on-node-click="expand"
-                                    :fieldNames="{
+            <a-form-item field="packageName" label="套餐名称" required>
+                <a-input v-model="form.packageName" placeholder="套餐名称" />
+            </a-form-item>
+            <a-form-item field="status" label="套餐状态" required v-if="props.params.operationType === proxy.operationType.update.type">
+                <a-select v-model="form.status" placeholder="套餐状态" allow-clear>
+                    <a-option v-for="(d, index) in dicts[proxy.DICT.tenantPackageStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                </a-select>
+            </a-form-item>
+            <a-form-item field="remark" label="备注">
+                <a-textarea v-model="form.remark" placeholder="备注" />
+            </a-form-item>
+            <a-form-item field="checkedPermIds" label="套餐权限" required>
+                <a-spin class="w-[100%]" :size="35" :loading="permTreeSpinLoading" tip="正在处理, 请稍候...">
+                    <a-scrollbar class="w-[100%] max-h-[250px] overflow-auto border" :outer-style="{width: '100%'}" type="track">
+                        <a-tree v-model:checked-keys="form.checkedPermIds" :data="permTreeData" ref="treeRef" v-if="permTreeData.length > 0"
+                                show-line multiple checkable blockNode action-on-node-click="expand"
+                                :fieldNames="{
                                         key: 'permId',
                                         title: 'permName',
                                         children: 'children'
                                     }" />
-                        </a-scrollbar>
-                    </a-spin>
-                </a-form-item>
-            </div>
+                    </a-scrollbar>
+                </a-spin>
+            </a-form-item>
         </a-form>
 
         <!-- 分割线 -->
@@ -82,7 +80,6 @@ const form = reactive({
 //表单校验规则
 const rules = {
     packageName: [{required: true, message: '套餐名称不能为空', trigger: 'submit'}],
-    status: [{required: true, message: '套餐状态不能为空', trigger: 'submit'}],
     permissionsIds: [{required: true, message: '套餐权限不能为空', trigger: 'submit'}],
     checkedPermIds: [{required: true, message: '套餐权限不能为空', trigger: 'submit'}]
 }

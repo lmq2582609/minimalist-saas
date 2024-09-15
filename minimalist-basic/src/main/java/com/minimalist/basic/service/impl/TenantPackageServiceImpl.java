@@ -10,10 +10,7 @@ import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
-import com.minimalist.basic.mapper.MPermsMapper;
-import com.minimalist.basic.mapper.MTenantMapper;
-import com.minimalist.basic.mapper.MTenantPackageMapper;
-import com.minimalist.basic.mapper.MTenantPackagePermMapper;
+import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
@@ -44,6 +41,9 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Autowired
     private MPermsMapper permsMapper;
 
+    @Autowired
+    private MRoleMapper roleMapper;
+
     /**
      * 添加租户套餐
      * @param tenantPackageVO 租户套餐信息
@@ -54,16 +54,15 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         MTenantPackage mTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         long tenantPackageId = UnqIdUtil.uniqueId();
         mTenantPackage.setPackageId(tenantPackageId);
+        mTenantPackage.setStatus(TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_1.getCode());
         //套餐权限赋值 - 用于回显
         mTenantPackage.setPermIds(CollectionUtil.join(tenantPackageVO.getCheckedPermIds(), ","));
         //插入租户套餐
-        int insertCount = tenantPackageMapper.insert(mTenantPackage);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        tenantPackageMapper.insert(mTenantPackage);
         //构造套餐与权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), tenantPackageId);
         //插入套餐与权限的关联数据
-        int insertBatchCount = entityService.insertBatch(mTenantPackagePerms);
-        Assert.isTrue(insertBatchCount == mTenantPackagePerms.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        entityService.insertBatch(mTenantPackagePerms);
     }
 
     /**
@@ -80,8 +79,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         long tenantCount = tenantMapper.selectTenantCountByTenantPackageId(tenantPackageId);
         Assert.isTrue(tenantCount <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.USE_TENANT_PACKAGE.getDesc()));
         //删除
-        long deleteCount = tenantPackageMapper.deleteTenantPackageByTenantPackageId(tenantPackageId);
-        Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        tenantPackageMapper.deleteTenantPackageByTenantPackageId(tenantPackageId);
     }
 
     /**
@@ -99,14 +97,12 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         newTenantPackage.updateBeforeSetVersion(mTenantPackage.getVersion());
         //套餐权限赋值 - 用于回显
         newTenantPackage.setPermIds(CollectionUtil.join(tenantPackageVO.getCheckedPermIds(), ","));
-        int updateCount = tenantPackageMapper.updateTenantPackageByTenantPackageId(newTenantPackage);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        tenantPackageMapper.updateTenantPackageByTenantPackageId(newTenantPackage);
         //删除原租户套餐与权限关联数据
         entityService.delete(MTenantPackagePerm::getPackageId, newTenantPackage.getPackageId());
         //插入新租户套餐与权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), newTenantPackage.getPackageId());
-        int insertBatchCount = entityService.insertBatch(mTenantPackagePerms);
-        Assert.isTrue(insertBatchCount == mTenantPackagePerms.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        entityService.insertBatch(mTenantPackagePerms);
     }
 
     /**

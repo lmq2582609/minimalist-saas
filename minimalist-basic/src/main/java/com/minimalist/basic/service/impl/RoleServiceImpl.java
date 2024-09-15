@@ -87,12 +87,10 @@ public class RoleServiceImpl implements RoleService {
         //角色权限赋值 - 用于回显
         mRole.setPermIds(CollectionUtil.join(roleVO.getCheckedPermIds(), ","));
         //插入角色
-        int insertCount = roleMapper.insert(mRole);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        roleMapper.insert(mRole);
         //插入角色和权限关联数据
         List<MRolePerm> mRolePerms = permIdToRolePerm(roleVO.getPermissionsIds(), roleId);
-        int insertBatchCount = entityService.insertBatch(mRolePerms);
-        Assert.isTrue(insertBatchCount == mRolePerms.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        entityService.insertBatch(mRolePerms);
     }
 
     /**
@@ -163,6 +161,18 @@ public class RoleServiceImpl implements RoleService {
             roleVO.setCheckedPermIds(StrUtil.split(mRole.getPermIds(), ","));
         }
         return roleVO;
+    }
+
+    /**
+     * 根据租户ID查询角色列表
+     * @param tenantId 租户ID
+     * @return 角色列表
+     */
+    @Override
+    public List<MRole> getRoleByTenantId(Long tenantId) {
+        LambdaQueryWrapper<MRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(MRole::getTenantId, tenantId);
+        return roleMapper.selectList(queryWrapper);
     }
 
     /**

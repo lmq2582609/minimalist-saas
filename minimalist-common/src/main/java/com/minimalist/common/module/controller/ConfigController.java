@@ -4,6 +4,8 @@ import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.module.entity.vo.config.ConfigQueryVO;
 import com.minimalist.common.module.entity.vo.config.ConfigVO;
 import com.minimalist.common.module.service.ConfigService;
+import com.minimalist.common.valid.Add;
+import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +26,7 @@ public class ConfigController {
 
     @PostMapping("/addConfig")
     @Operation(summary = "添加参数")
-    public ResponseEntity<Void> addConfig(@RequestBody @Validated ConfigVO configVO) {
+    public ResponseEntity<Void> addConfig(@RequestBody @Validated(Add.class) ConfigVO configVO) {
         configService.addConfig(configVO);
         return ResponseEntity.ok().build();
     }
@@ -40,7 +42,7 @@ public class ConfigController {
 
     @PutMapping("/updateConfigByConfigId")
     @Operation(summary = "修改参数")
-    public ResponseEntity<Void> updateConfigByConfigId(@RequestBody @Validated ConfigVO configVO) {
+    public ResponseEntity<Void> updateConfigByConfigId(@RequestBody @Validated(Update.class) ConfigVO configVO) {
         configService.updateConfigByConfigId(configVO);
         return ResponseEntity.ok().build();
     }

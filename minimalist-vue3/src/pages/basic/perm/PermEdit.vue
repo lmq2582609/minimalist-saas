@@ -31,7 +31,8 @@
                         <a-radio v-for="(item, index) in dicts[proxy.DICT.yesNo]" :key="index" :value="item.dictKey">{{ item.dictValue }}</a-radio>
                     </a-radio-group>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" :label="formName + '状态'" required tooltip="选择禁用，将不会出现在侧边栏，也不能被访问">
+                <a-form-item class="w-[49%]" field="status" :label="formName + '状态'" required
+                    tooltip="选择禁用，将不会出现在侧边栏，也不能被访问" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" :placeholder="formName + '状态'" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.permStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
@@ -110,7 +111,6 @@ const rules = {
     permType: [{required: true, message: '权限类型不能为空', trigger: 'submit'}],
     permName: [{required: true, message: '权限名称不能为空', trigger: 'submit'}],
     permSort: [{required: true, message: '排序值不能为空', trigger: 'submit'}],
-    status: [{required: true, message: '权限状态不能为空', trigger: 'submit'}],
 }
 //表单项名称
 const formName = ref('')

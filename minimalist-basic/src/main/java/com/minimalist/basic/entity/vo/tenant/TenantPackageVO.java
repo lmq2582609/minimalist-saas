@@ -31,7 +31,7 @@ public class TenantPackageVO implements Serializable {
     @Schema(name = "packageName", description = "套餐名称", type = "string")
     private String packageName;
 
-    @NotNull(message = "租户套餐状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "租户套餐状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = TenantEnum.TenantPackageStatus.class)
     @Schema(name = "status", description = "租户套餐状态", type = "integer")
     private Byte status;

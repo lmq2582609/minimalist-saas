@@ -38,7 +38,6 @@ public class DictDataVO implements Serializable {
     private String dictClass;
 
     @SchemaEnum(implementation = DictEnum.Status.class)
-    @NotNull(message = "字典状态不能为空")
     @Schema(name = "status", description = "字典状态", type = "integer")
     private Integer status;
 

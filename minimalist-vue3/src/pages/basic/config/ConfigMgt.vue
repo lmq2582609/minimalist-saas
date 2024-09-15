@@ -138,7 +138,6 @@ const datatable = reactive({
         {title: '参数名称', dataIndex: 'configName', slotName: 'configName', align: 'center'},
         {title: '参数键名', dataIndex: 'configKey', align: 'center'},
         {title: '参数键值', dataIndex: 'configValue', align: 'center', ellipsis: true, tooltip: true},
-        {title: '参数状态', dataIndex: 'status', slotName: 'status', align: 'center'},
         {title: '操作', slotName: 'operation', align: 'center', width: 160}
     ],
     //加载

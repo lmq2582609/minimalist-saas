@@ -40,7 +40,7 @@ public class PostVO implements Serializable {
     @Schema(name = "remark", description = "备注", type = "string")
     private String remark;
 
-    @NotNull(message = "岗位状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "岗位状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = PostEnum.PostStatus.class)
     @Schema(name = "status", description = "岗位状态", type = "integer")
     private Integer status;

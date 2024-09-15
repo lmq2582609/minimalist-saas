@@ -38,7 +38,7 @@ public class ConfigVO implements Serializable {
     private String configValue;
 
     @SchemaEnum(implementation = ConfigEnum.Status.class)
-    @NotNull(message = "参数配置状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "参数配置状态不能为空", groups = {Update.class})
     @Schema(name = "status", description = "参数配置状态", type = "integer")
     private Integer status;
 

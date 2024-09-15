@@ -63,7 +63,7 @@ const sysStore = useSysStore(pinia)
  * @return 返回一个对象，key是字典类型，value是字典数据列表
  */
 export const LoadDicts = (dictTypeList) => {
-    let result = {}
+    let result = reactive({})
     if (!dictTypeList || dictTypeList.length === 0) {
         return result;
     }

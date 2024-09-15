@@ -19,7 +19,6 @@ import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantService;
 import com.minimalist.common.constant.CommonConstant;
-import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.utils.UnqIdUtil;
@@ -54,6 +53,9 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private MUserRoleMapper userRoleMapper;
 
+    @Autowired
+    private MRolePermMapper rolePermMapper;
+
     /**
      * 添加租户
      * @param tenantVO 租户信息
@@ -87,8 +89,7 @@ public class TenantServiceImpl implements TenantService {
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
         mTenant.setStatus(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode());
-        int insertCount = tenantMapper.insert(mTenant);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        tenantMapper.insert(mTenant);
     }
 
     /**
@@ -123,10 +124,33 @@ public class TenantServiceImpl implements TenantService {
         tenantMapper.updateTenantByTenantId(newTenant);
         //如果租户套餐变更，则修改租户套餐
         if (!tenantVO.getPackageId().equals(tenant.getPackageId())) {
+            //查询租户下所有角色
+            List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
+            //当前套餐权限
+            List<MTenantPackagePerm> oldTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
+            //修改后的套餐权限
+            List<MTenantPackagePerm> newTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantVO.getPackageId());
 
 
 
+            for (MRole role : roleList) {
+                //如果是租户管理员，将套餐所有权限重新分配给租户管理员
+                if (RoleEnum.Role.ADMIN.getCode().equals(role.getRoleCode())) {
+                    //删除旧关联数据
 
+                    //插入新关联数据
+
+
+
+                } else {
+                    //如果是其他角色，删除超出套餐的权限
+
+                    //当前角色与权限关联数据
+                    List<MRolePerm> rolePerms = rolePermMapper.selectRolePermByRoleId(role.getRoleId());
+
+
+                }
+            }
         }
     }
 
@@ -254,8 +278,7 @@ public class TenantServiceImpl implements TenantService {
         MUserRole userRole = new MUserRole();
         userRole.setUserId(userId);
         userRole.setRoleId(roleId);
-        int insertUserRoleCount = userRoleMapper.insert(userRole);
-        Assert.isTrue(insertUserRoleCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        userRoleMapper.insert(userRole);
     }
 
 }

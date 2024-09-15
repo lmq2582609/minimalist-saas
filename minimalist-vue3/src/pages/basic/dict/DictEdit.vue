@@ -31,12 +31,12 @@
             <a-scrollbar class="w-[100%] max-h-[250px] overflow-auto" type="track">
                 <div class="w-[100%]">
                     <a-row class="w-[100%]" :gutter="12" v-for="(dict, index) in form.dictDataList" :key="index" justify="space-between">
-                        <a-col :span="6">
+                        <a-col :span="props.params.operationType === proxy.operationType.update.type ? 6 : 8">
                             <a-form-item field="dictKey" label="字典key">
                                 <a-input v-model="dict.dictKey" placeholder="字典key" />
                             </a-form-item>
                         </a-col>
-                        <a-col :span="6">
+                        <a-col :span="props.params.operationType === proxy.operationType.update.type ? 6 : 8">
                             <a-form-item field="dictValue" label="字典Value">
                                 <a-input v-model="dict.dictValue" placeholder="字典Value" />
                             </a-form-item>
@@ -53,7 +53,7 @@
                                 <a-input-number v-model="dict.dictOrder" placeholder="排序" :min="0" />
                             </a-form-item>
                         </a-col>
-                        <a-col :span="3">
+                        <a-col :span="3" v-if="props.params.operationType === proxy.operationType.update.type">
                             <a-form-item field="status" label="状态">
                                 <a-select v-model="dict.status" placeholder="状态" allow-clear>
                                     <a-option v-for="(item, index) in dicts[proxy.DICT.dictStatus]" :key="index" :value="item.dictKey" :label="item.dictValue" />

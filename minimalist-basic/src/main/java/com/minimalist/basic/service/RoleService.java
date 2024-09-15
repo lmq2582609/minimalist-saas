@@ -55,4 +55,11 @@ public interface RoleService {
      */
     RoleVO getRoleByRoleId(Long roleId);
 
+    /**
+     * 根据租户ID查询角色列表
+     * @param tenantId 租户ID
+     * @return 角色列表
+     */
+    List<MRole> getRoleByTenantId(Long tenantId);
+
 }

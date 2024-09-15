@@ -1,6 +1,5 @@
 package com.minimalist.basic.service.impl;
 
-import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
@@ -32,9 +31,6 @@ public class PermServiceImpl implements PermService {
 
     @Autowired
     private MTenantMapper tenantMapper;
-
-    @Autowired
-    private MTenantPackageMapper tenantPackageMapper;
 
     @Autowired
     private MTenantPackagePermMapper tenantPackagePermMapper;
@@ -86,6 +82,7 @@ public class PermServiceImpl implements PermService {
     public void addPerm(PermVO permVO) {
         MPerms mPerms = BeanUtil.copyProperties(permVO, MPerms.class);
         mPerms.setPermId(UnqIdUtil.uniqueId());
+        mPerms.setStatus(PermEnum.PermStatus.PERM_STATUS_1.getCode());
         //新增
         int insertCount = permsMapper.insert(mPerms);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));

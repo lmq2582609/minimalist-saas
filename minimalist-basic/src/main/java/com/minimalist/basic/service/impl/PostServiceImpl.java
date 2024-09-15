@@ -43,6 +43,7 @@ public class PostServiceImpl implements PostService {
         MPost mPost = postMapper.selectPostByPostCode(postVO.getPostCode());
         Assert.isNull(mPost, () -> new BusinessException(PostEnum.ErrorMsg.EXISTS_POST.getDesc()));
         mPost = BeanUtil.copyProperties(postVO, MPost.class);
+        mPost.setStatus(PostEnum.PostStatus.POST_STATUS_1.getCode());
         //部门ID
         long postId = UnqIdUtil.uniqueId();
         mPost.setPostId(postId);

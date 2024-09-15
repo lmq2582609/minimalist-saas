@@ -56,6 +56,8 @@ public class DictServiceImpl implements DictService {
      */
     @Override
     public void addDict(DictInfoVO dictInfoVO) {
+        //状态默认正常
+        dictInfoVO.getDictDataList().forEach(d -> d.setStatus(DictEnum.Status.STATUS_1.getCode()));
         //数据转换，构建字典实体数据
         List<MDict> dictList = buildDictData(dictInfoVO, true);
         //批量新增

@@ -60,7 +60,7 @@ public class PermVO implements Serializable {
     private Boolean visible;
 
     @SchemaEnum(implementation = PermEnum.PermStatus.class)
-    @NotNull(message = "权限状态不能为空", groups = {Add.class, Update.class})
+    @NotNull(message = "权限状态不能为空", groups = {Update.class})
     @Schema(name = "status", description = "权限状态", type = "integer")
     private Integer status;
 

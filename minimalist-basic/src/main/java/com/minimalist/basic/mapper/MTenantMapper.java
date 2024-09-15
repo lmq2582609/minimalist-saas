@@ -8,6 +8,8 @@ import com.minimalist.basic.entity.po.MTenant;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.common.mybatis.QueryCondition;
 
+import java.util.List;
+
 /**
  * <p>
  *  Mapper 接口
@@ -25,6 +27,15 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      */
     default long selectTenantCountByTenantPackageId(Long tenantPackageId) {
         return selectCount(new LambdaQueryWrapper<MTenant>().eq(MTenant::getPackageId, tenantPackageId));
+    }
+
+    /**
+     * 根据租户套餐ID查询租户
+     * @param tenantPackageId 租户套餐ID
+     * @return 租户数量
+     */
+    default List<MTenant> selectTenantByTenantPackageId(Long tenantPackageId) {
+        return selectList(new LambdaQueryWrapper<MTenant>().eq(MTenant::getPackageId, tenantPackageId));
     }
 
     /**
