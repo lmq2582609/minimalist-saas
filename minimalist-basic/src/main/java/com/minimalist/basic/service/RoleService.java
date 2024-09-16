@@ -62,4 +62,11 @@ public interface RoleService {
      */
     List<MRole> getRoleByTenantId(Long tenantId);
 
+    /**
+     * 根据角色ID删除超出的权限
+     * @param roleId 角色ID
+     * @param permIds 权限ID集合
+     */
+    void deleteExceedPermByRoleId(Long roleId, List<Long> permIds);
+
 }

@@ -20,6 +20,7 @@ import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantService;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.exception.BusinessException;
+import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class TenantServiceImpl implements TenantService {
     private MUserRoleMapper userRoleMapper;
 
     @Autowired
-    private MRolePermMapper rolePermMapper;
+    private EntityService entityService;
 
     /**
      * 添加租户
@@ -111,6 +112,7 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantVO 租户信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateTenantByTenantId(TenantVO tenantVO) {
         //根据租户套餐ID查询租户套餐，所选择的租户套餐必须为有效套餐
         checkTenantPackageStatus(tenantVO.getPackageId());
@@ -126,29 +128,25 @@ public class TenantServiceImpl implements TenantService {
         if (!tenantVO.getPackageId().equals(tenant.getPackageId())) {
             //查询租户下所有角色
             List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-            //当前套餐权限
-            List<MTenantPackagePerm> oldTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
             //修改后的套餐权限
             List<MTenantPackagePerm> newTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantVO.getPackageId());
-
-
-
             for (MRole role : roleList) {
                 //如果是租户管理员，将套餐所有权限重新分配给租户管理员
                 if (RoleEnum.Role.ADMIN.getCode().equals(role.getRoleCode())) {
                     //删除旧关联数据
-
+                    entityService.delete(MRolePerm::getRoleId, role.getRoleId());
                     //插入新关联数据
-
-
-
+                    List<MRolePerm> rolePerms = newTpp.stream().map(tpp -> {
+                        MRolePerm rolePerm = new MRolePerm();
+                        rolePerm.setRoleId(role.getRoleId());
+                        rolePerm.setPermId(tpp.getPermId());
+                        return rolePerm;
+                    }).toList();
+                    entityService.insertBatch(rolePerms);
                 } else {
-                    //如果是其他角色，删除超出套餐的权限
-
-                    //当前角色与权限关联数据
-                    List<MRolePerm> rolePerms = rolePermMapper.selectRolePermByRoleId(role.getRoleId());
-
-
+                    //如果是其他角色，删除超出的权限
+                    List<Long> permIds = newTpp.stream().map(MTenantPackagePerm::getPermId).toList();
+                    roleService.deleteExceedPermByRoleId(role.getRoleId(), permIds);
                 }
             }
         }

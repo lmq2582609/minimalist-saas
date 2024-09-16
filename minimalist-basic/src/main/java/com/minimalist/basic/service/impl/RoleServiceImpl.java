@@ -13,6 +13,7 @@ import com.minimalist.basic.entity.po.MUserRole;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
 import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.minimalist.basic.mapper.MRoleMapper;
+import com.minimalist.basic.mapper.MRolePermMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.common.enums.RespEnum;
@@ -38,6 +39,9 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private EntityService entityService;
+
+    @Autowired
+    private MRolePermMapper rolePermMapper;
 
     /**
      * 根据用户ID查询角色
@@ -173,6 +177,21 @@ public class RoleServiceImpl implements RoleService {
         LambdaQueryWrapper<MRole> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(MRole::getTenantId, tenantId);
         return roleMapper.selectList(queryWrapper);
+    }
+
+    /**
+     * 根据角色ID删除超出的权限
+     * @param roleId 角色ID
+     * @param permIds 权限ID集合
+     */
+    @Override
+    public void deleteExceedPermByRoleId(Long roleId, List<Long> permIds) {
+        if (CollectionUtil.isNotEmpty(permIds)) {
+            LambdaQueryWrapper<MRolePerm> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(MRolePerm::getRoleId, roleId);
+            queryWrapper.notIn(MRolePerm::getPermId, permIds);
+            rolePermMapper.delete(queryWrapper);
+        }
     }
 
     /**

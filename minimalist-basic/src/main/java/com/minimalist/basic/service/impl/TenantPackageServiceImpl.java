@@ -11,6 +11,7 @@ import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.minimalist.basic.mapper.*;
+import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.enums.RespEnum;
@@ -42,7 +43,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     private MPermsMapper permsMapper;
 
     @Autowired
-    private MRoleMapper roleMapper;
+    private RoleService roleService;
 
     /**
      * 添加租户套餐
@@ -90,11 +91,11 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Transactional(rollbackFor = Exception.class)
     public void updateTenantPackageByTenantPackageId(TenantPackageVO tenantPackageVO) {
         //查询租户套餐
-        MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageVO.getPackageId());
-        Assert.notNull(mTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
+        MTenantPackage oldTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageVO.getPackageId());
+        Assert.notNull(oldTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
         MTenantPackage newTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         //乐观锁字段复制
-        newTenantPackage.updateBeforeSetVersion(mTenantPackage.getVersion());
+        newTenantPackage.updateBeforeSetVersion(oldTenantPackage.getVersion());
         //套餐权限赋值 - 用于回显
         newTenantPackage.setPermIds(CollectionUtil.join(tenantPackageVO.getCheckedPermIds(), ","));
         tenantPackageMapper.updateTenantPackageByTenantPackageId(newTenantPackage);
@@ -103,6 +104,22 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         //插入新租户套餐与权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), newTenantPackage.getPackageId());
         entityService.insertBatch(mTenantPackagePerms);
+        //如果套餐的旧权限和修改后的新权限不一致，需要修改所有使用改套餐租户的权限
+        if (!newTenantPackage.getPermIds().equals(oldTenantPackage.getPermIds())) {
+            //根据套餐查租户
+            List<MTenant> tenants = tenantMapper.selectTenantByTenantPackageId(tenantPackageVO.getPackageId());
+            //修改后的套餐权限
+            List<MTenantPackagePerm> newTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageVO.getPackageId());
+            List<Long> permIds = newTpp.stream().map(MTenantPackagePerm::getPermId).toList();
+            for (MTenant tenant : tenants) {
+                //查询租户下所有角色
+                List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
+                //删除超出的权限
+                for (MRole role : roleList) {
+                    roleService.deleteExceedPermByRoleId(role.getRoleId(), permIds);
+                }
+            }
+        }
     }
 
     /**
