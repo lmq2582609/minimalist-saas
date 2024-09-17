@@ -132,7 +132,7 @@ const datatable = reactive({
     columns: [
         {title: '租户名', dataIndex: 'tenantName', slotName: 'tenantName', align: 'center', ellipsis: true, tooltip: true},
         {title: '租户套餐', dataIndex: 'packageId', slotName: 'packageId', align: 'center'},
-        {title: '联系人', dataIndex: 'contactName', align: 'center', width: 90},
+        {title: '联系人', dataIndex: 'contactName', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '联系人手机', dataIndex: 'phone', align: 'center', width: 125},
         {title: '联系人邮箱', dataIndex: 'email', align: 'center', ellipsis: true, tooltip: true},
         {title: '账号额度', dataIndex: 'accountCount', align: 'center', width: 90},

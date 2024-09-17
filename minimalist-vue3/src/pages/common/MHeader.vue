@@ -35,7 +35,7 @@
                 <div class="mr-3 cursor-pointer">
                     <a-dropdown @select="dropdownSelect">
                         <a-avatar :size="40" class="bg-blue-300">
-                            <template v-if="sysStore.user.userAvatar">
+                            <template v-if="sysStore.user?.userAvatar">
                                 <img :src="sysStore.user.userAvatar" alt="头像" />
                             </template>
                             <template v-else>

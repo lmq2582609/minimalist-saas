@@ -1,7 +1,7 @@
 <template>
     <div>
         <a-card class="w-[100%] text-2xl py-1">
-            您好，{{sysStore.user.username}}，祝您生活愉快!
+            您好，{{sysStore.user?.username}}，祝您生活愉快!
         </a-card>
         <div class="w-[100%] flex justify-between mt-3">
             <a-card title="更新日志" class="w-[50%] mr-2">

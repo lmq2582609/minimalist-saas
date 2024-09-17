@@ -54,11 +54,6 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userSex]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="status" label="用户状态" v-if="props.params.operationType === proxy.operationType.add.type">
-                    <a-select v-model="form.user.status" placeholder="用户状态" allow-clear allow-search>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.userStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
             </div>
         </a-form>
 
@@ -81,7 +76,7 @@ import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.userStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -128,9 +123,7 @@ const form = reactive({
         //邮箱
         email: null,
         //用户性别
-        userSex: null,
-        //用户状态
-        status: null
+        userSex: null
     }
 })
 //表单校验规则

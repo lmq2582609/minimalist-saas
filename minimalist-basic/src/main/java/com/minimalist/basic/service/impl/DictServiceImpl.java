@@ -222,20 +222,22 @@ public class DictServiceImpl implements DictService {
         if (CollectionUtil.isNotEmpty(dictTypes)) {
             //从缓存中获取字典
             List<DictCacheVO> dictCache = getDictCacheHandler(dictTypes);
-            //获取完毕后，校验是否有失效的字典缓存
-            if (CollectionUtil.isEmpty(dictCache)) {
-                //全部为空，重新获取字典
-                dictCache = setDictCacheHandler(dictTypes);
-            } else {
-                //不为空，逐个校验
-                Set<String> dictTypeSet = CollectionUtil.newHashSet(false, dictTypes);
-                //待重新获取的字典类型
+            //检查从缓存获取的字典是否缺失，缺失说明redis中数据过期
+            if (dictTypes.size() != dictCache.size()) {
+                //将缺失的字典type找出来
                 List<String> dueDictTypeList = CollectionUtil.list(false);
-                dictCache.forEach(d -> {
-                    if (!dictTypeSet.contains(d.getDictType())) {
-                        dueDictTypeList.add(d.getDictType());
+                for (String dictType : dictTypes) {
+                    boolean c = false;
+                    for (DictCacheVO dictCacheVO : dictCache) {
+                        if (dictCacheVO.getDictType().equals(dictType)) {
+                            c = true;
+                            break;
+                        }
                     }
-                });
+                    if (!c) {
+                        dueDictTypeList.add(dictType);
+                    }
+                }
                 //将未获取到的字典，重新获取
                 if (CollectionUtil.isNotEmpty(dueDictTypeList)) {
                     dictCache.addAll(setDictCacheHandler(dueDictTypeList));

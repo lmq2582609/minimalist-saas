@@ -14,6 +14,7 @@ import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.entity.vo.user.UserVO;
+import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.manager.UserManager;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
@@ -43,6 +44,9 @@ public class TenantServiceImpl implements TenantService {
     private MUserMapper userMapper;
 
     @Autowired
+    private MRoleMapper roleMapper;
+
+    @Autowired
     private RoleService roleService;
 
     @Autowired
@@ -56,6 +60,9 @@ public class TenantServiceImpl implements TenantService {
 
     @Autowired
     private EntityService entityService;
+
+    @Autowired
+    private TenantManager tenantManager;
 
     /**
      * 添加租户
@@ -99,7 +106,6 @@ public class TenantServiceImpl implements TenantService {
      */
     @Override
     public void deleteTenantByTenantId(Long tenantId) {
-        Assert.isFalse(CommonConstant.ZERO == tenantId, () -> new BusinessException(TenantEnum.ErrorMsg.SYSTEM_TENANT.getDesc()));
         //根据租户ID查询租户
         MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
@@ -128,27 +134,8 @@ public class TenantServiceImpl implements TenantService {
         if (!tenantVO.getPackageId().equals(tenant.getPackageId())) {
             //查询租户下所有角色
             List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-            //修改后的套餐权限
-            List<MTenantPackagePerm> newTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantVO.getPackageId());
-            for (MRole role : roleList) {
-                //如果是租户管理员，将套餐所有权限重新分配给租户管理员
-                if (RoleEnum.Role.ADMIN.getCode().equals(role.getRoleCode())) {
-                    //删除旧关联数据
-                    entityService.delete(MRolePerm::getRoleId, role.getRoleId());
-                    //插入新关联数据
-                    List<MRolePerm> rolePerms = newTpp.stream().map(tpp -> {
-                        MRolePerm rolePerm = new MRolePerm();
-                        rolePerm.setRoleId(role.getRoleId());
-                        rolePerm.setPermId(tpp.getPermId());
-                        return rolePerm;
-                    }).toList();
-                    entityService.insertBatch(rolePerms);
-                } else {
-                    //如果是其他角色，删除超出的权限
-                    List<Long> permIds = newTpp.stream().map(MTenantPackagePerm::getPermId).toList();
-                    roleService.deleteExceedPermByRoleId(role.getRoleId(), permIds);
-                }
-            }
+            //修改租户权限
+            tenantManager.updateTenantPermission(roleList, tenantVO.getPackageId());
         }
     }
 
@@ -235,22 +222,28 @@ public class TenantServiceImpl implements TenantService {
     }
 
     private void addTenantRole(Long roleId, Long tenantId, Long tenantPackageId, String permIds) {
-        RoleVO roleVO = new RoleVO();
-        roleVO.setRoleId(roleId);
-        roleVO.setRoleCode(RoleEnum.Role.ADMIN.getCode());
-        roleVO.setRoleName(RoleEnum.Role.ADMIN.getName());
-        roleVO.setRoleSort(CommonConstant.ZERO);
-        roleVO.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
-        roleVO.setRemark("添加租户系统自动创建角色");
-        roleVO.setTenantId(tenantId);
-        roleVO.setAllowDelete(false);   //该角色不允许被删除
+        MRole role = new MRole();
+        role.setRoleId(roleId);
+        role.setRoleName(RoleEnum.Role.ADMIN.getName());
+        role.setRoleCode(RoleEnum.Role.ADMIN.getCode());
         List<String> checkedPermIds = Arrays.asList(permIds.split(","));
-        roleVO.setCheckedPermIds(checkedPermIds);
-        //租户角色和权限关联关系
+        role.setPermIds(CollectionUtil.join(checkedPermIds, ","));
+        role.setRoleSort(CommonConstant.ZERO);
+        role.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
+        role.setRemark("添加租户系统自动创建角色");
+        role.setTenantId(tenantId);
+        role.setAllowDelete(false); //该角色不允许被删除
+        //插入角色
+        roleMapper.insert(role);
+        //插入角色和权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
-        List<Long> permissionsIds = mTenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-        roleVO.setPermissionsIds(permissionsIds);
-        roleService.addRole(roleVO);
+        List<MRolePerm> rolePerms = mTenantPackagePerms.stream().map(tpp -> {
+            MRolePerm rolePerm = new MRolePerm();
+            rolePerm.setRoleId(roleId);
+            rolePerm.setPermId(tpp.getPermId());
+            return rolePerm;
+        }).toList();
+        entityService.insertBatch(rolePerms);
     }
 
     private void addTenantUser(UserVO userInfo, Long tenantId) {

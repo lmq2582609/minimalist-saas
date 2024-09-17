@@ -13,7 +13,7 @@ public interface PermService {
      * @param roleIds 角色ID集合
      * @return 权限平铺数据
      */
-    List<MPerms> getPermsByUserId(List<Long> roleIds);
+    List<MPerms> getPermsByRoleId(List<Long> roleIds);
 
     /**
      * 转换权限树

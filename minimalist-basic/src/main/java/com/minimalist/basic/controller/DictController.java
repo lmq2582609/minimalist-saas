@@ -6,6 +6,7 @@ import com.minimalist.common.mybatis.bo.PageResp;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -69,7 +70,8 @@ public class DictController {
 
     @GetMapping("/getDictList/{dictTypes}")
     @Operation(summary = "根据字典类型查询字典 -> 用于下拉框数据展示或编码转换")
-    public ResponseEntity<List<DictCacheVO>> getDictList(@PathVariable(value = "dictTypes", required = false)
+    public ResponseEntity<List<DictCacheVO>> getDictList(@PathVariable(value = "dictTypes")
+                                                        @NotEmpty(message = "字典类型不能为空")
                                          @Parameter(name = "dictTypes", description = "字典类型列表，为空则查询所有字典数据") List<String> dictType) {
         return ResponseEntity.ok(dictService.getDictList(dictType));
     }

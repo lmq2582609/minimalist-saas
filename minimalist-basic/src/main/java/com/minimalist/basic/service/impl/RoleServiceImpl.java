@@ -180,21 +180,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 根据角色ID删除超出的权限
-     * @param roleId 角色ID
-     * @param permIds 权限ID集合
-     */
-    @Override
-    public void deleteExceedPermByRoleId(Long roleId, List<Long> permIds) {
-        if (CollectionUtil.isNotEmpty(permIds)) {
-            LambdaQueryWrapper<MRolePerm> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(MRolePerm::getRoleId, roleId);
-            queryWrapper.notIn(MRolePerm::getPermId, permIds);
-            rolePermMapper.delete(queryWrapper);
-        }
-    }
-
-    /**
      * 权限ID集合转换角色权限关联数据
      * @param permIds 权限ID集合
      * @param roleId 角色ID

@@ -7,7 +7,7 @@
                         <template #trigger-icon>
                             <IconCamera />
                         </template>
-                        <template v-if="sysStore.user.userAvatar">
+                        <template v-if="sysStore.user?.userAvatar">
                             <img :src="sysStore.user.userAvatar" alt="头像" />
                         </template>
                         <template v-else>

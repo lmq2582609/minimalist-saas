@@ -284,7 +284,7 @@ public class UserServiceImpl implements UserService {
             //存放菜单数据
             List<MPerms> menuList = CollectionUtil.list(false);
             //根据角色ID查询权限 - 返回权限平铺数据
-            List<MPerms> permList = permService.getPermsByUserId(roleIds);
+            List<MPerms> permList = permService.getPermsByRoleId(roleIds);
             //汇总权限标识符集合
             Set<String> permCodes = permList.stream()
                     //状态 = 正常
@@ -389,15 +389,11 @@ public class UserServiceImpl implements UserService {
         //租户状态
         Assert.isTrue(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode().equals(tenantVO.getStatus().intValue()),
                 () -> new BusinessException(TenantEnum.ErrorMsg.DISABLED_TENANT.getDesc()));
-        //获取当天最晚时间，23:59:59
-        LocalDateTime localDateTime = LocalDateTimeUtil.endOfDay(LocalDateTime.now());
-        //检查租户是否过期，过期提示不允许登录
-        Duration duration = LocalDateTimeUtil.between(localDateTime, tenantVO.getExpireTime());
-        //如果租户到期时间 < 当天，返回负，说明已到期
-        long exHours = duration.toHours();
-        Assert.isFalse(exHours <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.EX_TENANT.getDesc()));
+        //检查租户是否过期
+        tenantManager.checkTenantExpireTime(tenantVO.getExpireTime());
+        //登录
         StpUtil.login(loginUser.getUserId());
-        // 在登录时缓存参数
+        //在登录时缓存参数 - 缓存租户ID
         StpUtil.getSession().set(IgnoreTenant.TENANT_ID, loginUser.getTenantId());
         return StpUtil.getTokenInfo();
     }

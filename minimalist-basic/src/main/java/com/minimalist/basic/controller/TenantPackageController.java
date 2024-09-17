@@ -4,6 +4,7 @@ import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.common.tenant.IgnoreTenant;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +25,7 @@ public class TenantPackageController {
     @Autowired
     private TenantPackageService tenantPackageService;
 
+    @IgnoreTenant
     @PostMapping("/addTenantPackage")
     @Operation(summary = "添加租户套餐")
     public ResponseEntity<Void> addTenantPackage(@RequestBody @Validated(Add.class) TenantPackageVO tenantPackageVO) {
@@ -31,6 +33,7 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
+    @IgnoreTenant
     @DeleteMapping("/deleteTenantPackageByTenantPackageId")
     @Operation(summary = "删除租户套餐 -> 根据租户套餐ID删除租户套餐")
     public ResponseEntity<Void> deleteTenantPackageByTenantPackageId(@RequestParam("tenantPackageId")
@@ -40,6 +43,7 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
+    @IgnoreTenant
     @PutMapping("/updateTenantPackageByTenantPackageId")
     @Operation(summary = "修改租户套餐 -> 根据租户套餐ID修改")
     public ResponseEntity<Void> updateTenantPackageByTenantPackageId(@RequestBody @Validated(Update.class) TenantPackageVO tenantPackageVO) {
@@ -47,12 +51,14 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
+    @IgnoreTenant
     @GetMapping("/getPageTenantPackageList")
     @Operation(summary = "查询租户套餐(分页)")
     public ResponseEntity<PageResp<TenantPackageVO>> getPageTenantPackageList(TenantPackageQueryVO queryVO) {
         return ResponseEntity.ok(tenantPackageService.getPageTenantPackageList(queryVO));
     }
 
+    @IgnoreTenant
     @GetMapping("/getTenantPackageByTenantPackageId/{tenantPackageId}")
     @Operation(summary = "根据租户套餐ID查询租户套餐")
     public ResponseEntity<TenantPackageVO> getTenantPackageByTenantPackageId(@PathVariable(value = "tenantPackageId")

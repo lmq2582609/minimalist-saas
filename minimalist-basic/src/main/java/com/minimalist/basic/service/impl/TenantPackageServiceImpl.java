@@ -6,10 +6,12 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
+import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantPackageService;
@@ -44,6 +46,9 @@ public class TenantPackageServiceImpl implements TenantPackageService {
 
     @Autowired
     private RoleService roleService;
+
+    @Autowired
+    private TenantManager tenantManager;
 
     /**
      * 添加租户套餐
@@ -108,16 +113,11 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         if (!newTenantPackage.getPermIds().equals(oldTenantPackage.getPermIds())) {
             //根据套餐查租户
             List<MTenant> tenants = tenantMapper.selectTenantByTenantPackageId(tenantPackageVO.getPackageId());
-            //修改后的套餐权限
-            List<MTenantPackagePerm> newTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageVO.getPackageId());
-            List<Long> permIds = newTpp.stream().map(MTenantPackagePerm::getPermId).toList();
             for (MTenant tenant : tenants) {
                 //查询租户下所有角色
                 List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-                //删除超出的权限
-                for (MRole role : roleList) {
-                    roleService.deleteExceedPermByRoleId(role.getRoleId(), permIds);
-                }
+                //修改租户权限
+                tenantManager.updateTenantPermission(roleList, tenantPackageVO.getPackageId());
             }
         }
     }

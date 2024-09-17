@@ -41,7 +41,7 @@ public class PermServiceImpl implements PermService {
      * @return 权限平铺数据
      */
     @Override
-    public List<MPerms> getPermsByUserId(List<Long> roleIds) {
+    public List<MPerms> getPermsByRoleId(List<Long> roleIds) {
         //查询角色与权限关联关系
         List<MRolePerm> rolePermRelation = rolePermMapper.selectRolePermByRoleIds(roleIds);
         if (CollectionUtil.isEmpty(rolePermRelation)) {

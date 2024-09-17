@@ -74,7 +74,7 @@ public class UserManager {
         if (StrUtil.isNotBlank(email)) {
             MUser mUser = userMapper.selectUserByPhone(email);
             Assert.isTrue(ObjectUtil.isNull(mUser) || mUser.getUserId().equals(userId),
-                    () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
+                    () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
         }
     }
 
