@@ -16,7 +16,6 @@
                 <m-sider />
             </a-layout-sider>
             <a-layout-content class="m-content" :style="{left: siderWidth + 'px'}">
-                <m-breadcrumb class="mb-2" />
                 <!-- 主体内容，通过router动态变换 -->
                 <router-view v-slot="{ Component }">
                     <!-- transition动画效果，使用transition 每个页面必须只有1个根节点 -->
@@ -32,7 +31,6 @@
 <script setup>
 import MSider from "./common/MSider.vue";
 import MHeader from "./common/MHeader.vue";
-import MBreadcrumb from "~/pages/common/MBreadcrumb.vue";
 import { storeToRefs } from 'pinia'
 import { useSysStore } from '~/store/module/sys-store.js'
 
