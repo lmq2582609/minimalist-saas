@@ -1,7 +1,7 @@
 <template>
     <div class="w-[100%] flex justify-between items-center">
         <div class="flex items-center ml-4 cursor-pointer" @click="logoClick()">
-            <img class="w-[35px] h-[35px]" src="../../assets/logo.png" />
+            <img class="w-[35px] h-[35px]" src="../assets/logo.png" />
             <span class="logo-text">极简多租户管理系统</span>
         </div>
         <div class="flex items-center">
@@ -39,7 +39,7 @@
                                 <img :src="sysStore.user.userAvatar" alt="头像" />
                             </template>
                             <template v-else>
-                                <img src="../../assets/default-avatar.jpg" alt="头像" />
+                                <img src="../assets/default-avatar.jpg" alt="头像" />
                             </template>
                         </a-avatar>
                         <template #content>
