@@ -6,14 +6,16 @@ import UserSetting from '~/pages/basic/user/UserSetting.vue'
 import Msg from '~/utils/msg';
 import {getUserInfoApi} from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
+//页面加载条
 import NProgress from 'nprogress'
 import'nprogress/nprogress.css'
-
 //登录页
 import Login from '~/pages/login.vue'
 //404页面
 import NotFound from '~/pages/404.vue'
 
+//是否调用过getUserInfo - 防止重复请求
+let hasGetUserInfo = false
 //网页标题
 const pageTitle = '极简多租户管理系统'
 //公共路由，所有用户共享
@@ -120,21 +122,28 @@ router.beforeEach(async (to, from, next) => {
     document.title = (to.meta.title ? to.meta.title + ' - ' : '') + pageTitle
     //是否有新添加的路由
     let hasNewRouter = false
-    //获取用户信息
-    await getUserInfoApi().then(res => {
-        //用户信息存储到缓存
-        useSysStore().user = res
-        //渲染动态路由
-        hasNewRouter = dynamicAddRoutes(useSysStore().user.menus)
-    }).catch(res => {
-        //401 认证失败，重新登录
-        if (res.response.status === 401) {
-            //退出
-            useSysStore().userLogoutHandler()
-            //跳转到登录页
-            return next({path: routerWhiteList[0]})
-        }
-    })
+
+    //未调用过getUserInfo，就执行获取用户信息、菜单等数据
+    if (!hasGetUserInfo) {
+        //获取用户信息
+        await getUserInfoApi().then(res => {
+            //用户信息存储到缓存
+            useSysStore().user = res
+            //已调用过getUserInfo
+            hasGetUserInfo = true
+            //渲染动态路由
+            hasNewRouter = dynamicAddRoutes(useSysStore().user.menus)
+        }).catch(res => {
+            //401 认证失败，重新登录
+            if (res.response.status === 401) {
+                //退出
+                useSysStore().userLogoutHandler()
+                //跳转到登录页
+                return next({path: routerWhiteList[0]})
+            }
+        })
+    }
+
     //放行，如果跳转到新添加的路由next()中需要给参数to.fullPath，否则刷新会404
     hasNewRouter ?  next(to.fullPath) : next()
 })

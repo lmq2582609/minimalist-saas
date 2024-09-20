@@ -15,7 +15,7 @@ mybatis-plus:
 # springdoc-openapi 项目文档配置
 springdoc:
     title: 极简多租户开发平台
-    authorName: Little Sun
+    authorName: 小太阳
     authorUrl: https://apebbs.cn
     authorEmail: 438562332@qq.com
     swagger-ui:
@@ -84,6 +84,7 @@ spring:
             timeout: 10s
             lettuce:
                 pool:
+                    enabled: true
                     # 连接池最大连接数
                     max-active: 200
                     # 连接池最大阻塞等待时间（使用负值表示没有限制）
@@ -110,7 +111,7 @@ redisson:
     database: 0
     pingInterval: 10000
     connectionPoolSize: 100
-    connectionMinimumIdleSize: 20
+    connectionMinimumIdleSize: 0
 # 防XSS，使用说明文档请访问：https://gitee.com/596392912/mica 找到其中的mica-xss中的 README.md 查看
 mica:
     xss:
