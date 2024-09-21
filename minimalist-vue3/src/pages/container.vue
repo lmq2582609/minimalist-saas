@@ -22,7 +22,9 @@
                 <router-view v-slot="{ Component }">
                     <!-- transition动画效果，使用transition 每个页面必须只有1个根节点 -->
                     <transition name="fade">
-                        <component :is="Component"></component>
+                        <keep-alive :max="10">
+                            <component :is="Component"></component>
+                        </keep-alive>
                     </transition>
                 </router-view>
             </a-layout-content>

@@ -1,13 +1,13 @@
 <template>
     <div>
-        <a-card :body-style="{height: 'calc(100vh - 125px)'}">
+        <a-card :body-style="{height: 'calc(100vh - 125px)', padding: 0}">
             <div class="w-full h-full flex justify-between">
                 <!-- 部门数据 -->
-                <a-row class="w-[250px] h-full">
+                <a-row class="w-[250px] h-full border-r p-3">
                     <a-spin class="w-[100%] h-full" :size="35" :loading="loadDeptListLoading" tip="正在处理, 请稍候...">
-                        <a-scrollbar class="w-[100%] h-full overflow-auto" :outer-style="{width: '100%'}" type="track">
-                            <a-tree :data="deptTree" v-if="deptTree.length > 0" class="h-full"
-                                show-line  blockNode
+                        <a-scrollbar class="w-[100%] h-[calc(100vh-140px)] overflow-auto" :outer-style="{width: '100%'}" type="track">
+                            <a-tree :data="deptTree" v-if="deptTree.length > 0" class="h-full" show-line  blockNode
+                                v-model:selected-keys="selectDept" @select="selectDeptChange" ref="treeRef"
                                 :fieldNames="{
                                     key: 'deptId',
                                     title: 'deptName',
@@ -18,7 +18,7 @@
                 </a-row>
 
                 <!-- 用户数据 -->
-                <a-row class="flex-1" style="overflow-x: auto;overflow-y: hidden;">
+                <a-row class="flex flex-col flex-1 p-3" style="overflow-x: auto;overflow-y: hidden;">
                     <!-- 查询条件 -->
                     <a-row v-if="showSearchRow">
                         <a-form :model="searchForm" layout="inline" label-align="left" size="small">
@@ -133,7 +133,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
+import {ref, reactive, getCurrentInstance, shallowRef, onMounted} from 'vue'
 import { getPageUserListApi, deleteUserByUserIdApi } from "~/api/user.js";
 import UserEdit from "~/pages/basic/user/UserEdit.vue";
 import UserDetail from "~/pages/basic/user/UserDetail.vue";
@@ -189,6 +189,7 @@ const getPageList = (isReset = false) => {
         searchForm.pageSize = 10
     }
     datatable.loading = true
+    searchForm.dept = selectDept.value[0]
     getPageUserListApi(searchForm).then(res => {
         datatable.records = res.records
         datatable.total = res.total
@@ -247,25 +248,31 @@ const onCancel = () => {
     modal.visible = false
 }
 
+//当前选中的部门
+const selectDept = ref(['0'])
 //查询部门数据列表
+const treeRef = ref()
 const deptTree = ref([])
 const loadDeptListLoading = ref(false)
 const getDeptList = () => {
     loadDeptListLoading.value = true
     getDeptListApi({status: 1}).then(res => {
-        deptTree.value = res
+        deptTree.value = [{deptId: '0', deptName: '全部', children: res}]
     }).finally(() => {
         loadDeptListLoading.value = false
     })
 }
+//点击
+const selectDeptChange = (selectedKeys, data) => {
+    //查询数据列表
+    getPageList()
+}
 
-
-
-
-
-//查询数据列表
-getPageList()
-//查询部门数据列表
-getDeptList()
+onMounted(() => {
+    //查询数据列表
+    getPageList()
+    //查询部门数据列表
+    getDeptList()
+})
 </script>
 <style scoped></style>

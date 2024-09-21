@@ -5,7 +5,7 @@
                 <a-form-item class="w-[49%]" field="roleName" label="角色名称" required>
                     <a-input v-model="form.roleName" placeholder="角色名称" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="roleCode" label="角色编码" required tooltip="控制器中定义的角色编码，如：@PreAuthorize(`@ss.hasRole('admin')`)">
+                <a-form-item class="w-[49%]" field="roleCode" label="角色编码" required tooltip="控制器中定义的角色编码">
                     <a-input v-model="form.roleCode" placeholder="角色编码" />
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="roleSort" label="排序值" required>

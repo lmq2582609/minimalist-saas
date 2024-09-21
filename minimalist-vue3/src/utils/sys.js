@@ -81,36 +81,33 @@ export const randomCode = (length) => {
 
 /**
  * 检查权限，不止按照权限标识检查，若 userIdArr 中任意数据与当前登录用户一致，则放行
+ * 场景举例：假设有一个项目管理系统，有一个产品需求列表，有很多行数据，
+ * 当某一行数据的产品经理 = 当前登录的用户时，才显示修改和删除按钮，其余数据隐藏按钮
  * @param permArr 权限标识数组
  * @param userIdArr 放行的用户ID
  */
 export const hasPerm = (permArr = [], userIdArr = []) => {
-    //当前登录用户ID
-    let currentLoginUserId = sysStore.user.userId
-    //当前用户如果是系统租户，则放行
-    if (currentLoginUserId === '0') { return true }
-    //传入的用户ID，与当前登录用户一致，则放行
-    let checkUser = userIdArr.includes(currentLoginUserId)
-    if (checkUser) { return true }
-    //当前登录用户权限列表
-    let perms = sysStore.user.perms
-    return permArr.some(elem => perms.includes(elem))
+    return checkPermOrRole(permArr, userIdArr, 'perm')
 }
 
 /**
  * 检查角色，不止按照角色标识检查，若 userIdArr 中任意数据与当前登录用户一致，则放行
+ * 场景举例：假设有一个项目管理系统，有一个产品需求列表，有很多行数据，
+ * 当某一行数据的产品经理 = 当前登录的用户时，才显示修改和删除按钮，其余数据隐藏按钮
  * @param roleArr 角色标识数组
  * @param userIdArr 放行的用户ID
  */
 export const hasRole = (roleArr = [], userIdArr = []) => {
+    return checkPermOrRole(roleArr, userIdArr, 'role')
+}
+
+const checkPermOrRole = (checkArr = [], userIdArr = [], checkType) => {
     //当前登录用户ID
     let currentLoginUserId = sysStore.user.userId
-    //当前用户如果是系统租户，则放行
-    if (currentLoginUserId === '0') { return true }
     //传入的用户ID，与当前登录用户一致，则放行
     let checkUser = userIdArr.includes(currentLoginUserId)
     if (checkUser) { return true }
-    //当前登录用户角色列表
-    let roles = sysStore.user.roles
-    return roleArr.some(elem => roles.includes(elem))
+    //校验权限或角色
+    let arr = checkType === 'role' ? sysStore.user.roles : sysStore.user.perms
+    return checkArr.some(elem => arr.includes(elem))
 }

@@ -57,6 +57,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -211,10 +212,18 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public PageResp<UserVO> getPageUserList(UserQueryVO queryVO) {
-        Page<MUser> userPage = userMapper.selectPageUserList(queryVO);
-        //数据转换
-        List<UserVO> userVOList = BeanUtil.copyToList(userPage.getRecords(), UserVO.class);
-        return new PageResp<>(userVOList, userPage.getTotal());
+        //TODO
+        if (ObjectUtil.isNotNull(queryVO.getDept())) {
+            //按照部门查询
+
+            return new PageResp<>(new ArrayList<>(), 0);
+        } else {
+            //按照其他条件查询
+            Page<MUser> userPage = userMapper.selectPageUserList(queryVO);
+            //数据转换
+            List<UserVO> userVOList = BeanUtil.copyToList(userPage.getRecords(), UserVO.class);
+            return new PageResp<>(userVOList, userPage.getTotal());
+        }
     }
 
     /**
