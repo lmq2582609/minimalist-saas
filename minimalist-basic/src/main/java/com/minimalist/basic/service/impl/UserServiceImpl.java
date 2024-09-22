@@ -212,18 +212,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public PageResp<UserVO> getPageUserList(UserQueryVO queryVO) {
-        //TODO
-        if (ObjectUtil.isNotNull(queryVO.getDept())) {
-            //按照部门查询
-
-            return new PageResp<>(new ArrayList<>(), 0);
-        } else {
-            //按照其他条件查询
-            Page<MUser> userPage = userMapper.selectPageUserList(queryVO);
-            //数据转换
-            List<UserVO> userVOList = BeanUtil.copyToList(userPage.getRecords(), UserVO.class);
-            return new PageResp<>(userVOList, userPage.getTotal());
-        }
+        Page<MUser> userPage = userMapper.selectPageUserList(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()), queryVO);
+        //数据转换
+        List<UserVO> userVOList = BeanUtil.copyToList(userPage.getRecords(), UserVO.class);
+        return new PageResp<>(userVOList, userPage.getTotal());
     }
 
     /**

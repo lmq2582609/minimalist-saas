@@ -20,7 +20,7 @@ public class UserQueryVO extends Pager implements Serializable {
     private String phone;
 
     @Schema(name = "dept", description = "选择的部门", type = "string")
-    private Long dept;
+    private Long deptId;
 
     @Schema(name = "status", description = "用户状态", type = "integer")
     private Integer status;

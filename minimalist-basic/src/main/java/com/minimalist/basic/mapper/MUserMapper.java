@@ -2,12 +2,14 @@ package com.minimalist.basic.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.po.MUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.user.UserQueryVO;
 import com.minimalist.common.mybatis.QueryCondition;
 import com.minimalist.basic.entity.enums.UserEnum;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -114,19 +116,6 @@ public interface MUserMapper extends BaseMapper<MUser> {
     }
 
     /**
-     * 查询用户列表(分页)
-     * @param queryVO 查询条件
-     * @return 用户分页数据
-     */
-    default Page<MUser> selectPageUserList(UserQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MUser>()
-                        .likeNotNull(MUser::getUserRealName, queryVO.getUserRealName())
-                        .likeNotNull(MUser::getPhone, queryVO.getPhone())
-                        .eqNotNull(MUser::getStatus, queryVO.getStatus()));
-    }
-
-    /**
      * 根据部门ID列表，查询用户数
      * @param deptIds 部门ID
      * @return 用户数
@@ -138,4 +127,12 @@ public interface MUserMapper extends BaseMapper<MUser> {
         }
         return result;
     }
+
+    /**
+     * 查询用户列表(分页)
+     * @param query 查询条件
+     * @return 用户分页数据
+     */
+    Page<MUser> selectPageUserList(IPage<?> page, @Param("query") UserQueryVO query);
+
 }

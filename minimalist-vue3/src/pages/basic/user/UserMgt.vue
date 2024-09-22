@@ -189,7 +189,7 @@ const getPageList = (isReset = false) => {
         searchForm.pageSize = 10
     }
     datatable.loading = true
-    searchForm.dept = selectDept.value[0]
+    searchForm.deptId = selectDept.value[0]
     getPageUserListApi(searchForm).then(res => {
         datatable.records = res.records
         datatable.total = res.total

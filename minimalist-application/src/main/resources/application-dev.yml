@@ -12,6 +12,8 @@ mybatis-plus:
             logic-not-delete-value: 1
             # 删除后
             logic-delete-value: 0
+    # 别名包扫描路径
+    type-aliases-package: com.minimalist.**.entity
 # springdoc-openapi 项目文档配置
 springdoc:
     title: 极简多租户开发平台

@@ -2,4 +2,27 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.minimalist.basic.mapper.MUserMapper">
 
+    <select id="selectPageUserList" parameterType="UserQueryVO" resultType="MUser">
+        SELECT u.*
+        FROM m_user u
+        WHERE u.deleted = 1
+        <if test="query.status != null and query.status != ''">
+            AND u.status = #{query.status}
+        </if>
+        <if test="query.phone != null and query.phone != ''">
+            AND u.phone like concat('%', #{query.phone}, '%')
+        </if>
+        <if test="query.userRealName != null and query.userRealName != ''">
+            AND u.user_real_name like concat('%', #{query.userRealName}, '%')
+        </if>
+        <if test="query.deptId != null and query.deptId != 0">
+            AND EXISTS (
+                SELECT 1 FROM m_user_dept ud
+                LEFT JOIN m_dept d ON ud.dept_id = d.dept_id
+                WHERE u.user_id = ud.user_id
+                AND (d.dept_id = #{query.deptId} OR FIND_IN_SET(#{query.deptId}, d.ancestors))
+            )
+        </if>
+    </select>
+
 </mapper>
