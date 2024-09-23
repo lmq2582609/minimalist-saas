@@ -30,7 +30,10 @@ springdoc:
         - group: '1.全部'
           paths-to-match: '/**'
           packages-to-scan: com.minimalist
-        - group: '2.basic基础模块'
+        - group: '2.common公共模块'
+          paths-to-match: '/common/**'
+          packages-to-scan: com.minimalist.common
+        - group: '3.basic基础模块'
           paths-to-match: '/basic/**'
           packages-to-scan: com.minimalist.basic
 # knife4j的增强配置，不需要增强可以不配

@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 @RestController
 @Tag(name = "参数配置管理")
-@RequestMapping("/basic/config")
+@RequestMapping("/common/config")
 public class ConfigController {
 
     @Autowired

@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-card title="系统公告">
+        <a-card class="p-0" :body-style="{height: 'calc(100vh - 125px)'}">
             <!-- 查询条件 -->
             <a-row v-if="showSearchRow">
                 <a-form :model="searchForm" layout="inline" label-align="left" size="small">

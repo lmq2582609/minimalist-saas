@@ -1,6 +1,6 @@
 <template>
     <div>
-        <a-card :body-style="{height: 'calc(100vh - 125px)', padding: 0}">
+        <a-card class="p-0" :body-style="{height: 'calc(100vh - 125px)'}">
             <div class="w-full h-full flex justify-between">
                 <!-- 部门数据 -->
                 <a-row class="w-[250px] h-full border-r p-3">
