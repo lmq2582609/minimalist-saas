@@ -232,7 +232,6 @@ public class TenantServiceImpl implements TenantService {
         role.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
         role.setRemark("添加租户系统自动创建角色");
         role.setTenantId(tenantId);
-        role.setAllowDelete(false); //该角色不允许被删除
         //插入角色
         roleMapper.insert(role);
         //插入角色和权限关联数据
@@ -261,7 +260,6 @@ public class TenantServiceImpl implements TenantService {
         user.setPassword(userManager.passwordEncrypt(userInfo.getPassword(), salt));
         user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
         user.setTenantId(tenantId);
-        user.setAllowDelete(false); //该用户不可被删除，在删除租户的时候，会删除该用户
         userMapper.insert(user);
     }
 

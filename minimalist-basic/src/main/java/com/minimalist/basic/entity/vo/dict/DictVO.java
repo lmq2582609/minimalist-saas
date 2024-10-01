@@ -45,7 +45,4 @@ public class DictVO implements Serializable {
     @Schema(name = "status", description = "字典状态", type = "integer")
     private Integer status;
 
-    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
-    private Boolean allowDelete;
-
 }

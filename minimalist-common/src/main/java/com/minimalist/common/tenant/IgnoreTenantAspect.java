@@ -29,7 +29,7 @@ public class IgnoreTenantAspect {
         //需要校验是否为 系统租户
         if (checkAdmin) {
             //是系统租户，查询全部数据
-            boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
+            boolean isAdmin = SafetyUtil.checkIsSystemTenant();
             //不是系统租户，按租户查询
             SafetyUtil.setIgnoreTenant(!isAdmin);
         } else {

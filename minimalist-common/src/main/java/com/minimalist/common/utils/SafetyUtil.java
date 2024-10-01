@@ -40,10 +40,10 @@ public class SafetyUtil {
     }
 
     /**
-     * 根据租户ID校验是否为管理员
-     * @return true管理员 false租户
+     * 检查是否为系统租户，系统租户ID = 0
+     * @return 是/否
      */
-    public static boolean checkIsAdminByTenantId() {
+    public static boolean checkIsSystemTenant() {
         return CommonConstant.ZERO == getLonginUserTenantId();
     }
 

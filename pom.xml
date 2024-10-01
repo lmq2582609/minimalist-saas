@@ -18,8 +18,6 @@
     <properties>
         <!-- springboot版本 -->
         <springboot.version>3.1.1</springboot.version>
-        <!-- jwt版本 -->
-        <jwt.version>0.9.1</jwt.version>
         <!-- redisson版本 -->
         <redisson.version>3.36.0</redisson.version>
         <!-- mysql驱动版本 -->
@@ -31,7 +29,7 @@
         <!-- mybatis-plus 生成代码依赖的velocity-engine-core版本 -->
         <vec.version>2.3</vec.version>
         <!-- hutool工具包 -->
-        <hutool.version>5.8.20</hutool.version>
+        <hutool.version>5.8.32</hutool.version>
         <!-- sa-token -->
         <satoken.version>1.39.0</satoken.version>
         <!-- servlet -->

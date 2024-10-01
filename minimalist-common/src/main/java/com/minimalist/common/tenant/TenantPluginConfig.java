@@ -21,6 +21,7 @@ public class TenantPluginConfig implements ApplicationRunner {
 
     @Autowired
     private ConfigService configService;
+
     /** 多租户开关 */
     public static boolean onOff = true;
 

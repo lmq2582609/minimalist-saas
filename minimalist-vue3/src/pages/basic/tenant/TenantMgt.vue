@@ -78,7 +78,7 @@
                             <template #default>修改</template>
                         </a-button>
                         <a-popconfirm content="删除租户会导致租户下的所有用户无法使用，确认要删除吗?" @ok="deleteBtnOkClick(record.tenantId)">
-                            <a-button type="text" status="danger" size="mini" v-if="record.allowDelete">
+                            <a-button type="text" status="danger" size="mini">
                                 <template #icon>
                                     <icon-delete />
                                 </template>

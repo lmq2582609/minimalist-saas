@@ -6,6 +6,9 @@
         </div>
         <div class="flex items-center">
             <a-space>
+                <!-- 租户切换，管理员才能切换 -->
+                
+
                 <!-- 全屏 -->
                 <a-button shape="circle" size="small" @click="toggle">
                     <template #icon>

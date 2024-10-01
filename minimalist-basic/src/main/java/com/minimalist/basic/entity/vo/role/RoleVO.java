@@ -61,7 +61,4 @@ public class RoleVO implements Serializable {
     @Schema(name = "permissionsIds", description = "角色权限编码集合，全勾选+半勾选的节点", type = "array")
     private List<Long> permissionsIds;
 
-    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
-    private Boolean allowDelete;
-
 }

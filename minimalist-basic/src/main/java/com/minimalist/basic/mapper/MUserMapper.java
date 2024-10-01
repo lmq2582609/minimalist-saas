@@ -76,7 +76,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 该租户下的用户数量
      */
     default long selectUserCountByTenantId(Long tenantId) {
-        return selectCount(new LambdaQueryWrapper<MUser>().eq(MUser::getTenantId, tenantId).eq(MUser::getAllowDelete, true));
+        return selectCount(new LambdaQueryWrapper<MUser>().eq(MUser::getTenantId, tenantId));
     }
 
     /**

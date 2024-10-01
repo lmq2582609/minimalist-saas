@@ -68,9 +68,4 @@ public class MTenant extends BaseEntity {
     @TableField("remark")
     private String remark;
 
-
-    /** 该数据是否可以被删除 0否 1是 */
-    @TableField(value = "allow_delete")
-    private Boolean allowDelete;
-
 }

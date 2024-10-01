@@ -74,7 +74,4 @@ public class TenantVO implements Serializable {
     @Schema(name = "user", description = "租户的用户信息，新增时填充", type = "string")
     private UserVO user;
 
-    @Schema(name = "allowDelete", description = "该数据是否可以被删除", type = "boolean")
-    private Boolean allowDelete;
-
 }

@@ -134,12 +134,12 @@ public class PermServiceImpl implements PermService {
      */
     @Override
     public List<PermVO> getEnablePermList() {
-        //检查是否是管理员 -> 管理员查询所有权限
-        boolean isAdmin = SafetyUtil.checkIsAdminByTenantId();
+        //检查是否为系统租户
+        boolean isAdmin = SafetyUtil.checkIsSystemTenant();
         //权限数据列表
         List<MPerms> perms = null;
         if (isAdmin) {
-            //管理员查询，查询所有权限
+            //系统租户会查询所有权限
             perms = permsMapper.getEnablePermList();
         } else {
             //租户查询，只查询租户套餐关联的权限

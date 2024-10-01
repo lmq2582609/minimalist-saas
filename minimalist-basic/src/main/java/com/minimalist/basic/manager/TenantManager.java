@@ -52,7 +52,8 @@ public class TenantManager {
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
         long userCount = userMapper.selectUserCountByTenantId(tenantId);
-        Assert.isFalse(userCount >= mTenant.getAccountCount(),
+        // +1是去除租户本身的用户
+        Assert.isFalse((userCount + 1) >= mTenant.getAccountCount(),
                 () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
         //检查租户状态
         Assert.isTrue(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode().equals(mTenant.getStatus()),
