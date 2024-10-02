@@ -37,4 +37,10 @@ public interface EDictService {
      */
     DictCacheVO getPostDictData();
 
+    /**
+     * 获取租户字典数据（额外字典数据）
+     * @return 字典数据列表
+     */
+    DictCacheVO getTenantDictData();
+
 }

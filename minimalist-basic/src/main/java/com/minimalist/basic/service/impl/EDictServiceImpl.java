@@ -7,11 +7,9 @@ import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.EDictService;
 import com.minimalist.common.eDict.EDict;
 import com.minimalist.common.eDict.EDictConstant;
-import com.minimalist.common.tenant.IgnoreTenant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 额外的字典数据，这些数据不会出现在字典管理表中，因为这些数据是来源于其他表
@@ -32,6 +30,9 @@ public class EDictServiceImpl implements EDictService {
     private MPostMapper postMapper;
 
     @Autowired
+    private MTenantMapper tenantMapper;
+
+    @Autowired
     private MTenantPackageMapper tenantPackageMapper;
 
     /**
@@ -41,7 +42,6 @@ public class EDictServiceImpl implements EDictService {
     @Override
     @EDict(dictType = EDictConstant.DEPT_LIST)
     public DictCacheVO getDeptDictData() {
-        //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
         dictCacheVO.setDictType(EDictConstant.DEPT_LIST);
         //查询部门列表
@@ -53,7 +53,7 @@ public class EDictServiceImpl implements EDictService {
                 dictKV.setDictValue(dept.getDeptName());
                 dictKV.setDictType(EDictConstant.DEPT_LIST);
                 return dictKV;
-            }).collect(Collectors.toList());
+            }).toList();
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;
@@ -76,7 +76,6 @@ public class EDictServiceImpl implements EDictService {
     @Override
     @EDict(dictType = EDictConstant.TENANT_PACKAGE_LIST)
     public DictCacheVO getTenantPackageDictData() {
-        //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
         dictCacheVO.setDictType(EDictConstant.TENANT_PACKAGE_LIST);
         //查询所有租户套餐
@@ -88,7 +87,7 @@ public class EDictServiceImpl implements EDictService {
                 dictKV.setDictValue(dept.getPackageName());
                 dictKV.setDictType(EDictConstant.TENANT_PACKAGE_LIST);
                 return dictKV;
-            }).collect(Collectors.toList());
+            }).toList();
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;
@@ -101,7 +100,6 @@ public class EDictServiceImpl implements EDictService {
     @Override
     @EDict(dictType = EDictConstant.ROLE_LIST)
     public DictCacheVO getRoleDictData() {
-        //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
         dictCacheVO.setDictType(EDictConstant.ROLE_LIST);
         //查询角色列表
@@ -113,7 +111,7 @@ public class EDictServiceImpl implements EDictService {
                 dictKV.setDictValue(role.getRoleName());
                 dictKV.setDictType(EDictConstant.ROLE_LIST);
                 return dictKV;
-            }).collect(Collectors.toList());
+            }).toList();
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;
@@ -126,7 +124,6 @@ public class EDictServiceImpl implements EDictService {
     @Override
     @EDict(dictType = EDictConstant.POST_LIST)
     public DictCacheVO getPostDictData() {
-        //返回结果
         DictCacheVO dictCacheVO = new DictCacheVO();
         dictCacheVO.setDictType(EDictConstant.POST_LIST);
         //查询岗位列表
@@ -138,7 +135,32 @@ public class EDictServiceImpl implements EDictService {
                 dictKV.setDictValue(post.getPostName());
                 dictKV.setDictType(EDictConstant.POST_LIST);
                 return dictKV;
-            }).collect(Collectors.toList());
+            }).toList();
+            dictCacheVO.setDictList(dictKVList);
+        }
+        return dictCacheVO;
+    }
+
+    /**
+     * 获取租户字典数据（额外字典数据）
+     * @return 字典数据列表
+     */
+    @Override
+    @EDict(dictType = EDictConstant.TENANT_LIST)
+    public DictCacheVO getTenantDictData() {
+        DictCacheVO dictCacheVO = new DictCacheVO();
+        dictCacheVO.setDictType(EDictConstant.TENANT_LIST);
+        //查询租户列表
+        List<MTenant> tenantList = tenantMapper.selectTenantDict();
+        if (CollectionUtil.isNotEmpty(tenantList)) {
+            List<DictCacheVO.DictKV> dictKVList = tenantList.stream()
+                    .map(tenant -> {
+                DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
+                dictKV.setDictKey(tenant.getTenantId().toString());
+                dictKV.setDictValue(tenant.getTenantName());
+                dictKV.setDictType(EDictConstant.TENANT_LIST);
+                return dictKV;
+            }).toList();
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;
@@ -162,7 +184,7 @@ public class EDictServiceImpl implements EDictService {
                 dictKV.setDictValue(dept.getNickname());
                 dictKV.setDictType(dictType);
                 return dictKV;
-            }).collect(Collectors.toList());
+            }).toList();
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;

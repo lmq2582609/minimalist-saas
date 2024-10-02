@@ -23,8 +23,8 @@ public class EDictConstant {
     /** 用户字典type */
     public static final String USER_LIST = "dict-user-list";
 
-    /** 全部用户字典type */
-    public static final String USER_ALL_LIST = "dict-user-all-list";
+    /** 租户字典type */
+    public static final String TENANT_LIST = "dict-tenant-list";
 
     /** 租户套餐字典type */
     public static final String TENANT_PACKAGE_LIST = "tenant-package-list";

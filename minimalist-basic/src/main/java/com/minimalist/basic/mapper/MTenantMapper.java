@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.MTenant;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.common.mybatis.QueryCondition;
-
 import java.util.List;
 
 /**
@@ -94,6 +94,17 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      */
     default MTenant selectTenantByUserId(Long userId) {
         return selectOne(new LambdaQueryWrapper<MTenant>().eq(MTenant::getUserId, userId));
+    }
+
+    /**
+     * 租户列表 -> 字典查询
+     * @return 部门列表
+     */
+    default List<MTenant> selectTenantDict() {
+        LambdaQueryWrapper<MTenant> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(MTenant::getTenantId, MTenant::getTenantName);
+        queryWrapper.eq(MTenant::getStatus, TenantEnum.TenantStatus.TENANT_STATUS_1.getCode());
+        return selectList(queryWrapper);
     }
 
 }

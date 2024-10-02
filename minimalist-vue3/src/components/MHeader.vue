@@ -7,8 +7,12 @@
         <div class="flex items-center">
             <a-space>
                 <!-- 租户切换，管理员才能切换 -->
-                
-
+                <a-select placeholder="租户切换" class="min-w-[18em]" allow-clear>
+                    <template v-for="(d, index) in dicts[proxy.DICT.tenantList]" :key="index">
+                        <!-- 将系统租户隐藏，因为默认就是系统租户 -->
+                        <a-option  :value="d.dictKey" :label="d.dictValue" v-if="d.dictKey !== 0" />
+                    </template>
+                </a-select>
                 <!-- 全屏 -->
                 <a-button shape="circle" size="small" @click="toggle">
                     <template #icon>
@@ -82,6 +86,9 @@ const router = useRouter()
 const sysStore = useSysStore()
 //全局实例
 const {proxy} = getCurrentInstance()
+//加载字典
+const dicts = proxy.LoadDicts([proxy.DICT.tenantList])
+
 
 //主题2种模式，true白天，false黑夜
 const theme = ref(true)
