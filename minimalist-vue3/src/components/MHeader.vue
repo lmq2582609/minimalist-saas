@@ -7,7 +7,7 @@
         <div class="flex items-center">
             <a-space>
                 <!-- 租户切换，管理员才能切换 -->
-                <a-select placeholder="租户切换" class="min-w-[18em]" allow-clear>
+                <a-select v-model="tenantId" placeholder="租户切换" class="min-w-[18em]" allow-clear @change="tenantChange">
                     <template v-for="(d, index) in dicts[proxy.DICT.tenantList]" :key="index">
                         <!-- 将系统租户隐藏，因为默认就是系统租户 -->
                         <a-option  :value="d.dictKey" :label="d.dictValue" v-if="d.dictKey !== 0" />
@@ -79,7 +79,9 @@ import { useRouter } from 'vue-router'
 import { useFullscreen } from '@vueuse/core'
 import { logoutApi } from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
-
+import { useCookies } from '@vueuse/integrations/useCookies'
+//cookie
+const cookie = useCookies()
 //路由
 const router = useRouter()
 //缓存
@@ -136,6 +138,24 @@ const logoClick = () => {
 const skipLink = (url) => {
     window.open(url, '_blank')
 }
+//租户切换
+const tenantId = ref()
+const tenantChange = () => {
+    if (!tenantId.value) {
+        sysStore.tenantId = null
+        //清除cookie
+        cookie.remove('tenant_id')
+    } else {
+        sysStore.tenantId = tenantId.value
+        //设置cookie
+        cookie.set('tenant_id', tenantId.value)
+    }
+    //刷新当前页面
+
+
+
+}
+
 </script>
 <style scoped>
 .logo-text {

@@ -8,6 +8,8 @@ import { removeToken } from "~/utils/cookie";
 //"sysStore" -> 第一个参数是应用中 Store 的唯一ID
 export const useSysStore = defineStore('sysStore', {
 	state: () => ({
+        //租户切换
+        tenantId: null,
         //用户信息
         user: null,
         //sider展开/缩起，false展开，true缩起
