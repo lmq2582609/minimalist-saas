@@ -38,12 +38,6 @@ public class MRole extends BaseEntity {
     private String roleCode;
 
     /**
-     * 存储角色所关联的权限集合，使用英文逗号分割，此字段只用于角色管理，获取用户权限从角色与权限关联表中获取
-     */
-    @TableField("perm_ids")
-    private String permIds;
-
-    /**
      * 显示顺序
      */
     @TableField("role_sort")

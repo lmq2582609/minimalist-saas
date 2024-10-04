@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.enums.PermEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.perm.PermQueryVO;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PermServiceImpl implements PermService {
@@ -129,29 +131,40 @@ public class PermServiceImpl implements PermService {
     }
 
     /**
-     * 查询权限列表（只查询启用的权限）
+     * 查询系统租户权限列表（只查询启用的权限）
      * @return 权限树
      */
     @Override
     public List<PermVO> getEnablePermList() {
+        List<MPerms> enablePermList = permsMapper.getEnablePermList();
+        return permsToTree(enablePermList);
+    }
+
+    /**
+     * 查询租户权限列表 -> (只获取正常状态的权限)
+     * @return 权限树
+     */
+    @Override
+    public List<PermVO> getTenantEnablePermList() {
         //检查是否为系统租户
         boolean isAdmin = SafetyUtil.checkIsSystemTenant();
-        //权限数据列表
-        List<MPerms> perms = null;
-        if (isAdmin) {
-            //系统租户会查询所有权限
-            perms = permsMapper.getEnablePermList();
-        } else {
-            //租户查询，只查询租户套餐关联的权限
-            long tenantId = SafetyUtil.getLonginUserTenantId();
-            //查询租户
-            MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
-            //查询租户套餐权限
-            List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
-            List<Long> permIds = tenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-            perms = permsMapper.selectPermsByPermsIds(permIds);
+        //从cookie中获取租户ID，如果有值表示需要查询这个租户的数据
+        String cookieTenantId = SafetyUtil.getCookieTenantId();
+        if (isAdmin && StrUtil.isBlank(cookieTenantId)) {
+            //如果是系统租户，并且cookie中没有tenantId，则查询perm表所有数据
+            List<MPerms> enablePermList = permsMapper.getEnablePermList();
+            return permsToTree(enablePermList);
         }
-        return permsToTree(perms);
+        //租户查询，只查询租户套餐关联的权限
+        long tenantId = Optional.ofNullable(cookieTenantId)
+                .map(Long::parseLong).orElse(SafetyUtil.getLonginUserTenantId());
+        //查询租户
+        MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
+        //查询租户套餐权限
+        List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
+        List<Long> permIds = tenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+        List<MPerms> enablePermList = permsMapper.selectPermsByPermsIds(permIds);
+        return permsToTree(enablePermList);
     }
 
     /**

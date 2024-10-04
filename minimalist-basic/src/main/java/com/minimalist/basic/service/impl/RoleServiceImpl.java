@@ -88,8 +88,6 @@ public class RoleServiceImpl implements RoleService {
         mRole = BeanUtil.copyProperties(roleVO, MRole.class);
         //角色ID赋值
         mRole.setRoleId(roleId);
-        //角色权限赋值 - 用于回显
-        mRole.setPermIds(CollectionUtil.join(roleVO.getCheckedPermIds(), ","));
         //插入角色
         roleMapper.insert(mRole);
         //插入角色和权限关联数据
@@ -125,8 +123,6 @@ public class RoleServiceImpl implements RoleService {
         MRole newRole = BeanUtil.copyProperties(roleVO, MRole.class);
         //乐观锁字段赋值
         newRole.updateBeforeSetVersion(mRole.getVersion());
-        //角色权限赋值 - 用于回显
-        newRole.setPermIds(CollectionUtil.join(roleVO.getCheckedPermIds(), ","));
         //修改角色
         int updateCount = roleMapper.updateRoleByRoleId(newRole);
         Assert.isTrue(updateCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
@@ -160,10 +156,10 @@ public class RoleServiceImpl implements RoleService {
         //查询角色
         MRole mRole = roleMapper.selectRoleByRoleId(roleId);
         RoleVO roleVO = BeanUtil.copyProperties(mRole, RoleVO.class);
-        //角色选中权限回显
-        if (StrUtil.isNotBlank(mRole.getPermIds())) {
-            roleVO.setCheckedPermIds(StrUtil.split(mRole.getPermIds(), ","));
-        }
+        //根据角色查询权限，回显数据
+        List<MRolePerm> rolePerms = rolePermMapper.selectRolePermByRoleId(roleId);
+        List<String> permIds = rolePerms.stream().map(rp -> rp.getPermId().toString()).toList();
+        roleVO.setCheckedPermIds(permIds);
         return roleVO;
     }
 

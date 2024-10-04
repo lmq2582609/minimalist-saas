@@ -43,9 +43,14 @@ export function getPermListApi(params) {
 }
 
 
-//获取权限树(只查询启用的权限)
+//获取系统租户权限树(只查询启用的权限)
 export function getEnablePermListApi() {
     return axios.get("/basic/permission/getEnablePermList")
+}
+
+//获取租户权限树(只查询启用的权限)
+export function getTenantEnablePermListApi() {
+    return axios.get("/basic/permission/getTenantEnablePermList")
 }
 
 //获取权限详细信息

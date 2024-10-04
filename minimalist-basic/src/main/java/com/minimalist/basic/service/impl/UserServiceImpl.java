@@ -140,10 +140,6 @@ public class UserServiceImpl implements UserService {
             //设置默认密码
             user.setPassword(userManager.passwordEncrypt("123456qwerty", salt));
         }
-        //处理用户所在部门
-        if (CollectionUtil.isNotEmpty(userVO.getCheckedDeptIds())) {
-            user.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
-        }
         userMapper.insert(user);
         //新增用户关联信息
         userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userId);
@@ -188,15 +184,6 @@ public class UserServiceImpl implements UserService {
         }
         //乐观锁字段赋值
         newUser.updateBeforeSetVersion(optUser.getVersion());
-        //处理用户所在部门
-        if (CollectionUtil.isNotEmpty(userVO.getCheckedDeptIds())) {
-            newUser.setDeptIds(CollectionUtil.join(userVO.getCheckedDeptIds(), ","));
-        } else {
-            //此处需要set一个null值，因为上面copyProperties拷贝时，
-            //vo中的deptIds是Set类型，user实体中的deptIds是String类型
-            //如果vo中deptIds是空集合，会导致拷贝后user实体中的deptIds="[]"
-            newUser.setDeptIds(null);
-        }
         //修改用户
         userMapper.updateUserByUserId(newUser);
         //删除用户关联信息
@@ -236,11 +223,9 @@ public class UserServiceImpl implements UserService {
         userVO.setRoleIds(userRoleList.stream().map(MUserRole::getRoleId).collect(Collectors.toSet()));
         //查询用户与部门关联数据
         List<MUserDept> userDeptList = userDeptMapper.selectUserDeptRelation(userVO.getUserId());
-        userVO.setDeptIds(userDeptList.stream().map(MUserDept::getDeptId).collect(Collectors.toSet()));
         //部门选中回显
-        if (StrUtil.isNotBlank(mUser.getDeptIds())) {
-            userVO.setCheckedDeptIds(StrUtil.split(mUser.getDeptIds(), ","));
-        }
+        List<String> deptIds = userDeptList.stream().map(d -> d.getDeptId().toString()).toList();
+        userVO.setCheckedDeptIds(deptIds);
         return userVO;
     }
 
@@ -309,11 +294,10 @@ public class UserServiceImpl implements UserService {
         //用户岗位
         userInfoVO.setPostList(postService.getPostByUserId(userId));
         //用户所属部门
-        if (StrUtil.isNotBlank(user.getDeptIds())) {
-            List<Long> deptIds = StrUtil.split(user.getDeptIds(), ",")
-                    .stream().map(Long::parseLong).toList();
-            userInfoVO.setDeptList(deptService.getDeptByDeptIds(deptIds));
-        }
+        List<MUserDept> userDeptList = userDeptMapper.selectUserDeptRelation(userId);
+        //部门选中回显
+        List<Long> deptIds = userDeptList.stream().map(MUserDept::getDeptId).toList();
+        userInfoVO.setDeptList(deptService.getDeptByDeptIds(deptIds));
         return userInfoVO;
     }
 

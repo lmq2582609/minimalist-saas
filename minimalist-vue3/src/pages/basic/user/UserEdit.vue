@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance, watch } from 'vue'
+import {ref, reactive, getCurrentInstance, watch, nextTick} from 'vue'
 import { getUserByUserIdApi, addUserApi, updateUserByUserIdApi } from "~/api/user.js";
 import { getEnableDeptListApi } from "~/api/dept.js";
 import { getAllTreeParentId } from "~/utils/sys.js";
@@ -162,10 +162,6 @@ const rules = {
 const okBtnClick = () => {
     //获取部门 -> 全勾选+半勾选
     form.deptIds = getDeptTreeSelectData(true)
-    //获取部门 -> 全勾选 -> 用于回显，需剔除父节点ID
-    let checkedDeptIdArr = getDeptTreeSelectData(false)
-    //剔除父节点ID，只保留叶子节点的id
-    form.checkedDeptIds = checkedDeptIdArr.filter(deptId => !allParentDeptId.value.includes(deptId));
     //表单验证
     formRef.value.validate((valid) => {
         if (valid) {return false}
@@ -225,13 +221,17 @@ const allParentDeptId = ref([])
 //部门树ref
 const treeRef = ref(null)
 //获取部门数据列表
-const getDeptTree = () => {
+const getDeptTree = (loadUser = false) => {
     deptTreeSpinLoading.value = true
     getEnableDeptListApi().then(res => {
         //部门树数据赋值
         deptTreeData.value = res
-        //获取所有父deptId
-        allParentDeptId.value = getAllTreeParentId(res, 'deptId')
+        if (loadUser) {
+            //获取所有父deptId
+            allParentDeptId.value = getAllTreeParentId(res, 'deptId')
+            //加载用户信息
+            loadUserInfo(props.params.userId)
+        }
     }).finally(() => {
         deptTreeSpinLoading.value = false
     })
@@ -244,7 +244,19 @@ const loadUserInfo = (userId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    form[key] = res[key]
+                    if (key === 'checkedDeptIds') {
+                        let checkedDeptIds = []
+                        //处理部门回显
+                        res[key].forEach(deptId => {
+                            //如果不是父节点，则回显为勾选
+                            if (!allParentDeptId.value.includes(deptId)) {
+                                checkedDeptIds.push(deptId)
+                            }
+                        })
+                        form.checkedDeptIds = checkedDeptIds
+                    } else {
+                        form[key] = res[key]
+                    }
                 }
             }
         }
@@ -256,11 +268,12 @@ const loadUserInfo = (userId) => {
 watch(() => props.params, (newVal, oldVal) => {
     //部门ID
     if (props.params.userId) {
-        //加载用户信息
-        loadUserInfo(props.params.userId)
+        //加载部门树
+        getDeptTree(true)
+    } else {
+        //加载部门树
+        getDeptTree()
     }
-    //加载部门树
-    getDeptTree()
 }, { deep: true, immediate: true })
 </script>
 <style scoped>

@@ -1,9 +1,14 @@
 package com.minimalist.common.utils;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.tenant.IgnoreTenant;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.Optional;
 
@@ -55,6 +60,16 @@ public class SafetyUtil {
         return Optional.ofNullable(StpUtil.getSession().getString(IgnoreTenant.TENANT_ID))
                 .map(Long::valueOf)
                 .orElse(-1L);
+    }
+
+    /**
+     * 获取cookie中的租户ID
+     * @return cookie中的租户ID
+     */
+    public static String getCookieTenantId() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        Cookie cookie = JakartaServletUtil.getCookie(request, IgnoreTenant.TENANT_ID);
+        return Optional.ofNullable(cookie).map(Cookie::getValue).orElse(null);
     }
 
 }

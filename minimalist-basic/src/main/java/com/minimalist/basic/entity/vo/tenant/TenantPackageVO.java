@@ -39,8 +39,7 @@ public class TenantPackageVO implements Serializable {
     @Schema(name = "remark", description = "备注", type = "string")
     private String remark;
 
-    @NotEmpty(message = "租户套餐权限不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "checkedPermIds", description = "租户套餐权限编码集合，全勾选的节点", type = "array")
+    @Schema(name = "checkedPermIds", description = "租户套餐权限编码集合，用于回显", type = "array")
     private List<String> checkedPermIds;
 
     @JsonSerialize(using = LongArrJsonSerializer.class)

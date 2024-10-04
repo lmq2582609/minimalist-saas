@@ -74,7 +74,7 @@
     </div>
 </template>
 <script setup>
-import { ref, getCurrentInstance } from 'vue'
+import {ref, getCurrentInstance, onMounted} from 'vue'
 import { useRouter } from 'vue-router'
 import { useFullscreen } from '@vueuse/core'
 import { logoutApi } from "~/api/user.js";
@@ -142,20 +142,23 @@ const skipLink = (url) => {
 const tenantId = ref()
 const tenantChange = () => {
     if (!tenantId.value) {
-        sysStore.tenantId = null
         //清除cookie
         cookie.remove('tenant_id')
+        cookie.remove('tenant_id_base64')
     } else {
-        sysStore.tenantId = tenantId.value
         //设置cookie
         cookie.set('tenant_id', tenantId.value)
+        //多存储一个base64数据，是因为Long类型cookie.get后会丢失精度，所以get时获取base64的数据后再解码拿到tenantId
+        cookie.set('tenant_id_base64', btoa(tenantId.value))
     }
-    //刷新当前页面
-
-
-
 }
-
+onMounted(() => {
+    //初始化时，如果cookie中有tenantId，则回显
+    let tid = cookie.get('tenant_id_base64')
+    if (tid) {
+        tenantId.value = atob(tid)
+    }
+})
 </script>
 <style scoped>
 .logo-text {

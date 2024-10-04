@@ -48,9 +48,9 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance, watch } from 'vue'
+import {ref, reactive, getCurrentInstance, watch, nextTick} from 'vue'
 import { addRoleApi, updateRoleByRoleIdApi, getRoleByRoleIdApi } from "~/api/role.js";
-import { getEnablePermListApi } from "~/api/perm.js";
+import {getTenantEnablePermListApi} from "~/api/perm.js";
 import { getAllTreeParentId } from "~/utils/sys.js";
 
 //全局实例
@@ -101,10 +101,6 @@ const rules = {
 const okBtnClick = () => {
     //获取权限 -> 全勾选+半勾选
     form.permissionsIds = getPermTreeSelectData(true)
-    //获取权限 -> 全勾选 -> 用于回显，需剔除父节点ID
-    let checkedPermIdArr = getPermTreeSelectData(false)
-    //剔除父节点ID，只保留叶子节点的id
-    form.checkedPermIds = checkedPermIdArr.filter(permId => !allParentPermId.value.includes(permId));
     //表单验证
     formRef.value.validate((valid) => {
         if (valid) {return false}
@@ -161,13 +157,17 @@ const treeRef = ref(null)
 //权限树所有父节点ID(只要有子集，就视为是父节点)
 const allParentPermId = ref([])
 //获取权限数据列表
-const getPermTree = () => {
+const getPermTree = (loadRole = false) => {
     permTreeSpinLoading.value = true
-    getEnablePermListApi().then(res => {
+    getTenantEnablePermListApi().then(res => {
         //权限树数据赋值
         permTreeData.value = res
-        //获取所有父permId
-        allParentPermId.value = getAllTreeParentId(res, 'permId')
+        if (loadRole) {
+            //获取所有父permId
+            allParentPermId.value = getAllTreeParentId(res, 'permId')
+            //加载角色信息
+            loadRoleInfo(props.params.roleId)
+        }
     }).finally(() => {
         permTreeSpinLoading.value = false
     })
@@ -180,7 +180,19 @@ const loadRoleInfo = (roleId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    form[key] = res[key]
+                    if (key === 'checkedPermIds') {
+                        let checkedPermIds = []
+                        //处理权限回显
+                        res[key].forEach(permId => {
+                            //如果不是父节点，则回显为勾选
+                            if (!allParentPermId.value.includes(permId)) {
+                                checkedPermIds.push(permId)
+                            }
+                        })
+                        form.checkedPermIds = checkedPermIds
+                    } else {
+                        form[key] = res[key]
+                    }
                 }
             }
         }
@@ -192,11 +204,12 @@ const loadRoleInfo = (roleId) => {
 watch(() => props.params, (newVal, oldVal) => {
     //角色ID
     if (props.params.roleId) {
-        //加载角色信息
-        loadRoleInfo(props.params.roleId)
+        //加载权限树，同时加载角色详情
+        getPermTree(true)
+    } else {
+        //加载权限树
+        getPermTree()
     }
-    //加载权限树
-    getPermTree()
 }, { deep: true, immediate: true })
 </script>
 <style scoped>

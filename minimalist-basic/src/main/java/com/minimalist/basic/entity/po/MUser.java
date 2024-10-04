@@ -26,12 +26,6 @@ public class MUser extends BaseEntity {
     private Long userId;
 
     /**
-     * 用户所在部门ID集合，用于回显
-     */
-    @TableField("dept_ids")
-    private String deptIds;
-
-    /**
      * 用户账号
      */
     @TableField("username")

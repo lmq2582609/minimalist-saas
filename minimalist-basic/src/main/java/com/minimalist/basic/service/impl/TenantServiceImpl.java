@@ -84,7 +84,7 @@ public class TenantServiceImpl implements TenantService {
         checkAddTenantUser(userInfo);
         //为租户创建角色
         long roleId = UnqIdUtil.uniqueId();
-        addTenantRole(roleId, tenantId, tenantPackage.getPackageId(), tenantPackage.getPermIds());
+        addTenantRole(roleId, tenantId, tenantPackage.getPackageId());
         //为租户创建用户
         long userId = UnqIdUtil.uniqueId();
         userInfo.setUserId(userId);
@@ -221,13 +221,11 @@ public class TenantServiceImpl implements TenantService {
         Assert.notNull(user.getUserSex(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_USERSEX_NULL.getDesc()));
     }
 
-    private void addTenantRole(Long roleId, Long tenantId, Long tenantPackageId, String permIds) {
+    private void addTenantRole(Long roleId, Long tenantId, Long tenantPackageId) {
         MRole role = new MRole();
         role.setRoleId(roleId);
         role.setRoleName(RoleEnum.Role.ADMIN.getName());
         role.setRoleCode(RoleEnum.Role.ADMIN.getCode());
-        List<String> checkedPermIds = Arrays.asList(permIds.split(","));
-        role.setPermIds(CollectionUtil.join(checkedPermIds, ","));
         role.setRoleSort(CommonConstant.ZERO);
         role.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
         role.setRemark("添加租户系统自动创建角色");

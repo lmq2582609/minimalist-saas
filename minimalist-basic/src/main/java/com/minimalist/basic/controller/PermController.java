@@ -54,9 +54,15 @@ public class PermController {
     }
 
     @GetMapping("/getEnablePermList")
-    @Operation(summary = "查询权限列表 -> 只获取正常状态的权限")
+    @Operation(summary = "查询系统租户权限列表 -> 只获取正常状态的权限")
     public ResponseEntity<List<PermVO>> getEnablePermList() {
         return ResponseEntity.ok(permService.getEnablePermList());
+    }
+
+    @GetMapping("/getTenantEnablePermList")
+    @Operation(summary = "查询租户权限列表 -> 只获取正常状态的权限")
+    public ResponseEntity<List<PermVO>> getTenantEnablePermList() {
+        return ResponseEntity.ok(permService.getTenantEnablePermList());
     }
 
     @GetMapping("/getPermByPermId/{permId}")

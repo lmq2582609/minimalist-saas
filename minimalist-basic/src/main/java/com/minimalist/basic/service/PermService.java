@@ -48,10 +48,16 @@ public interface PermService {
     List<PermVO> getPermList(PermQueryVO queryVO);
 
     /**
-     * 查询权限列表 -> 其他地方使用(只获取正常状态的权限)
+     * 查询系统租户权限列表 -> (只获取正常状态的权限)
      * @return 权限树
      */
     List<PermVO> getEnablePermList();
+
+    /**
+     * 查询租户权限列表 -> (只获取正常状态的权限)
+     * @return 权限树
+     */
+    List<PermVO> getTenantEnablePermList();
 
     /**
      * 根据权限ID查询权限

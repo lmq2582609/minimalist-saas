@@ -52,8 +52,7 @@ public class RoleVO implements Serializable {
     @Schema(name = "tenantId", description = "租户ID", type = "string")
     private Long tenantId;
 
-    @NotEmpty(message = "角色权限不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "checkedPermIds", description = "角色权限编码集合，全勾选的节点，用于回显", type = "array")
+    @Schema(name = "checkedPermIds", description = "角色权限编码集合，用于回显", type = "array")
     private List<String> checkedPermIds;
 
     @JsonSerialize(using = LongArrJsonSerializer.class)

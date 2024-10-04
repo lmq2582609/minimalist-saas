@@ -28,9 +28,10 @@
     </a-spin>
 </template>
 <script setup>
-import { ref, reactive, getCurrentInstance, watch } from 'vue'
+import {ref, reactive, getCurrentInstance, watch, nextTick} from 'vue'
 import { getRoleByRoleIdApi } from "~/api/role.js";
-import { getEnablePermListApi } from "~/api/perm.js";
+import { getTenantEnablePermListApi } from "~/api/perm.js";
+import {getAllTreeParentId} from "~/utils/sys.js";
 
 //全局实例
 const { proxy } = getCurrentInstance()
@@ -70,7 +71,19 @@ const loadRoleInfo = (roleId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    form[key] = res[key]
+                    if (key === 'checkedPermIds') {
+                        let checkedPermIds = []
+                        //处理权限回显
+                        res[key].forEach(permId => {
+                            //如果不是父节点，则回显为勾选
+                            if (!allParentPermId.value.includes(permId)) {
+                                checkedPermIds.push(permId)
+                            }
+                        })
+                        form.checkedPermIds = checkedPermIds
+                    } else {
+                        form[key] = res[key]
+                    }
                 }
             }
         }
@@ -82,12 +95,20 @@ const loadRoleInfo = (roleId) => {
 const permTreeData = ref([])
 //权限树加载
 const permTreeSpinLoading = ref(false)
+//权限树所有父节点ID(只要有子集，就视为是父节点)
+const allParentPermId = ref([])
 //获取权限数据列表
-const getPermTree = () => {
+const getPermTree = (loadRole = false) => {
     permTreeSpinLoading.value = true
-    getEnablePermListApi().then(res => {
+    getTenantEnablePermListApi().then(res => {
         //权限树数据赋值
         permTreeData.value = res
+        if (loadRole) {
+            //获取所有父permId
+            allParentPermId.value = getAllTreeParentId(res, 'permId')
+            //查询数据
+            loadRoleInfo(props.params.roleId)
+        }
     }).finally(() => {
         permTreeSpinLoading.value = false
     })
@@ -96,8 +117,9 @@ const getPermTree = () => {
 watch(() => props.params, (newVal, oldVal) => {
     //角色ID
     if (props.params.roleId) {
-        //查询数据
-        loadRoleInfo(props.params.roleId)
+        //加载权限树，同时加载角色详情
+        getPermTree(true)
+    } else {
         //加载权限树
         getPermTree()
     }

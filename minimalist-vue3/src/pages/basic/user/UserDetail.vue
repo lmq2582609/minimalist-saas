@@ -44,9 +44,10 @@
     </a-spin>
 </template>
 <script setup>
-import { ref, reactive, getCurrentInstance, watch } from 'vue'
+import {ref, reactive, getCurrentInstance, watch, nextTick} from 'vue'
 import { getUserByUserIdApi } from "~/api/user.js";
 import { getEnableDeptListApi } from "~/api/dept.js";
+import {getAllTreeParentId} from "~/utils/sys.js";
 
 //全局实例
 const { proxy } = getCurrentInstance()
@@ -96,7 +97,19 @@ const loadUserInfo = (userId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    form[key] = res[key]
+                    if (key === 'checkedDeptIds') {
+                        let checkedDeptIds = []
+                        //处理部门回显
+                        res[key].forEach(deptId => {
+                            //如果不是父节点，则回显为勾选
+                            if (!allParentDeptId.value.includes(deptId)) {
+                                checkedDeptIds.push(deptId)
+                            }
+                        })
+                        form.checkedDeptIds = checkedDeptIds
+                    } else {
+                        form[key] = res[key]
+                    }
                 }
             }
         }
@@ -108,12 +121,20 @@ const loadUserInfo = (userId) => {
 const deptTreeSpinLoading = ref(false)
 //部门树数据
 const deptTreeData = ref([])
+//部门树所有父节点ID(只要有子集，就视为是父节点)
+const allParentDeptId = ref([])
 //获取部门数据列表
-const getDeptTree = () => {
+const getDeptTree = (loadUser = false) => {
     deptTreeSpinLoading.value = true
     getEnableDeptListApi().then(res => {
         //权限树数据赋值
         deptTreeData.value = res
+        if (loadUser) {
+            //获取所有父deptId
+            allParentDeptId.value = getAllTreeParentId(res, 'deptId')
+            //加载用户信息
+            loadUserInfo(props.params.userId)
+        }
     }).finally(() => {
         deptTreeSpinLoading.value = false
     })
@@ -122,8 +143,9 @@ const getDeptTree = () => {
 watch(() => props.params, (newVal, oldVal) => {
     //角色ID
     if (props.params.userId) {
-        //查询数据
-        loadUserInfo(props.params.userId)
+        //加载部门树
+        getDeptTree(true)
+    } else {
         //加载部门树
         getDeptTree()
     }

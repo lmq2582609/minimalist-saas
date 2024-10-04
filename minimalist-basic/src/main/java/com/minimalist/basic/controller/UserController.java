@@ -66,6 +66,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByUserId(userId));
     }
 
+    @IgnoreTenant
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息(登录后获取，含角色、权限、菜单、部门等)")
     public ResponseEntity<UserInfoVO> getUserInfo() {

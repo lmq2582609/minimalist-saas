@@ -4,9 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
@@ -16,7 +14,6 @@ import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.common.constant.CommonConstant;
-import com.minimalist.common.enums.RespEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
@@ -25,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TenantPackageServiceImpl implements TenantPackageService {
@@ -61,8 +59,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         long tenantPackageId = UnqIdUtil.uniqueId();
         mTenantPackage.setPackageId(tenantPackageId);
         mTenantPackage.setStatus(TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_1.getCode());
-        //套餐权限赋值 - 用于回显
-        mTenantPackage.setPermIds(CollectionUtil.join(tenantPackageVO.getCheckedPermIds(), ","));
         //插入租户套餐
         tenantPackageMapper.insert(mTenantPackage);
         //构造套餐与权限关联数据
@@ -101,16 +97,20 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         MTenantPackage newTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         //乐观锁字段复制
         newTenantPackage.updateBeforeSetVersion(oldTenantPackage.getVersion());
-        //套餐权限赋值 - 用于回显
-        newTenantPackage.setPermIds(CollectionUtil.join(tenantPackageVO.getCheckedPermIds(), ","));
         tenantPackageMapper.updateTenantPackageByTenantPackageId(newTenantPackage);
         //删除原租户套餐与权限关联数据
         entityService.delete(MTenantPackagePerm::getPackageId, newTenantPackage.getPackageId());
         //插入新租户套餐与权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), newTenantPackage.getPackageId());
         entityService.insertBatch(mTenantPackagePerms);
+
+        //查询套餐的权限
+        List<MTenantPackagePerm> oldPerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageVO.getPackageId());
+        String op = oldPerms.stream().map(p -> p.getPermId().toString()).collect(Collectors.joining(","));
+        //修改后的套餐权限
+        String np = tenantPackageVO.getPermissionsIds().stream().map(Object::toString).collect(Collectors.joining(","));
         //如果套餐的旧权限和修改后的新权限不一致，需要修改所有使用改套餐租户的权限
-        if (!newTenantPackage.getPermIds().equals(oldTenantPackage.getPermIds())) {
+        if (!op.equals(np)) {
             //根据套餐查租户
             List<MTenant> tenants = tenantMapper.selectTenantByTenantPackageId(tenantPackageVO.getPackageId());
             for (MTenant tenant : tenants) {
@@ -148,9 +148,9 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageId);
         TenantPackageVO tenantPackageVO = BeanUtil.copyProperties(mTenantPackage, TenantPackageVO.class);
         //套餐选中权限回显
-        if (StrUtil.isNotBlank(mTenantPackage.getPermIds())) {
-            tenantPackageVO.setCheckedPermIds(StrUtil.split(mTenantPackage.getPermIds(), ","));
-        }
+        List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
+        List<String> permIds = tenantPackagePerms.stream().map(p -> p.getPermId().toString()).toList();
+        tenantPackageVO.setCheckedPermIds(permIds);
         return tenantPackageVO;
     }
 

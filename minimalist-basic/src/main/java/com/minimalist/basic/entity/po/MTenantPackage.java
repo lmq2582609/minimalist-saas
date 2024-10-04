@@ -32,12 +32,6 @@ public class MTenantPackage extends BaseEntity {
     private String packageName;
 
     /**
-     * 存储套餐所关联的权限集合，使用英文逗号分割，此字段只用于套餐管理，获取租户套餐从套餐与权限关联表中获取
-     */
-    @TableField("perm_ids")
-    private String permIds;
-
-    /**
      * 状态 0禁用 1正常
      */
     @TableField("status")
