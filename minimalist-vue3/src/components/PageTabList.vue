@@ -28,6 +28,7 @@ import {onMounted, ref, watch} from "vue";
 import {useSysStore} from "~/store/module/sys-store.js";
 import {useRoute, useRouter, onBeforeRouteUpdate} from "vue-router";
 import { useCookies } from '@vueuse/integrations/useCookies'
+import {PAGE_TAB_LIST} from "~/utils/cookie.js";
 //cookie
 const cookie = useCookies()
 //缓存
@@ -48,7 +49,7 @@ const addTab = (tab) => {
     if (index === -1) {
         tabList.value.push(tab)
         //同时添加到cookie，保证页面刷新后tab还存在
-        cookie.set('pageTabList', tabList.value)
+        cookie.set(PAGE_TAB_LIST, tabList.value)
     }
     //激活这个tab页
     activeTab.value = tab.path
@@ -74,7 +75,7 @@ const deleteTab = (path) => {
     //在tabList中删除关闭的tab
     tabList.value = tabList.value.filter(tab => tab.path !== path)
     //同时添加到cookie，保证页面刷新后tab还存在
-    cookie.set('pageTabList', tabList.value)
+    cookie.set(PAGE_TAB_LIST, tabList.value)
 }
 //to   -> 跳转到哪个页面去(路径)
 //from -> 从哪个页面跳转过来的(路径)
@@ -87,7 +88,7 @@ onBeforeRouteUpdate((to, from) => {
 })
 //初始化标签页
 const initTabList = () => {
-    let tabs = cookie.get('pageTabList')
+    let tabs = cookie.get(PAGE_TAB_LIST)
     if (tabs && tabs.length >= 0) {
         tabList.value = tabs
     }
@@ -112,7 +113,7 @@ const tabDropdownSelect = (key) => {
         tabList.value = [ indexTab ]
     }
     //同时添加到cookie，保证页面刷新后tab还存在
-    cookie.set('pageTabList', tabList.value)
+    cookie.set(PAGE_TAB_LIST, tabList.value)
 }
 
 

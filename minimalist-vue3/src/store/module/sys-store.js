@@ -2,7 +2,8 @@
  * 存储系统缓存
  */
 import { defineStore } from 'pinia'
-import { removeToken } from "~/utils/cookie";
+import { useCookies } from '@vueuse/integrations/useCookies'
+import {Authentication, PAGE_TAB_LIST, TENANT_ID, TENANT_ID_BASE64} from "~/utils/cookie.js";
 
 //命名最好以 `use` 开头且以 `Store` 结尾，(比如 `useUserStore`，`useCartStore`，`useProductStore`)
 //"sysStore" -> 第一个参数是应用中 Store 的唯一ID
@@ -10,6 +11,8 @@ export const useSysStore = defineStore('sysStore', {
 	state: () => ({
         //用户信息
         user: null,
+        //是否调用过用户信息接口
+        hasGetUserinfo: false,
         //sider展开/缩起，false展开，true缩起
         siderCollapsed: false,
         //sider当前宽度
@@ -26,10 +29,20 @@ export const useSysStore = defineStore('sysStore', {
         },
         //用户退出登录后的处理
         userLogoutHandler() {
-            //移除cookie里的token
-            removeToken()
+            //清空cookie
+            let cookie = useCookies()
+            //清空请求头
+            cookie.remove(Authentication)
+            //清空租户ID
+            cookie.remove(TENANT_ID)
+            //清空租户ID
+            cookie.remove(TENANT_ID_BASE64)
+            //清空标签页
+            cookie.remove(PAGE_TAB_LIST)
             //清除当前用户状态
             this.user = null
+            //是否获取过用户信息接口置为false
+            this.hasGetUserinfo = false
         }
     }
 })

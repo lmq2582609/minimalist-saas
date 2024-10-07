@@ -10,12 +10,8 @@ import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.po.MUserPost;
 import com.minimalist.basic.entity.po.MUserRole;
 import com.minimalist.basic.mapper.MUserMapper;
-import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.basic.entity.enums.UserEnum;
-import com.minimalist.common.module.entity.enums.ConfigEnum;
-import com.minimalist.common.module.entity.po.MConfig;
-import com.minimalist.common.module.mapper.MConfigMapper;
 import com.minimalist.common.mybatis.EntityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -32,9 +28,6 @@ public class UserManager {
     private MUserMapper userMapper;
 
     @Autowired
-    private MConfigMapper configMapper;
-
-    @Autowired
     private EntityService entityService;
 
     /**
@@ -45,8 +38,7 @@ public class UserManager {
      */
     public String passwordEncrypt(String password, String salt) {
         String p1 = SecureUtil.md5(password + salt);
-        MConfig config = configMapper.selectConfigByConfigKey(CommonConstant.SYSTEM_CONFIG_PASSWORD_SALT, ConfigEnum.Status.STATUS_1.getCode());
-        return SecureUtil.md5(p1 + config.getConfigValue());
+        return SecureUtil.md5(p1);
     }
 
     /**

@@ -46,6 +46,12 @@ public class MConfig extends BaseEntity {
     private String configValue;
 
     /**
+     * 说明
+     */
+    @TableField("description")
+    private String description;
+
+    /**
      * 状态  0禁用 1正常
      */
     @TableField("status")

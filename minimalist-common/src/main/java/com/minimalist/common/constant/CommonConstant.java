@@ -20,7 +20,4 @@ public class CommonConstant {
     /** 用户头像大小 key */
     public static final String SYSTEM_CONFIG_USER_AVATAR_SIZE = "system.config.user.avatar.size";
 
-    /** 密码加密盐 key */
-    public static final String SYSTEM_CONFIG_PASSWORD_SALT = "system.config.password.salt";
-
 }

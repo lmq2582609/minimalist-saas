@@ -10,6 +10,9 @@
             <a-form-item class="w-[100%]" field="configValue" label="参数键值" required tooltip="参数的value">
                 <a-textarea v-model="form.configValue" placeholder="参数键值" />
             </a-form-item>
+            <a-form-item class="w-[100%]" field="description" label="说明">
+                <a-textarea v-model="form.description" placeholder="说明" />
+            </a-form-item>
             <a-form-item class="w-[100%]" field="status" label="参数状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                 <a-select v-model="form.status" placeholder="参数状态" allow-clear>
                     <a-option v-for="(d, index) in dicts[proxy.DICT.configStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -61,6 +64,8 @@ const form = reactive({
     configValue: null,
     //参数状态
     status: null,
+    //说明
+    description: null
 })
 //表单校验规则
 const rules = {

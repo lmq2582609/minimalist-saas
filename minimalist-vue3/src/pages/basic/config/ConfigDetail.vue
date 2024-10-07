@@ -4,6 +4,7 @@
             <a-descriptions-item label="参数名称">{{ form.configName }}</a-descriptions-item>
             <a-descriptions-item label="参数key">{{ form.configKey }}</a-descriptions-item>
             <a-descriptions-item label="参数value">{{ form.configValue }}</a-descriptions-item>
+            <a-descriptions-item label="说明">{{ form.description }}</a-descriptions-item>
             <a-descriptions-item label="参数状态">
                 <dict-convert :dict-data="dicts[proxy.DICT.configStatus]" :dict-key="form.status" />
             </a-descriptions-item>
@@ -38,6 +39,8 @@ const form = reactive({
     configValue: null,
     //参数状态
     status: null,
+    //说明
+    description: null
 })
 //加载参数详细信息
 const loadConfigInfo = (configId) => {

@@ -131,6 +131,8 @@ mica:
         mode: validate
         # mode=clear专用 用于保留换行
         pretty-print: false
+        # mode=clear专用 转义，默认关闭
+        enable-escape: false
         # 需要拦截的路由
         path-patterns: /**
         # 需要放行的路由，可以配置，也可以使用 @XssCleanIgnore 注解对某个方法和类进行忽略

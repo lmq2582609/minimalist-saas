@@ -80,6 +80,7 @@ import { useFullscreen } from '@vueuse/core'
 import { logoutApi } from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
 import { useCookies } from '@vueuse/integrations/useCookies'
+import {TENANT_ID, TENANT_ID_BASE64} from "~/utils/cookie.js";
 //cookie
 const cookie = useCookies()
 //路由
@@ -125,6 +126,7 @@ const dropdownSelect = (val) => {
 const logout = () => {
     logoutApi().then(res => {
         sysStore.userLogoutHandler()
+        //确认对话框
         confirmModalVisible.value = false
         //跳转到登录页
         router.push('/login')
@@ -143,18 +145,18 @@ const tenantId = ref()
 const tenantChange = () => {
     if (!tenantId.value) {
         //清除cookie
-        cookie.remove('tenant_id')
-        cookie.remove('tenant_id_base64')
+        cookie.remove(TENANT_ID)
+        cookie.remove(TENANT_ID_BASE64)
     } else {
         //设置cookie
-        cookie.set('tenant_id', tenantId.value)
+        cookie.set(TENANT_ID, tenantId.value)
         //多存储一个base64数据，是因为Long类型cookie.get后会丢失精度，所以get时获取base64的数据后再解码拿到tenantId
-        cookie.set('tenant_id_base64', btoa(tenantId.value))
+        cookie.set(TENANT_ID_BASE64, btoa(tenantId.value))
     }
 }
 onMounted(() => {
     //初始化时，如果cookie中有tenantId，则回显
-    let tid = cookie.get('tenant_id_base64')
+    let tid = cookie.get(TENANT_ID_BASE64)
     if (tid) {
         tenantId.value = atob(tid)
     }

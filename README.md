@@ -6,19 +6,23 @@
     <span>基于SpringBoot3+Vue3前后端分离的Java快速开发脚手架</span>
 </div>
 
-
 ## 项目简介
+
 极简多租户管理系统是一个基于数据库字段隔离的多租户管理系统，具备常规基础功能的单体应用。项目中只提供了一些基础功能，算是一个多租户系统的基础版，因为我也要用这个基础版，所以顺便将基础版代码开源，希望提供给有需要的人。
 
 ## 项目地址
 
-演示地址：http://
+演示地址：部署中...
 
-详细文档：http://
+详细文档：编写中...
 
 Gitee：https://gitee.com/marlife/minimalist-saas
 
 Github：https://github.com/lmq2582609/minimalist-saas
+
+管理员账号/密码
+
+admin/111111
 
 ## 技术体系
 
@@ -26,6 +30,7 @@ Github：https://github.com/lmq2582609/minimalist-saas
 - 后端：Java17 + SpringBoot3.X + Mybatis-Plus + Spring Security + Swagger-Knife4j + Redisson + Mysql
 
 ## 演示图
+
 <table>
     <tr>
         <td><img src="resources/images/login-page.png"/></td>

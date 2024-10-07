@@ -1,4 +1,5 @@
 import {createRouter, createWebHashHistory} from "vue-router";
+import { useCookies } from '@vueuse/integrations/useCookies'
 import {getToken} from "~/utils/cookie";
 import Container from '~/pages/container.vue'
 import Index from '~/pages/index.vue'
@@ -13,9 +14,6 @@ import'nprogress/nprogress.css'
 import Login from '~/pages/login.vue'
 //404页面
 import NotFound from '~/pages/404.vue'
-
-//是否调用过getUserInfo - 防止重复请求
-let hasGetUserInfo = false
 //网页标题
 const pageTitle = '极简多租户管理系统'
 //公共路由，所有用户共享
@@ -123,21 +121,25 @@ router.beforeEach(async (to, from, next) => {
     //是否有新添加的路由
     let hasNewRouter = false
 
+    //缓存
+    let useStore = useSysStore()
+    //是否调用过getUserInfo接口，没有调用过则调用，调用后不再重复调用
+    let hasGetUserInfo = useStore.hasGetUserinfo
     //未调用过getUserInfo，就执行获取用户信息、菜单等数据
     if (!hasGetUserInfo) {
         //获取用户信息
         await getUserInfoApi().then(res => {
             //用户信息存储到缓存
-            useSysStore().user = res
+            useStore.user = res
             //已调用过getUserInfo
-            hasGetUserInfo = true
+            useStore.hasGetUserinfo = true
             //渲染动态路由
-            hasNewRouter = dynamicAddRoutes(useSysStore().user.menus)
+            hasNewRouter = dynamicAddRoutes(useStore.user.menus)
         }).catch(res => {
             //401 认证失败，重新登录
             if (res.response.status === 401) {
                 //退出
-                useSysStore().userLogoutHandler()
+                useStore.userLogoutHandler()
                 //跳转到登录页
                 return next({path: routerWhiteList[0]})
             }
