@@ -30,23 +30,18 @@
 
         <!-- spring-file-storage -->
         <dependency>
-            <groupId>cn.xuyanwu</groupId>
-            <artifactId>spring-file-storage</artifactId>
+            <groupId>org.dromara.x-file-storage</groupId>
+            <artifactId>x-file-storage-spring</artifactId>
             <version>${spring-file.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>cn.hutool</groupId>
-                    <artifactId>hutool-core</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- webp-imageio，java处理webp图片需引入 -->
-        <dependency>
-            <groupId>com.github.gotson</groupId>
-            <artifactId>webp-imageio</artifactId>
-            <version>0.2.2</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.github.gotson</groupId>-->
+<!--            <artifactId>webp-imageio</artifactId>-->
+<!--            <version>0.2.2</version>-->
+<!--        </dependency>-->
+
         <!-- spring-boot-test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

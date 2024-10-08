@@ -6,9 +6,6 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.xuyanwu.spring.file.storage.FileInfo;
-import cn.xuyanwu.spring.file.storage.FileStorageService;
-import cn.xuyanwu.spring.file.storage.UploadPretreatment;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.po.MFile;
@@ -20,6 +17,9 @@ import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.utils.UnqIdUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.dromara.x.file.storage.core.FileInfo;
+import org.dromara.x.file.storage.core.FileStorageService;
+import org.dromara.x.file.storage.core.upload.UploadPretreatment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -135,7 +135,7 @@ public class FileServiceImpl implements FileService {
                     .setPath(FileEnum.FileSource.getPath(fileSource));
             //如果是图片，则生成缩略图
             if (StrUtil.isNotBlank(file.getContentType()) && file.getContentType().contains("image")) {
-                uploadPretreatment.thumbnail(th -> th.size(350, 350), file);
+                uploadPretreatment.thumbnailOf(file);
             }
             //上传
             fileInfo = uploadPretreatment.upload();

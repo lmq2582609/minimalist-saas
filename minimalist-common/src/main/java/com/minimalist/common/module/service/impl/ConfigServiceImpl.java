@@ -6,7 +6,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.common.constant.CommonConstant;
 import com.minimalist.common.constant.RedisKeyConstant;
 import com.minimalist.common.module.entity.enums.ConfigEnum;
 import com.minimalist.common.module.entity.po.MConfig;
@@ -18,13 +17,9 @@ import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.module.mapper.MConfigMapper;
 import com.minimalist.common.module.service.ConfigService;
 import com.minimalist.common.redis.RedisManager;
-import com.minimalist.common.tenant.TenantPluginConfig;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -91,20 +86,6 @@ public class ConfigServiceImpl implements ConfigService {
         //添加后将配置放入缓存
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
         redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
-
-        //如果修改的是多租户开关
-        if (CommonConstant.SYSTEM_CONFIG_TENANT.equals(configVO.getConfigKey())) {
-            TenantPluginConfig.onOff = Boolean.TRUE.equals(Boolean.valueOf(configVO.getConfigValue()));
-        }
-
-        //如果修改的是多租户忽略的表
-        if (CommonConstant.SYSTEM_CONFIG_TENANT_IGNORE_TABLE.equals(configVO.getConfigKey())) {
-            if (StrUtil.isNotBlank(configVO.getConfigValue())) {
-                TenantPluginConfig.tenantIgnoreTable = new HashSet<>(Arrays.asList(configVO.getConfigValue().split(",")));
-            } else {
-                TenantPluginConfig.tenantIgnoreTable = new HashSet<>();
-            }
-        }
     }
 
     /**

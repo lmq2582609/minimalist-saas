@@ -47,8 +47,7 @@ public class PostServiceImpl implements PostService {
         //部门ID
         long postId = UnqIdUtil.uniqueId();
         mPost.setPostId(postId);
-        int insertCount = postMapper.insert(mPost);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        postMapper.insert(mPost);
     }
 
     /**
@@ -75,8 +74,7 @@ public class PostServiceImpl implements PostService {
         MPost newPost = BeanUtil.copyProperties(postVO, MPost.class);
         //乐观锁字段赋值
         newPost.updateBeforeSetVersion(mPost.getVersion());
-        int updateCount = postMapper.updatePostByPostId(newPost);
-        Assert.isTrue(updateCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        postMapper.updatePostByPostId(newPost);
     }
 
     /**

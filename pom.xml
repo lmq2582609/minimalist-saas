@@ -37,9 +37,9 @@
         <!-- knife4j -->
         <knife4j.version>4.1.0</knife4j.version>
         <!-- spring-file -->
-        <spring-file.version>0.7.0</spring-file.version>
+        <spring-file.version>2.2.1</spring-file.version>
         <!-- tika -->
-        <tika.version>2.8.0</tika.version>
+<!--        <tika.version>2.8.0</tika.version>-->
         <!-- mica-xss -->
         <mica-xss.version>3.3.2</mica-xss.version>
         <!-- TTL -->

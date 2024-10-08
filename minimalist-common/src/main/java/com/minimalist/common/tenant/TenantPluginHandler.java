@@ -55,9 +55,9 @@ public class TenantPluginHandler implements TenantLineHandler {
             return true;
         }
         //多租户开启
-        if (TenantPluginConfig.onOff) {
+        if (TenantHelper.getTenantOnOff()) {
             //某张表忽略
-            return TenantPluginConfig.tenantIgnoreTable.contains(tableName);
+            return TenantHelper.getTenantIgnoreTable().contains(tableName);
         }
         //多租户未开启，忽略
         return true;
@@ -76,7 +76,7 @@ public class TenantPluginHandler implements TenantLineHandler {
             return true;
         }
         //多租户开启
-        if (TenantPluginConfig.onOff) {
+        if (TenantHelper.getTenantOnOff()) {
             return TenantLineHandler.super.ignoreInsert(columns, tenantIdColumn);
         }
         //多租户未开启，忽略
