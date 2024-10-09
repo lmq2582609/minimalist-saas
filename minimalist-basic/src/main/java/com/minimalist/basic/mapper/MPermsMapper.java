@@ -82,7 +82,8 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
         return selectList(new QueryCondition<MPerms>()
                 .likeNotNull(MPerms::getPermName, queryVO.getPermName())
                 .likeNotNull(MPerms::getPermType, queryVO.getPermType())
-                .eqNotNull(MPerms::getStatus, queryVO.getStatus()));
+                .eqNotNull(MPerms::getStatus, queryVO.getStatus())
+        );
     }
 
     /**

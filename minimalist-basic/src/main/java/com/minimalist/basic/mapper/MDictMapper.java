@@ -69,7 +69,7 @@ public interface MDictMapper extends BaseMapper<MDict> {
     default List<MDict> selectDictListByDictType(List<String> dictTypeList) {
         return selectList(new LambdaQueryWrapper<MDict>()
                 .in(MDict::getDictType, dictTypeList)
-                .orderBy(true, true, MDict::getDictOrder));
+                .orderByAsc(MDict::getDictOrder));
     }
 
     /**

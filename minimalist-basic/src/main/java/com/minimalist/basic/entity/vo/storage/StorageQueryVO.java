@@ -1,6 +1,5 @@
 package com.minimalist.basic.entity.vo.storage;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
@@ -16,7 +15,7 @@ public class StorageQueryVO extends Pager implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @TableField("storage_name")
+    @Schema(name = "storageName", description = "存储名称", type = "string")
     private String storageName;
 
     @Schema(name = "storageCode", description = "存储编码", type = "string")

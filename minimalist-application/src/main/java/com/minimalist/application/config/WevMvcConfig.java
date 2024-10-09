@@ -18,7 +18,7 @@ public class WevMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         //访问 /files/** 的路径时，映射到本地 basePath 路径，注意/files/**路径需要在spring security中放行
-        registry.addResourceHandler("/files/**").addResourceLocations("file:" + basePath);
+        //registry.addResourceHandler("/files/**").addResourceLocations("file:" + basePath);
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }

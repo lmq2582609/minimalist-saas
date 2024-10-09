@@ -258,7 +258,9 @@ public class DictServiceImpl implements DictService {
         List<MDict> mDicts;
         if (CollectionUtil.isEmpty(dictType)) {
             //查询全部
-            mDicts = dictMapper.selectList(new LambdaQueryWrapper<>());
+            LambdaQueryWrapper<MDict> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.orderByAsc(MDict::getDictOrder);
+            mDicts = dictMapper.selectList(queryWrapper);
         } else {
             //按字典类型查询
             mDicts = dictMapper.selectDictListByDictType(dictType);

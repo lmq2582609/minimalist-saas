@@ -40,6 +40,12 @@ export const DICT = {
     filePlatform: 'file-platform',
     //参数状态
     configStatus: 'config-status',
+    //通用状态 - 数字
+    commonNumberStatus: 'common-number-status',
+    //存储类型
+    storageType: 'storage-type',
+
+    /**************** 额外字典 ***************/
     //租户套餐列表 -> 额外字典
     tenantPackageList: 'tenant-package-list',
     //部门列表 -> 额外字典

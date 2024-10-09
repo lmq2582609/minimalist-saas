@@ -24,11 +24,11 @@ const commonRoutes = [
         component: Container,
         children: [
                 {path: '/', component: Index, meta: {title: '控制台'}},
-                {path: '/user/setting', component: UserSetting, meta: {title: '用户设置'}}
+                {path: '/user/setting', component: UserSetting, meta: {title: '用户设置'}},
         ]
     },
     {path: '/login', name: 'Login', component: Login, meta: {title: '登录'}},
-    {path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound},
+    {path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound, meta: {title: '页面不存在'}},
 ]
 //导入所有路由，动态加载
 const routeAll = import.meta.glob(`../pages/**/*.vue`);
