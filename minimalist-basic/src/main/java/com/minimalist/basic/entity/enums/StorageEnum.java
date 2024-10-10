@@ -9,7 +9,6 @@ public class StorageEnum {
     @Getter
     @AllArgsConstructor
     public enum ErrorMsg {
-        EXISTS_STORAGE_CODE("该存储编码已存在"),
         NONENTITY_STORAGE("该存储信息不存在"),
         ;
         private final String desc;

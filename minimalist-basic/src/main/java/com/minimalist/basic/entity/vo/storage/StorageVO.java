@@ -29,10 +29,6 @@ public class StorageVO implements Serializable {
     @Schema(name = "storageName", description = "存储名称", type = "string")
     private String storageName;
 
-    @NotBlank(message = "存储编码不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "storageCode", description = "存储编码", type = "string")
-    private String storageCode;
-
     @NotBlank(message = "存储类型不能为空", groups = {Add.class, Update.class})
     @Schema(name = "storageType", description = "存储类型", type = "string")
     private String storageType;

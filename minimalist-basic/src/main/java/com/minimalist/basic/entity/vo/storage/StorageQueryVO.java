@@ -18,9 +18,6 @@ public class StorageQueryVO extends Pager implements Serializable {
     @Schema(name = "storageName", description = "存储名称", type = "string")
     private String storageName;
 
-    @Schema(name = "storageCode", description = "存储编码", type = "string")
-    private String storageCode;
-
     @Schema(name = "storageType", description = "存储类型", type = "string")
     private String storageType;
 

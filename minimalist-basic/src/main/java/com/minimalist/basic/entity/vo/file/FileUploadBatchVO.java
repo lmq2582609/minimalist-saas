@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.file;
 
-import com.minimalist.basic.entity.enums.FileEnum;
+import com.minimalist.common.file.FileEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;

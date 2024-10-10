@@ -1,4 +1,4 @@
-package com.minimalist.basic.entity.enums;
+package com.minimalist.common.file;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +16,41 @@ public class FileEnum {
         ;
         private final String desc;
     }
+
+    /** 存储类型 */
+    @Getter
+    @AllArgsConstructor
+    public enum StorageType {
+        LOCAL("local", "本地"),
+        MINIO("minio", "MinIO"),
+        ;
+        private final String code;
+        private final String desc;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /** 文件状态 */
     @Getter

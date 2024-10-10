@@ -32,12 +32,6 @@ public class MStorage extends BaseEntity {
     private String storageName;
 
     /**
-     * 存储唯一标识编码
-     */
-    @TableField("storage_code")
-    private String storageCode;
-
-    /**
      * 存储类型，用于标识存储平台，如本地、阿里云oss、七牛云oss等
      */
     @TableField("storage_type")

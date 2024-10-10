@@ -7,9 +7,6 @@
                     <a-form-item field="storageName" label="存储名称">
                         <a-input v-model="searchForm.storageName" placeholder="存储名称" />
                     </a-form-item>
-                    <a-form-item field="storageCode" label="存储编码">
-                        <a-input v-model="searchForm.storageCode" placeholder="存储编码" />
-                    </a-form-item>
                     <a-form-item field="storageType" label="存储类型">
                         <a-select v-model="searchForm.storageType" placeholder="存储类型" allow-clear>
                             <a-option v-for="(d, index) in dicts[proxy.DICT.storageType]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -107,7 +104,7 @@
         </a-card>
 
         <!-- 添加/修改 -->
-        <a-modal v-model:visible="modal.visible" width="600px" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
+        <a-modal v-model:visible="modal.visible" width="700px" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
@@ -130,8 +127,6 @@ const showSearchRow = ref(true)
 const searchForm = reactive({
     //存储名称
     storageName: null,
-    //存储编码
-    storageCode: null,
     //存储类型
     storageType: null,
     //存储状态
@@ -146,7 +141,6 @@ const datatable = reactive({
     //列配置
     columns: [
         {title: '存储名称', dataIndex: 'storageName', slotName: 'storageName', align: 'center'},
-        {title: '存储编码', dataIndex: 'storageCode', align: 'center'},
         {title: '存储类型', dataIndex: 'storageType', slotName: 'storageType', align: 'center'},
         {title: '是否默认使用', dataIndex: 'storageDefault', slotName: 'storageDefault', align: 'center'},
         {title: '说明', dataIndex: 'description', width: 200, align: 'center', ellipsis: true, tooltip: true},

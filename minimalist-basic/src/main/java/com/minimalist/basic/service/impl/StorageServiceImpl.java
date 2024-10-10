@@ -2,6 +2,8 @@ package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.PostEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
@@ -11,10 +13,13 @@ import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.service.StorageService;
 import com.minimalist.common.exception.BusinessException;
+import com.minimalist.common.file.FileHandler;
+import com.minimalist.common.file.FileManager;
 import com.minimalist.common.mybatis.bo.PageResp;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,18 +29,29 @@ public class StorageServiceImpl implements StorageService {
     @Autowired
     private MStorageMapper storageMapper;
 
+    @Autowired
+    private FileManager fileManager;
+
     /**
      * 添加存储
      * @param storageVO 存储信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addStorage(StorageVO storageVO) {
-        long count = storageMapper.checkStorageByStorageCode(storageVO.getStorageCode(), null);
-        Assert.isFalse(count > 0, () -> new BusinessException(StorageEnum.ErrorMsg.EXISTS_STORAGE_CODE.getDesc()));
+        //校验存储配置
+        FileHandler fileHandler = fileManager.getFileHandler(storageVO.getStorageType());
+        fileHandler.valid(storageVO.getStorageConfig());
         MStorage storage = BeanUtil.copyProperties(storageVO, MStorage.class);
         storage.setStatus(StorageEnum.Status.STATUS_1.getCode());
-        storage.setStorageId(UnqIdUtil.uniqueId());
+        long storageId = UnqIdUtil.uniqueId();
+        storage.setStorageId(storageId);
         storageMapper.insert(storage);
+        //如果选择了默认存储
+        if (Boolean.TRUE.equals(storageVO.getStorageDefault())) {
+            //将其他存储更新为非默认存储
+            storageMapper.updateStorageToNoDefault(storageId);
+        }
     }
 
     /**
@@ -53,13 +69,19 @@ public class StorageServiceImpl implements StorageService {
      */
     @Override
     public void updateStorageByStorageId(StorageVO storageVO) {
-        long count = storageMapper.checkStorageByStorageCode(storageVO.getStorageCode(), storageVO.getStorageId());
-        Assert.isFalse(count > 0, () -> new BusinessException(StorageEnum.ErrorMsg.EXISTS_STORAGE_CODE.getDesc()));
+        //校验存储配置
+        FileHandler fileHandler = fileManager.getFileHandler(storageVO.getStorageType());
+        fileHandler.valid(storageVO.getStorageConfig());
         MStorage oldStorage = storageMapper.selectStorageByStorageId(storageVO.getStorageId());
         Assert.notNull(oldStorage, () -> new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc()));
         MStorage storage = BeanUtil.copyProperties(storageVO, MStorage.class);
         storage.updateBeforeSetVersion(oldStorage.getVersion());
         storageMapper.updateStorageByStorageId(storage);
+        //如果选择了默认存储
+        if (Boolean.TRUE.equals(storageVO.getStorageDefault())) {
+            //将其他存储更新为非默认存储
+            storageMapper.updateStorageToNoDefault(storageVO.getStorageId());
+        }
     }
 
     /**

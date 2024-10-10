@@ -5,17 +5,15 @@
                 <a-form-item class="w-[49%]" field="storageName" label="存储名称" required>
                     <a-input v-model="form.storageName" placeholder="存储名称" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="storageCode" label="存储编码" required tooltip="存储信息的唯一英文标识">
-                    <a-input v-model="form.storageCode" placeholder="存储编码" />
-                </a-form-item>
-            </a-row>
-
-            <a-row justify="space-between">
                 <a-form-item class="w-[49%]" field="storageDefault" label="是否默认使用" required tooltip="只能有一个默认的存储。如果之前已有默认的存储，选择`是`会将之前的数据置为`否`，新增的本条数据置为`是`">
-                    <a-select v-model="form.storageDefault" placeholder="是否默认使用" allow-clear @change="ch">
+                    <a-select v-model="form.storageDefault" placeholder="是否默认使用" allow-clear>
+                        <!-- 目前a-option还不支持使用布尔值，所以dictKey需要转成字符串 -->
+                        <!-- 所以，storageDefault回显时也要转成字符串 -->
                         <a-option v-for="(d, index) in dicts[proxy.DICT.yesNo]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
+            </a-row>
+            <a-row justify="space-between">
                 <a-form-item class="w-[49%]" field="status" label="存储状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="存储状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -37,10 +35,10 @@
             </a-row>
 
             <!-- 本地存储 -->
-            <local ref="storageConfigRef" v-if="form.storageType === 'local'" />
+            <local ref="storageConfigRef" :params="form.storageConfig" :optType="proxy.operationType.update.type" v-if="form.storageType === 'local'" />
 
             <!-- minio -->
-            <minio ref="storageConfigRef" v-if="form.storageType === 'minio'" />
+            <minio ref="storageConfigRef" :params="form.storageConfig" :optType="proxy.operationType.update.type" v-if="form.storageType === 'minio'" />
 
         </a-form>
 
@@ -85,8 +83,6 @@ const form = reactive({
     storageId: null,
     //存储名称
     storageName: null,
-    //存储编码
-    storageCode: null,
     //存储类型
     storageType: null,
     //是否默认使用
@@ -98,13 +94,9 @@ const form = reactive({
     //状态
     status: null
 })
-const ch = () => {
-    console.info('storageDefault', form.storageDefault)
-}
 //表单校验规则
 const rules = {
     storageName: [{required: true, message: '存储名称不能为空', trigger: 'submit'}],
-    storageCode: [{required: true, message: '存储编码不能为空', trigger: 'submit'}],
     storageType: [{required: true, message: '存储类型不能为空', trigger: 'submit'}],
     storageDefault: [{required: true, message: '是否默认使用不能为空', trigger: 'submit'}],
 }
@@ -153,7 +145,12 @@ const loadStorageInfo = (storageId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    form[key] = res[key]
+                    //true和false的下拉框回显，需要转成string类型
+                    if (key === 'storageDefault') {
+                        form[key] = String(res[key])
+                    } else {
+                        form[key] = res[key]
+                    }
                 }
             }
         }

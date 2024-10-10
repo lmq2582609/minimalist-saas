@@ -2,7 +2,7 @@ package com.minimalist.basic.entity.vo.file;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.FileEnum;
+import com.minimalist.common.file.FileEnum;
 import com.minimalist.common.convert.FileSizeSerializer;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
