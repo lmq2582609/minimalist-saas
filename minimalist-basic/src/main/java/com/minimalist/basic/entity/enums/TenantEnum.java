@@ -30,26 +30,4 @@ public class TenantEnum {
         private final String desc;
     }
 
-    /** 租户状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum TenantStatus {
-        TENANT_STATUS_0(0, "禁用"),
-        TENANT_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
-    /** 租户套餐状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum TenantPackageStatus {
-        TENANT_PACKAGE_STATUS_0(0, "禁用"),
-        TENANT_PACKAGE_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
 }

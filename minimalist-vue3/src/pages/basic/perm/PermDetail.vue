@@ -11,7 +11,7 @@
             </a-descriptions-item>
             <a-descriptions-item label="路由地址">{{ form.permPath }}</a-descriptions-item>
             <a-descriptions-item label="权限状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.permStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
             <a-descriptions-item label="是否可见">
                 <dict-convert :dict-data="dicts[proxy.DICT.yesNo]" :dict-key="form.visible" />
@@ -29,7 +29,7 @@ import FunctionalIcons from "~/components/iconSelect/FunctionalIcons.vue";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.permStatus, proxy.DICT.yesNo, proxy.DICT.permType])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.yesNo, proxy.DICT.permType])
 //接收父组件参数
 const props = defineProps({
     params: {

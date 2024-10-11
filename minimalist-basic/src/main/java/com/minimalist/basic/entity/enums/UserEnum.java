@@ -31,17 +31,6 @@ public class UserEnum {
         private final String desc;
     }
 
-    /** 用户状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum UserStatus {
-        USER_STATUS_0(0, "禁用"),
-        USER_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
     /** 用户性别 */
     @Getter
     @AllArgsConstructor

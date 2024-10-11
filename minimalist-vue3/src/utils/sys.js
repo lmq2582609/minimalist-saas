@@ -3,6 +3,13 @@ import { useSysStore } from '../store/module/sys-store.js'
 
 //缓存
 const sysStore = useSysStore(pinia)
+
+//公共的状态
+export const status = {
+    status_0: {key: 0, value: '禁用'},
+    status_1: {key: 1, value: '正常'}
+}
+
 //全局 - '是/否' 枚举
 export const yesNo = {
     yes: {key: true, value: '是'},

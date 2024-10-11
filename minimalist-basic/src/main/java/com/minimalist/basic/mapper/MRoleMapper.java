@@ -3,12 +3,11 @@ package com.minimalist.basic.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.po.MRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.QueryCondition;
-
 import java.util.List;
 
 /**
@@ -86,7 +85,7 @@ public interface MRoleMapper extends BaseMapper<MRole> {
     default List<MRole> selectRoleDict() {
         LambdaQueryWrapper<MRole> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(MRole::getRoleId, MRole::getRoleName);
-        queryWrapper.eq(MRole::getStatus, RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
+        queryWrapper.eq(MRole::getStatus, StatusEnum.STATUS_1.getCode());
         return selectList(queryWrapper);
     }
 

@@ -2,7 +2,7 @@ package com.minimalist.basic.entity.vo.post;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.PostEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -41,7 +41,7 @@ public class PostVO implements Serializable {
     private String remark;
 
     @NotNull(message = "岗位状态不能为空", groups = {Update.class})
-    @SchemaEnum(implementation = PostEnum.PostStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "岗位状态", type = "integer")
     private Integer status;
 

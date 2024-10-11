@@ -6,12 +6,6 @@ export const permType = {
     B: {key: 'B', value: '按钮'}
 }
 
-//权限状态
-export const permStatus = {
-    disable: {key: 0, value: '禁用'},
-    enable: {key: 1, value: '启用'}
-}
-
 //添加权限
 export function addPermApi(data) {
     return axios.post('/basic/permission/addPerm', data)

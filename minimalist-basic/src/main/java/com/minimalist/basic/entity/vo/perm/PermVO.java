@@ -3,6 +3,7 @@ package com.minimalist.basic.entity.vo.perm;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.minimalist.basic.entity.enums.PermEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -59,7 +60,7 @@ public class PermVO implements Serializable {
     @Schema(name = "visible", description = "是否可见", type = "boolean")
     private Boolean visible;
 
-    @SchemaEnum(implementation = PermEnum.PermStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @NotNull(message = "权限状态不能为空", groups = {Update.class})
     @Schema(name = "status", description = "权限状态", type = "integer")
     private Integer status;

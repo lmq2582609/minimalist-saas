@@ -1,45 +1,21 @@
-import pinia from '../store'
-import { useSysStore } from '../store/module/sys-store.js'
 import { getDictByDictTypeListApi } from '../api/dict'
 import { reactive, onMounted } from 'vue';
 
 export const DICT = {
     //是/否
     yesNo: 'yes-no',
-    //字典状态
-    dictStatus: 'dict-status',
     //字典样式
     dictClass: 'dict-class',
-    //权限状态
-    permStatus: 'perm-status',
-    //部门状态
-    deptStatus: 'dept-status',
     //权限类型
     permType: 'perm-type',
-    //角色状态
-    roleStatus: 'role-status',
-    //岗位状态
-    postStatus: 'post-status',
-    //租户状态
-    tenantStatus: 'tenant-status',
-    //用户状态
-    userStatus: 'user-status',
     //用户性别
     userSex: 'user-sex',
-    //租户套餐状态
-    tenantPackageStatus: 'tenant-package-status',
-    //公告状态
-    noticeStatus: 'notice-status',
     //公告类型
     noticeType: 'notice-type',
-    //文件状态
-    fileStatus: 'file-status',
     //文件来源
     fileSource: 'file-source',
     //文件存储平台
     filePlatform: 'file-platform',
-    //参数状态
-    configStatus: 'config-status',
     //通用状态 - 数字
     commonNumberStatus: 'common-number-status',
     //存储类型
@@ -59,9 +35,6 @@ export const DICT = {
     //租户列表 -> 额外字典
     tenantList: 'dict-tenant-list'
 }
-
-//缓存
-const sysStore = useSysStore(pinia)
 
 /**
  * 加载字典数据

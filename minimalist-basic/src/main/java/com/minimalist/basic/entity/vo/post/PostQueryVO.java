@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.post;
 
-import com.minimalist.basic.entity.enums.PostEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +21,7 @@ public class PostQueryVO extends Pager implements Serializable {
     @Schema(name = "postCode", description = "岗位编码", type = "string")
     private String postCode;
 
-    @SchemaEnum(implementation = PostEnum.PostStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "岗位状态", type = "integer")
     private Integer status;
 

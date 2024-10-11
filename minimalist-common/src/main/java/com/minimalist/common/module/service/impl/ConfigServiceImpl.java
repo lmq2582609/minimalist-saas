@@ -7,6 +7,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.common.constant.RedisKeyConstant;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.module.entity.enums.ConfigEnum;
 import com.minimalist.common.module.entity.po.MConfig;
 import com.minimalist.common.module.entity.vo.config.ConfigQueryVO;
@@ -20,6 +21,7 @@ import com.minimalist.common.redis.RedisManager;
 import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
@@ -36,14 +38,14 @@ public class ConfigServiceImpl implements ConfigService {
      * @param configVO 参数配置信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void addConfig(ConfigVO configVO) {
         //检查键名唯一性
         MConfig config = configMapper.selectConfigByConfigKey(configVO.getConfigKey(), null);
         Assert.isNull(config, () -> new BusinessException(ConfigEnum.ErrorMsg.CONTAIN_CONFIG_KEY.getDesc()));
         MConfig insertConfig = BeanUtil.copyProperties(configVO, MConfig.class);
         insertConfig.setConfigId(UnqIdUtil.uniqueId());
-        int insertCount = configMapper.insert(insertConfig);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        configMapper.insert(insertConfig);
         //添加后将配置放入缓存
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
         redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
@@ -120,7 +122,7 @@ public class ConfigServiceImpl implements ConfigService {
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configKey);
         ConfigVO configVO = redisManager.get(redisKey);
         if (ObjectUtil.isNull(configVO)) {
-            MConfig mConfig = configMapper.selectConfigByConfigKey(configKey, ConfigEnum.Status.STATUS_1.getCode());
+            MConfig mConfig = configMapper.selectConfigByConfigKey(configKey, StatusEnum.STATUS_1.getCode());
             configVO = BeanUtil.copyProperties(mConfig, ConfigVO.class);
             //重新放入缓存
             redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);

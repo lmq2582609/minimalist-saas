@@ -2,7 +2,7 @@ package com.minimalist.common.module.entity.vo.config;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.common.module.entity.enums.ConfigEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -40,7 +40,7 @@ public class ConfigVO implements Serializable {
     @Schema(name = "description", description = "说明", type = "string")
     private String description;
 
-    @SchemaEnum(implementation = ConfigEnum.Status.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @NotNull(message = "参数配置状态不能为空", groups = {Update.class})
     @Schema(name = "status", description = "参数配置状态", type = "integer")
     private Integer status;

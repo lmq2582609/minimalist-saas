@@ -2,8 +2,8 @@ package com.minimalist.basic.entity.vo.role;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.common.convert.LongArrJsonSerializer;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -41,7 +41,7 @@ public class RoleVO implements Serializable {
     private Integer roleSort;
 
     @NotNull(message = "角色状态不能为空", groups = {Update.class})
-    @SchemaEnum(implementation = RoleEnum.RoleStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "角色状态", type = "integer")
     private Integer status;
 

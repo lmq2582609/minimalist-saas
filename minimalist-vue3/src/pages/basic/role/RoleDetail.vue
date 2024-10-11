@@ -5,7 +5,7 @@
             <a-descriptions-item label="角色编码">{{ form.roleCode }}</a-descriptions-item>
             <a-descriptions-item label="排序">{{ form.roleSort }}</a-descriptions-item>
             <a-descriptions-item label="角色状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.roleStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
             <a-descriptions-item label="备注">{{ form.remark }}</a-descriptions-item>
         </a-descriptions>
@@ -36,7 +36,7 @@ import {getAllTreeParentId} from "~/utils/sys.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.roleStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

@@ -11,7 +11,7 @@
             <a-descriptions-item label="账号额度">{{ form.accountCount }}</a-descriptions-item>
             <a-descriptions-item label="过期时间">{{ form.expireTime }}</a-descriptions-item>
             <a-descriptions-item label="租户状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.tenantStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
             <a-descriptions-item label="备注">{{ form.remark }}</a-descriptions-item>
         </a-descriptions>
@@ -24,7 +24,7 @@ import { getTenantByTenantIdApi } from "~/api/tenant.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.tenantPackageList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

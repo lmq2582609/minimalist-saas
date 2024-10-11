@@ -22,7 +22,7 @@
                     <span>公告类型：<dict-convert :dict-data="dicts[proxy.DICT.noticeType]" :dict-key="form.noticeType" /></span>
                     <span>排序：{{ form.noticeSort }}</span>
                     <span>是否置顶：<dict-convert :dict-data="dicts[proxy.DICT.yesNo]" :dict-key="form.noticeTop" /></span>
-                    <span>公告状态：<dict-convert :dict-data="dicts[proxy.DICT.status]" :dict-key="form.noticeStatus" /></span>
+                    <span>公告状态：<dict-convert :dict-data="dicts[proxy.DICT.status]" :dict-key="form.commonNumberStatus" /></span>
                     <span>是否外链：<dict-convert :dict-data="dicts[proxy.DICT.yesNo]" :dict-key="form.noticeOutChain" /></span>
                     <span>外链URL：
                         <template v-if="form.noticeLink">
@@ -61,7 +61,7 @@ import 'tinymce/skins/ui/oxide/skin.css'
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.noticeStatus, proxy.DICT.noticeType, proxy.DICT.userList, proxy.DICT.deptList, proxy.DICT.yesNo])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.noticeType, proxy.DICT.userList, proxy.DICT.deptList, proxy.DICT.yesNo])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

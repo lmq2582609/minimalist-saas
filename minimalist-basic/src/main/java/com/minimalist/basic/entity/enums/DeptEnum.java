@@ -16,25 +16,4 @@ public class DeptEnum {
         private final String desc;
     }
 
-    /** 部门状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum DeptStatus {
-        DEPT_STATUS_0(0, "禁用"),
-        DEPT_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
-    /** 获取部门位置 */
-    @Getter
-    @AllArgsConstructor
-    public enum GetDeptPos {
-        USER(1, "在用户管理页获取部门"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
 }

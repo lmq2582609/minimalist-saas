@@ -5,7 +5,7 @@
             <a-descriptions-item label="岗位编码">{{ form.postCode }}</a-descriptions-item>
             <a-descriptions-item label="排序">{{ form.postSort }}</a-descriptions-item>
             <a-descriptions-item label="岗位状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.postStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
             <a-descriptions-item label="备注">{{ form.remark }}</a-descriptions-item>
         </a-descriptions>
@@ -18,7 +18,7 @@ import { getPostByPostIdApi } from "~/api/post.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.postStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

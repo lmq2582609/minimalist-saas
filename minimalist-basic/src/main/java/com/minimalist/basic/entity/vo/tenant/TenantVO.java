@@ -4,8 +4,8 @@ import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.vo.user.UserVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -64,7 +64,7 @@ public class TenantVO implements Serializable {
     private Integer accountCount;
 
     @NotNull(message = "租户状态不能为空", groups = {Update.class})
-    @SchemaEnum(implementation = TenantEnum.TenantStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "租户状态", type = "integer")
     private Byte status;
 

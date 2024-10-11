@@ -1,12 +1,5 @@
 import axios from '~/axios'
 
-//字典状态
-export const dictStatus = {
-    status_0: {key: 0, value: '禁用'},
-    status_1: {key: 1, value: '正常'}
-}
-
-
 //获取字典列表 - 分页
 export function getPageDictListApi(params) {
     return axios({

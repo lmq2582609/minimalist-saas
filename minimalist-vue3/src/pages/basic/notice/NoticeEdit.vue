@@ -40,7 +40,7 @@
                 </a-form-item>
                 <a-form-item class="w-[33%]" field="status" label="公告状态" required>
                     <a-select v-model="form.status" placeholder="公告状态" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.noticeStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[100%]" field="noticePicFileId" label="公告封面图">
@@ -75,7 +75,7 @@ import { fileSource, fileAccept, fileListType } from "~/utils/sys.js";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.postStatus, proxy.DICT.noticeType, proxy.DICT.yesNo, proxy.DICT.userList, proxy.DICT.noticeStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.noticeType, proxy.DICT.yesNo, proxy.DICT.userList])
 //接收父组件参数
 const props = defineProps({
     params: {

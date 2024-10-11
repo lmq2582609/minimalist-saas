@@ -2,12 +2,11 @@ package com.minimalist.basic.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.minimalist.basic.entity.enums.DeptEnum;
 import com.minimalist.basic.entity.po.MDept;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.QueryCondition;
-
 import java.util.List;
 
 /**
@@ -88,7 +87,7 @@ public interface MDeptMapper extends BaseMapper<MDept> {
     default List<MDept> selectDeptDict() {
         LambdaQueryWrapper<MDept> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(MDept::getDeptId, MDept::getParentDeptId, MDept::getDeptName, MDept::getDeptSort);
-        queryWrapper.eq(MDept::getStatus, DeptEnum.DeptStatus.DEPT_STATUS_1.getCode());
+        queryWrapper.eq(MDept::getStatus, StatusEnum.STATUS_1.getCode());
         return selectList(queryWrapper);
     }
 

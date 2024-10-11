@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.role;
 
-import com.minimalist.basic.entity.enums.RoleEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +21,7 @@ public class RoleQueryVO extends Pager implements Serializable {
     @Schema(name = "roleCode", description = "角色编码", type = "string")
     private String roleCode;
 
-    @SchemaEnum(implementation = RoleEnum.RoleStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "角色状态", type = "integer")
     private Integer status;
 

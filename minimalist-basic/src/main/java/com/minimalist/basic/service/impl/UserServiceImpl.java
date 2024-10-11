@@ -6,7 +6,6 @@ import cn.hutool.captcha.CircleCaptcha;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.codec.Base64;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -14,7 +13,6 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.PermEnum;
-import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.MPerms;
 import com.minimalist.basic.entity.po.MUser;
@@ -38,6 +36,7 @@ import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
 import com.minimalist.basic.service.*;
 import com.minimalist.common.constant.CommonConstant;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.constant.RedisKeyConstant;
 import com.minimalist.common.enums.RespEnum;
@@ -55,11 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -130,7 +125,6 @@ public class UserServiceImpl implements UserService {
         long userId = UnqIdUtil.uniqueId();
         user.setUserId(userId);
         user.setTenantId(tenantId);
-        user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
         //生成盐值，密码加密
         String salt = RandomUtil.randomString(6);
         user.setSalt(salt);
@@ -260,7 +254,7 @@ public class UserServiceImpl implements UserService {
             //汇总角色ID
             List<Long> roleIds = roles.stream()
                     //状态 = 正常
-                    .filter(r -> RoleEnum.RoleStatus.ROLE_STATUS_1.getCode().equals(r.getStatus()))
+                    .filter(r -> StatusEnum.STATUS_1.getCode().equals(r.getStatus()))
                     .map(r -> {
                         //角色标识符
                         roleCodes.add(r.getRoleCode());
@@ -274,7 +268,7 @@ public class UserServiceImpl implements UserService {
             //汇总权限标识符集合
             Set<String> permCodes = permList.stream()
                     //状态 = 正常
-                    .filter(p -> PermEnum.PermStatus.PERM_STATUS_1.getCode().equals(p.getStatus()))
+                    .filter(p -> StatusEnum.STATUS_1.getCode().equals(p.getStatus()))
                     .map(p -> {
                         //如果是菜单，存储到菜单集合
                         if (PermEnum.PermType.MENU.getCode().equals(p.getPermType())) {
@@ -365,14 +359,14 @@ public class UserServiceImpl implements UserService {
         String passwordEncrypt = userManager.passwordEncrypt(reqVO.getPassword(), loginUser.getSalt());
         Assert.isTrue(loginUser.getPassword().equals(passwordEncrypt), () -> new BusinessException(UserEnum.ErrorMsg.U_OR_P_INCORRECT.getDesc()));
         //校验用户状态
-        Assert.isTrue(UserEnum.UserStatus.USER_STATUS_1.getCode().equals(loginUser.getStatus()),
+        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(loginUser.getStatus()),
                 () -> new BusinessException(UserEnum.ErrorMsg.USER_FROZEN.getDesc()));
         //根据用户ID查询租户
         TenantVO tenantVO = tenantService.getTenantByTenantId(loginUser.getTenantId());
         //账户未绑定租户
         Assert.notNull(tenantVO, () -> new BusinessException(UserEnum.ErrorMsg.USER_UNBOUND_TENANT.getDesc()));
         //租户状态
-        Assert.isTrue(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode().equals(tenantVO.getStatus().intValue()),
+        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(tenantVO.getStatus().intValue()),
                 () -> new BusinessException(TenantEnum.ErrorMsg.DISABLED_TENANT.getDesc()));
         //检查租户是否过期
         tenantManager.checkTenantExpireTime(tenantVO.getExpireTime());

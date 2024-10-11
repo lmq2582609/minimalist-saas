@@ -28,15 +28,4 @@ public class RoleEnum {
         private final String desc;
     }
 
-    /** 角色状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum RoleStatus {
-        ROLE_STATUS_0(0, "禁用"),
-        ROLE_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
 }

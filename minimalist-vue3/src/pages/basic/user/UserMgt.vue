@@ -30,7 +30,7 @@
                             </a-form-item>
                             <a-form-item field="status" label="用户状态">
                                 <a-select v-model="searchForm.status" placeholder="用户状态" allow-clear allow-search>
-                                    <a-option v-for="(d, index) in dicts[proxy.DICT.userStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                                    <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                                 </a-select>
                             </a-form-item>
                             <a-form-item>
@@ -95,7 +95,7 @@
                             </template>
                             <!-- 用户状态 -->
                             <template #status="{ record }">
-                                <dict-convert :dict-data="dicts[proxy.DICT.userStatus]" :dict-key="record.status" />
+                                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
                             </template>
                             <!-- 操作 -->
                             <template #operation="{ record }">
@@ -142,7 +142,7 @@ import {getDeptListApi} from "~/api/dept.js";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.userStatus, proxy.DICT.deptList, proxy.DICT.userSex])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.deptList, proxy.DICT.userSex])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单

@@ -14,17 +14,6 @@ public class NoticeEnum {
         private final String desc;
     }
 
-    /** 公告状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum NoticeStatus {
-        NOTICE_STATUS_0(0, "禁用"),
-        NOTICE_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
     /** 公告类型 */
     @Getter
     @AllArgsConstructor

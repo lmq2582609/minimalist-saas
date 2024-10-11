@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ser.std.NullSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.minimalist.common.convert.LongArrJsonSerializer;
 import com.minimalist.basic.entity.enums.UserEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -65,7 +66,7 @@ public class UserVO implements Serializable {
     private String remark;
 
     @NotNull(message = "用户状态不能为空", groups = {Update.class})
-    @SchemaEnum(implementation = UserEnum.UserStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "用户状态", type = "integer")
     private Integer status;
 

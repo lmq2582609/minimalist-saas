@@ -56,7 +56,7 @@
                         <a-col :span="3" v-if="props.params.operationType === proxy.operationType.update.type">
                             <a-form-item field="status" label="状态">
                                 <a-select v-model="dict.status" placeholder="状态" allow-clear>
-                                    <a-option v-for="(item, index) in dicts[proxy.DICT.dictStatus]" :key="index" :value="item.dictKey" :label="item.dictValue" />
+                                    <a-option v-for="(item, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="item.dictKey" :label="item.dictValue" />
                                 </a-select>
                             </a-form-item>
                         </a-col>
@@ -86,12 +86,13 @@
 
 <script setup>
 import { ref, reactive, getCurrentInstance, watch } from 'vue'
-import { dictStatus, addDictApi, updateDictApi, getDictByDictTypeApi, deleteDictByDictIdApi } from '~/api/dict'
+import { addDictApi, updateDictApi, getDictByDictTypeApi, deleteDictByDictIdApi } from '~/api/dict'
+import {status} from "~/utils/sys.js";
 
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.dictStatus, proxy.DICT.dictClass])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.dictClass])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -102,7 +103,7 @@ const props = defineProps({
 //父组件函数
 const emits = defineEmits(['ok', 'cancel'])
 //字典空数据
-const emptyDictData = {rowKey: proxy.randomCode(18), dictId: null, dictKey: null, dictValue: null, dictOrder: 0, dictClass: null, status: dictStatus.status_1.key}
+const emptyDictData = {rowKey: proxy.randomCode(18), dictId: null, dictKey: null, dictValue: null, dictOrder: 0, dictClass: null, status: status.status_1.key}
 //表单ref
 const formRef = ref(null)
 //表单

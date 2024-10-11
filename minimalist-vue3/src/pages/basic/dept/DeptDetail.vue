@@ -17,7 +17,7 @@
             <a-descriptions-item label="部门电话">{{ form.phone }}</a-descriptions-item>
             <a-descriptions-item label="部门邮箱">{{ form.email }}</a-descriptions-item>
             <a-descriptions-item label="部门状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.deptStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
         </a-descriptions>
     </a-spin>
@@ -30,7 +30,7 @@ import {getDeptByDeptIdApi} from "~/api/dept.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.deptStatus, proxy.DICT.userList, proxy.DICT.deptList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.userList, proxy.DICT.deptList])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

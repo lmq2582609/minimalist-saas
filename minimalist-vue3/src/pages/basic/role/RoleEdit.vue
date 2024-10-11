@@ -13,7 +13,7 @@
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="角色状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="角色状态" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.roleStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[100%]" field="remark" label="备注">
@@ -56,7 +56,7 @@ import { getAllTreeParentId } from "~/utils/sys.js";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.roleStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus])
 //接收父组件参数
 const props = defineProps({
     params: {

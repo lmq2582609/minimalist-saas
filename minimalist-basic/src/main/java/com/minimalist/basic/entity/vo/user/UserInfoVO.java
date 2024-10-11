@@ -7,6 +7,7 @@ import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.entity.vo.perm.PermVO;
 import com.minimalist.basic.entity.vo.post.PostVO;
 import com.minimalist.basic.entity.enums.UserEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -55,7 +56,7 @@ public class UserInfoVO implements Serializable {
     @Schema(name = "remark", description = "备注", type = "string")
     private String remark;
 
-    @SchemaEnum(implementation = UserEnum.UserStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "用户状态", type = "integer")
     private Integer status;
 

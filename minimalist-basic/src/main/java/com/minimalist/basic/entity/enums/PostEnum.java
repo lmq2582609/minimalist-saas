@@ -15,15 +15,4 @@ public class PostEnum {
         private final String desc;
     }
 
-    /** 岗位状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum PostStatus {
-        POST_STATUS_0(0, "禁用"),
-        POST_STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
 }

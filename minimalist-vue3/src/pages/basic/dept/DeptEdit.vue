@@ -25,7 +25,7 @@
                 </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="部门状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="部门状态" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.deptStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
             </div>
@@ -50,7 +50,7 @@ import { getDeptListApi, getDeptByDeptIdApi, addDeptApi, updateDeptByDeptIdApi }
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.deptStatus, proxy.DICT.userList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.userList])
 //接收父组件参数
 const props = defineProps({
     params: {

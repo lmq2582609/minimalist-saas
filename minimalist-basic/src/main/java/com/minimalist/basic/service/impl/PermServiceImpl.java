@@ -84,10 +84,7 @@ public class PermServiceImpl implements PermService {
     public void addPerm(PermVO permVO) {
         MPerms mPerms = BeanUtil.copyProperties(permVO, MPerms.class);
         mPerms.setPermId(UnqIdUtil.uniqueId());
-        mPerms.setStatus(PermEnum.PermStatus.PERM_STATUS_1.getCode());
-        //新增
-        int insertCount = permsMapper.insert(mPerms);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        permsMapper.insert(mPerms);
     }
 
     /**

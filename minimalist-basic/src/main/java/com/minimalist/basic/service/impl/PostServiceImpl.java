@@ -12,7 +12,7 @@ import com.minimalist.basic.entity.vo.post.PostVO;
 import com.minimalist.basic.mapper.MPostMapper;
 import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.service.PostService;
-import com.minimalist.common.enums.RespEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
@@ -43,7 +43,7 @@ public class PostServiceImpl implements PostService {
         MPost mPost = postMapper.selectPostByPostCode(postVO.getPostCode());
         Assert.isNull(mPost, () -> new BusinessException(PostEnum.ErrorMsg.EXISTS_POST.getDesc()));
         mPost = BeanUtil.copyProperties(postVO, MPost.class);
-        mPost.setStatus(PostEnum.PostStatus.POST_STATUS_1.getCode());
+        mPost.setStatus(StatusEnum.STATUS_1.getCode());
         //部门ID
         long postId = UnqIdUtil.uniqueId();
         mPost.setPostId(postId);

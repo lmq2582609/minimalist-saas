@@ -7,9 +7,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.NoticeEnum;
 import com.minimalist.basic.entity.po.MNotice;
 import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.QueryCondition;
 import com.minimalist.common.mybatis.bo.Pager;
-
 import java.time.LocalDateTime;
 
 /**
@@ -72,7 +72,7 @@ public interface MNoticeMapper extends BaseMapper<MNotice> {
     default Page<MNotice> selectHomePageNoticeList(Pager pager) {
         return selectPage(new Page<>(pager.getPageNum(), pager.getPageSize()),
                 new LambdaQueryWrapper<MNotice>()
-                        .eq(MNotice::getStatus, NoticeEnum.NoticeStatus.NOTICE_STATUS_1.getCode())
+                        .eq(MNotice::getStatus, StatusEnum.STATUS_1.getCode())
                         .eq(MNotice::getNoticeType, NoticeEnum.NoticeType.NOTICE.getCode())
                         .orderByAsc(MNotice::getNoticeSort)
                         .orderByDesc(MNotice::getNoticeTop)

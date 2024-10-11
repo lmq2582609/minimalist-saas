@@ -9,7 +9,7 @@
                     </a-form-item>
                     <a-form-item field="status" label="文件状态">
                         <a-select v-model="searchForm.status" placeholder="文件状态" allow-clear>
-                            <a-option v-for="(d, index) in dicts[proxy.DICT.fileStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                            <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                         </a-select>
                     </a-form-item>
                     <a-form-item>
@@ -61,7 +61,7 @@
                     </template>
                     <!-- 文件状态 -->
                     <template #status="{ record }">
-                        <dict-convert :dict-data="dicts[proxy.DICT.fileStatus]" :dict-key="record.status" />
+                        <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
                     </template>
                     <!-- 操作 -->
                     <template #operation="{ record }">
@@ -97,7 +97,7 @@ import { getPageFileListApi, deleteFileApi } from "~/api/file.js";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.fileStatus, proxy.DICT.fileSource, proxy.DICT.filePlatform])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.filePlatform])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单

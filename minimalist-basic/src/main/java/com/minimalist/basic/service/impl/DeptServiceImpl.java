@@ -14,6 +14,7 @@ import com.minimalist.basic.mapper.MDeptMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.service.DeptService;
 import com.minimalist.common.constant.CommonConstant;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.utils.UnqIdUtil;
@@ -23,7 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class DeptServiceImpl implements DeptService {
@@ -45,7 +45,7 @@ public class DeptServiceImpl implements DeptService {
     public void addDept(DeptVO deptVO) {
         MDept mDept = BeanUtil.copyProperties(deptVO, MDept.class);
         mDept.setDeptId(UnqIdUtil.uniqueId());
-        mDept.setStatus(DeptEnum.DeptStatus.DEPT_STATUS_1.getCode());
+        mDept.setStatus(StatusEnum.STATUS_1.getCode());
         //如果不是顶级
         if (CommonConstant.ZERO != deptVO.getParentDeptId()) {
             MDept parentDept = deptMapper.selectDeptByDeptId(deptVO.getParentDeptId());

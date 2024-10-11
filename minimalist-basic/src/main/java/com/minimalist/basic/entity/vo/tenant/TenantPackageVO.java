@@ -2,8 +2,8 @@ package com.minimalist.basic.entity.vo.tenant;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.common.convert.LongArrJsonSerializer;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -32,7 +32,7 @@ public class TenantPackageVO implements Serializable {
     private String packageName;
 
     @NotNull(message = "租户套餐状态不能为空", groups = {Update.class})
-    @SchemaEnum(implementation = TenantEnum.TenantPackageStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "租户套餐状态", type = "integer")
     private Byte status;
 

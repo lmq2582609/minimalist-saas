@@ -8,9 +8,7 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
-import com.minimalist.basic.entity.enums.UserEnum;
 import com.minimalist.basic.entity.po.*;
-import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.entity.vo.user.UserVO;
@@ -20,6 +18,7 @@ import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantService;
 import com.minimalist.common.constant.CommonConstant;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
@@ -96,7 +95,6 @@ public class TenantServiceImpl implements TenantService {
         //插入租户数据
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
-        mTenant.setStatus(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode());
         tenantMapper.insert(mTenant);
     }
 
@@ -202,7 +200,7 @@ public class TenantServiceImpl implements TenantService {
     private MTenantPackage checkTenantPackageStatus(Long tenantPackageId) {
         MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageId);
         Assert.notNull(mTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
-        Assert.isFalse(TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_0.getCode() == mTenantPackage.getStatus().intValue(),
+        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(mTenantPackage.getStatus()),
                 () -> new BusinessException(TenantEnum.ErrorMsg.STATUS_TENANT_PACKAGE.getDesc()));
         return mTenantPackage;
     }
@@ -227,7 +225,6 @@ public class TenantServiceImpl implements TenantService {
         role.setRoleName(RoleEnum.Role.ADMIN.getName());
         role.setRoleCode(RoleEnum.Role.ADMIN.getCode());
         role.setRoleSort(CommonConstant.ZERO);
-        role.setStatus(RoleEnum.RoleStatus.ROLE_STATUS_1.getCode());
         role.setRemark("添加租户系统自动创建角色");
         role.setTenantId(tenantId);
         //插入角色
@@ -256,7 +253,6 @@ public class TenantServiceImpl implements TenantService {
         String salt = RandomUtil.randomString(6);
         user.setSalt(salt);
         user.setPassword(userManager.passwordEncrypt(userInfo.getPassword(), salt));
-        user.setStatus(UserEnum.UserStatus.USER_STATUS_1.getCode());
         user.setTenantId(tenantId);
         userMapper.insert(user);
     }

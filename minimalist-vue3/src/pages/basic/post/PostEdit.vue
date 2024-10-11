@@ -1,25 +1,23 @@
 <template>
     <a-spin class="w-[100%]" :size="35" :loading="spinLoading" tip="正在处理, 请稍候...">
         <a-form :model="form" ref="formRef" layout="vertical" :rules="rules" auto-label-width>
-<!--            <div class="flex justify-between" style="flex-wrap: wrap;">-->
-                <a-form-item field="postName" label="岗位名称" required>
-                    <a-input v-model="form.postName" placeholder="岗位名称" />
-                </a-form-item>
-                <a-form-item field="postCode" label="岗位编码" required tooltip="岗位的唯一英文标识">
-                    <a-input v-model="form.postCode" placeholder="岗位编码" />
-                </a-form-item>
-                <a-form-item field="postSort" label="排序值" required>
-                    <a-input-number :min="0" v-model="form.postSort" placeholder="排序值" />
-                </a-form-item>
-                <a-form-item field="status" label="岗位状态" required v-if="props.params.operationType === proxy.operationType.update.type">
-                    <a-select v-model="form.status" placeholder="岗位状态" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.postStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
-                <a-form-item field="remark" label="备注">
-                    <a-textarea v-model="form.remark" placeholder="备注" />
-                </a-form-item>
-<!--            </div>-->
+            <a-form-item field="postName" label="岗位名称" required>
+                <a-input v-model="form.postName" placeholder="岗位名称" />
+            </a-form-item>
+            <a-form-item field="postCode" label="岗位编码" required tooltip="岗位的唯一英文标识">
+                <a-input v-model="form.postCode" placeholder="岗位编码" />
+            </a-form-item>
+            <a-form-item field="postSort" label="排序值" required>
+                <a-input-number :min="0" v-model="form.postSort" placeholder="排序值" />
+            </a-form-item>
+            <a-form-item field="status" label="岗位状态" required v-if="props.params.operationType === proxy.operationType.update.type">
+                <a-select v-model="form.status" placeholder="岗位状态" allow-clear>
+                    <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                </a-select>
+            </a-form-item>
+            <a-form-item field="remark" label="备注">
+                <a-textarea v-model="form.remark" placeholder="备注" />
+            </a-form-item>
         </a-form>
 
         <!-- 分割线 -->
@@ -41,7 +39,7 @@ import { addPostApi, updatePostByPostIdApi, getPostByPostIdApi } from "~/api/pos
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.postStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus])
 //接收父组件参数
 const props = defineProps({
     params: {

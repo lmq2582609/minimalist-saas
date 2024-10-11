@@ -9,7 +9,7 @@
                     </a-form-item>
                     <a-form-item field="status" label="权限状态">
                         <a-select v-model="searchForm.status" placeholder="权限状态" allow-clear>
-                            <a-option v-for="(d, index) in dicts[proxy.DICT.permStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                            <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                         </a-select>
                     </a-form-item>
                     <a-form-item>
@@ -71,7 +71,7 @@
                     </template>
                     <!-- 状态数据转换 -->
                     <template #status="{ record }">
-                        <dict-convert :dict-data="dicts[proxy.DICT.permStatus]" :dict-key="record.status" />
+                        <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
                     </template>
                     <!-- 操作 -->
                     <template #operation="{ record }">
@@ -118,7 +118,7 @@ import {getPermListApi, deletePermByPermIdApi} from '~/api/perm'
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.permStatus, proxy.DICT.permType])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.permType])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单

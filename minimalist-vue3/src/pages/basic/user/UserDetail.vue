@@ -10,7 +10,7 @@
                 <dict-convert :dict-data="dicts[proxy.DICT.userSex]" :dict-key="form.userSex" />
             </a-descriptions-item>
             <a-descriptions-item label="用户状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.userStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
             <a-descriptions-item label="用户角色">
                 <template v-for="(roleId, index) in form.roleIds" :key="index">
@@ -52,7 +52,7 @@ import {getAllTreeParentId} from "~/utils/sys.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.userStatus, proxy.DICT.userSex, proxy.DICT.roleList, proxy.DICT.postList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.userSex, proxy.DICT.roleList, proxy.DICT.postList])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

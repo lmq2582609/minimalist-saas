@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.po.MUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.user.UserQueryVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.QueryCondition;
 import com.minimalist.basic.entity.enums.UserEnum;
 import org.apache.ibatis.annotations.Param;
@@ -66,7 +67,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
     default List<MUser> selectUserDict() {
         LambdaQueryWrapper<MUser> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(MUser::getUserId, MUser::getNickname);
-        queryWrapper.eq(MUser::getStatus, UserEnum.UserStatus.USER_STATUS_1.getCode());
+        queryWrapper.eq(MUser::getStatus, StatusEnum.STATUS_1.getCode());
         return selectList(queryWrapper);
     }
 

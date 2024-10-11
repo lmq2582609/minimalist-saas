@@ -12,6 +12,7 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.common.enums.RespEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.basic.entity.enums.UserEnum;
 import com.minimalist.common.mybatis.EntityService;
@@ -56,7 +57,7 @@ public class TenantManager {
         Assert.isFalse((userCount + 1) >= mTenant.getAccountCount(),
                 () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
         //检查租户状态
-        Assert.isTrue(TenantEnum.TenantStatus.TENANT_STATUS_1.getCode().equals(mTenant.getStatus()),
+        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(mTenant.getStatus()),
                 () -> new BusinessException(TenantEnum.ErrorMsg.DISABLED_TENANT.getDesc()));
         //检查租户是否过期
         checkTenantExpireTime(mTenant.getExpireTime());

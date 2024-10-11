@@ -2,10 +2,7 @@ package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.enums.PostEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.basic.entity.po.MStorage;
 import com.minimalist.basic.entity.vo.storage.StorageQueryVO;
@@ -20,7 +17,6 @@ import com.minimalist.common.utils.UnqIdUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -43,7 +39,6 @@ public class StorageServiceImpl implements StorageService {
         FileHandler fileHandler = fileManager.getFileHandler(storageVO.getStorageType());
         fileHandler.valid(storageVO.getStorageConfig());
         MStorage storage = BeanUtil.copyProperties(storageVO, MStorage.class);
-        storage.setStatus(StorageEnum.Status.STATUS_1.getCode());
         long storageId = UnqIdUtil.uniqueId();
         storage.setStorageId(storageId);
         storageMapper.insert(storage);

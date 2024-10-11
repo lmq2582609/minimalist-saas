@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.MTenantPackage;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.QueryCondition;
 
 import java.util.List;
@@ -68,7 +69,8 @@ public interface MTenantPackageMapper extends BaseMapper<MTenantPackage> {
      * @return 用户列表
      */
     default List<MTenantPackage> selectTenantPackageDict() {
-        return selectList(new LambdaQueryWrapper<MTenantPackage>().eq(MTenantPackage::getStatus, TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_1.getCode()));
+        return selectList(new LambdaQueryWrapper<MTenantPackage>()
+                .eq(MTenantPackage::getStatus, StatusEnum.STATUS_1.getCode()));
     }
 
 }

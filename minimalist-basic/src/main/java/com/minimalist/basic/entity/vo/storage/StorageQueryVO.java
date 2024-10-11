@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.storage;
 
-import com.minimalist.basic.entity.enums.StorageEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,7 +21,7 @@ public class StorageQueryVO extends Pager implements Serializable {
     @Schema(name = "storageType", description = "存储类型", type = "string")
     private String storageType;
 
-    @SchemaEnum(implementation = StorageEnum.Status.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "存储状态", type = "integer")
     private Integer status;
 

@@ -1,6 +1,8 @@
 package com.minimalist.basic.entity.vo.dict;
 
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.bo.Pager;
+import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;
@@ -19,6 +21,7 @@ public class DictQueryVO extends Pager implements Serializable {
     @Schema(name = "dictType", description = "字典类型", type = "string")
     private String dictType;
 
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "字典状态", type = "int")
     private Byte status;
 

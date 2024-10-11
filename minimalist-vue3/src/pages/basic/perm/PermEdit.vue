@@ -34,7 +34,7 @@
                 <a-form-item class="w-[49%]" field="status" :label="formName + '状态'" required
                     tooltip="选择禁用，将不会出现在侧边栏，也不能被访问" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" :placeholder="formName + '状态'" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.permStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[49%]" v-if="form.permType === permType.M.key" field="component" label="组件路径" tooltip="vue文件的路径，文件需要放到pages目录下，如：`/basic/user/UserMgt.vue`">
@@ -60,13 +60,14 @@
 
 <script setup>
 import { ref, reactive, getCurrentInstance, watch } from 'vue'
-import {addPermApi, permType, permStatus, updatePermByPermIdApi, getPermListApi, getPermByPermIdApi} from '~/api/perm'
+import {addPermApi, permType, updatePermByPermIdApi, getPermListApi, getPermByPermIdApi} from '~/api/perm'
+import {status} from "~/utils/sys.js";
 import IconSelect from "~/components/iconSelect/index.vue";
 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.permStatus, proxy.DICT.permType, proxy.DICT.yesNo])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.permType, proxy.DICT.yesNo])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -103,7 +104,7 @@ const form = reactive({
     //备注
     remark: null,
     //权限状态
-    status: permStatus.enable.key,
+    status: status.status_1.key,
 })
 //表单验证规则
 const rules = {

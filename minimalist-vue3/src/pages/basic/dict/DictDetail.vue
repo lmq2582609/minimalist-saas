@@ -23,7 +23,7 @@
                     </template>
                 </a-descriptions-item>
                 <a-descriptions-item label="字典状态">
-                    <dict-convert :dict-data="dicts[proxy.DICT.dictStatus]" :dict-key="item.status" />
+                    <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="item.status" />
                 </a-descriptions-item>
             </template>
         </a-descriptions>
@@ -37,7 +37,7 @@ import { getDictByDictTypeApi } from '~/api/dict'
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.dictStatus, proxy.DICT.dictClass])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.dictClass])
 //接收父组件参数
 const props = defineProps({
     params: {

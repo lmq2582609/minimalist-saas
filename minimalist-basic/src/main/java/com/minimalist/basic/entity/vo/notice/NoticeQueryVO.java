@@ -1,6 +1,7 @@
 package com.minimalist.basic.entity.vo.notice;
 
 import com.minimalist.basic.entity.enums.NoticeEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
@@ -26,7 +27,7 @@ public class NoticeQueryVO extends Pager implements Serializable {
     private Integer noticeType;
 
     @NotNull(message = "公告状态不能为空", groups = {Add.class, Update.class})
-    @SchemaEnum(implementation = NoticeEnum.NoticeStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "公告状态", type = "string")
     private Byte status;
 

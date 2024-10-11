@@ -3,12 +3,11 @@ package com.minimalist.basic.mapper;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.enums.PostEnum;
 import com.minimalist.basic.entity.po.MPost;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.post.PostQueryVO;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.QueryCondition;
-
 import java.util.List;
 
 /**
@@ -87,7 +86,7 @@ public interface MPostMapper extends BaseMapper<MPost> {
     default List<MPost> selectPostDict() {
         LambdaQueryWrapper<MPost> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(MPost::getPostId, MPost::getPostName);
-        queryWrapper.eq(MPost::getStatus, PostEnum.PostStatus.POST_STATUS_1.getCode());
+        queryWrapper.eq(MPost::getStatus, StatusEnum.STATUS_1.getCode());
         return selectList(queryWrapper);
     }
 

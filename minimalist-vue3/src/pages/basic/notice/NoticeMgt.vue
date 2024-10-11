@@ -14,7 +14,7 @@
                     </a-form-item>
                     <a-form-item field="status" label="公告状态">
                         <a-select v-model="searchForm.status" placeholder="公告状态" allow-clear>
-                            <a-option v-for="(d, index) in dicts[proxy.DICT.noticeStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                            <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                         </a-select>
                     </a-form-item>
                     <a-form-item>
@@ -98,7 +98,7 @@
                     </template>
                     <!-- 公告状态 -->
                     <template #status="{ record }">
-                        <dict-convert :dict-data="dicts[proxy.DICT.noticeStatus]" :dict-key="record.status" />
+                        <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
                     </template>
                     <!-- 创建人 -->
                     <template #createId="{ record }">
@@ -146,7 +146,7 @@ import NoticeDetail from "~/pages/basic/notice/NoticeDetail.vue";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.noticeStatus, proxy.DICT.noticeType, proxy.DICT.userList, proxy.DICT.deptList, proxy.DICT.yesNo])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.noticeType, proxy.DICT.userList, proxy.DICT.deptList, proxy.DICT.yesNo])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单

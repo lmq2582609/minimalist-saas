@@ -14,6 +14,7 @@ import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.common.constant.CommonConstant;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.mybatis.EntityService;
 import com.minimalist.common.mybatis.bo.PageResp;
@@ -58,7 +59,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         MTenantPackage mTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         long tenantPackageId = UnqIdUtil.uniqueId();
         mTenantPackage.setPackageId(tenantPackageId);
-        mTenantPackage.setStatus(TenantEnum.TenantPackageStatus.TENANT_PACKAGE_STATUS_1.getCode());
+        mTenantPackage.setStatus(StatusEnum.STATUS_1.getCode());
         //插入租户套餐
         tenantPackageMapper.insert(mTenantPackage);
         //构造套餐与权限关联数据

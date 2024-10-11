@@ -18,6 +18,7 @@ import com.minimalist.basic.service.EDictService;
 import com.minimalist.common.constant.RedisKeyConstant;
 import com.minimalist.common.entity.BeanMethod;
 import com.minimalist.common.enums.RespEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.exception.BusinessException;
 import com.minimalist.common.eDict.EDictConstant;
 import com.minimalist.common.mybatis.EntityService;
@@ -57,7 +58,7 @@ public class DictServiceImpl implements DictService {
     @Override
     public void addDict(DictInfoVO dictInfoVO) {
         //状态默认正常
-        dictInfoVO.getDictDataList().forEach(d -> d.setStatus(DictEnum.Status.STATUS_1.getCode()));
+        dictInfoVO.getDictDataList().forEach(d -> d.setStatus(StatusEnum.STATUS_1.getCode()));
         //数据转换，构建字典实体数据
         List<MDict> dictList = buildDictData(dictInfoVO, true);
         //批量新增

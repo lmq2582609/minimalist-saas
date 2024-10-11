@@ -9,7 +9,7 @@
                     </a-form-item>
                     <a-form-item field="status" label="租户状态">
                         <a-select v-model="searchForm.status" placeholder="租户状态" allow-clear>
-                            <a-option v-for="(d, index) in dicts[proxy.DICT.tenantStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                            <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                         </a-select>
                     </a-form-item>
                     <a-form-item>
@@ -67,7 +67,7 @@
                     </template>
                     <!-- 租户状态 -->
                     <template #status="{ record }">
-                        <dict-convert :dict-data="dicts[proxy.DICT.tenantStatus]" :dict-key="record.status" />
+                        <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
                     </template>
                     <!-- 操作 -->
                     <template #operation="{ record }">
@@ -112,7 +112,7 @@ import TenantEdit from "~/pages/basic/tenant/TenantEdit.vue";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.tenantStatus, proxy.DICT.tenantPackageList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单

@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.tenant;
 
-import com.minimalist.basic.entity.enums.TenantEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.mybatis.bo.Pager;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,7 +18,7 @@ public class TenantPackageQueryVO extends Pager implements Serializable {
     @Schema(name = "packageName", description = "套餐名称", type = "string")
     private String packageName;
 
-    @SchemaEnum(implementation = TenantEnum.TenantPackageStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "租户套餐状态", type = "integer")
     private Byte status;
 

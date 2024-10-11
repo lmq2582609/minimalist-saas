@@ -14,15 +14,4 @@ public class StorageEnum {
         private final String desc;
     }
 
-    /** 存储状态 */
-    @Getter
-    @AllArgsConstructor
-    public enum Status {
-        STATUS_0(0, "禁用"),
-        STATUS_1(1, "正常"),
-        ;
-        private final Integer code;
-        private final String desc;
-    }
-
 }

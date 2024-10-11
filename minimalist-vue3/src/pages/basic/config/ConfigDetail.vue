@@ -6,7 +6,7 @@
             <a-descriptions-item label="参数value">{{ form.configValue }}</a-descriptions-item>
             <a-descriptions-item label="说明">{{ form.description }}</a-descriptions-item>
             <a-descriptions-item label="参数状态">
-                <dict-convert :dict-data="dicts[proxy.DICT.configStatus]" :dict-key="form.status" />
+                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
         </a-descriptions>
     </a-spin>
@@ -17,7 +17,7 @@ import {getConfigByConfigIdApi} from "~/api/config.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.configStatus])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数

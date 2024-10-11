@@ -2,7 +2,7 @@ package com.minimalist.basic.entity.vo.dept;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.DeptEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;
 import com.minimalist.common.valid.Update;
@@ -55,7 +55,7 @@ public class DeptVO implements Serializable {
     @Schema(name = "email", description = "部门邮箱", type = "string")
     private String email;
 
-    @SchemaEnum(implementation = DeptEnum.DeptStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @NotNull(message = "部门状态不能为空", groups = {Update.class})
     @Schema(name = "status", description = "部门状态", type = "integer")
     private Integer status;

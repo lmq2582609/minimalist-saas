@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.perm;
 
-import com.minimalist.basic.entity.enums.PermEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -20,7 +20,7 @@ public class PermQueryVO implements Serializable {
     @Schema(name = "permType", description = "权限类型", type = "string")
     private String permType;
 
-    @SchemaEnum(implementation = PermEnum.PermStatus.class)
+    @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "状态", type = "integer")
     private Integer status;
 
