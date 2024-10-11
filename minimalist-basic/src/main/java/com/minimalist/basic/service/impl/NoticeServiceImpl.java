@@ -7,14 +7,14 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.common.file.FileEnum;
+import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.basic.entity.enums.NoticeEnum;
-import com.minimalist.basic.entity.po.MFile;
+import com.minimalist.common.module.entity.po.MFile;
 import com.minimalist.basic.entity.po.MNotice;
-import com.minimalist.basic.entity.vo.file.FileVO;
+import com.minimalist.common.module.entity.vo.file.FileVO;
 import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
 import com.minimalist.basic.entity.vo.notice.NoticeVO;
-import com.minimalist.basic.mapper.MFileMapper;
+import com.minimalist.common.module.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MNoticeMapper;
 import com.minimalist.basic.service.NoticeService;
 import com.minimalist.common.enums.RespEnum;
@@ -67,7 +67,7 @@ public class NoticeServiceImpl implements NoticeService {
         int insertCount = noticeMapper.insert(mNotice);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, noticeVO, FileEnum.FileStatus.FILE_STATUS_1.getCode());
+        fileStatusHandler(null, noticeVO, StatusEnum.STATUS_1.getCode());
     }
 
     /**
@@ -81,10 +81,9 @@ public class NoticeServiceImpl implements NoticeService {
         MNotice mNotice = noticeMapper.selectNoticeByNoticeId(noticeId);
         Assert.notNull(mNotice, () -> new BusinessException(NoticeEnum.ErrorMsg.NONENTITY_NOTICE.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), FileEnum.FileStatus.FILE_STATUS_0.getCode());
+        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), StatusEnum.STATUS_0.getCode());
         //删除公告
-        int deleteCount = noticeMapper.deleteNoticeByNoticeId(noticeId);
-        Assert.isTrue(deleteCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        noticeMapper.deleteNoticeByNoticeId(noticeId);
     }
 
     /**
@@ -231,13 +230,13 @@ public class NoticeServiceImpl implements NoticeService {
                 oldNoticePicFileIdList.addAll(noticePicFileIdList);
             }
             //将旧公告封面图的状态置为未使用
-            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), oldNoticePicFileIdList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
+            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), oldNoticePicFileIdList, StatusEnum.STATUS_0.getCode());
             //旧公告富文本中的图片
             String decodeOldContent = TextUtil.decode(oldNotice.getNoticeContent());
             List<String> oldContentImgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
             //将旧公告富文本中的图片状态置为未使用
             if (CollectionUtil.isNotEmpty(oldContentImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), oldContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_0.getCode());
+                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), oldContentImgUrlList, StatusEnum.STATUS_0.getCode());
             }
 
             //新公告封面图片文件ID
@@ -247,13 +246,13 @@ public class NoticeServiceImpl implements NoticeService {
                 newNoticePicIdList.addAll(noticePicFileIdList);
             }
             //将新公告封面图的状态置为已使用
-            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), newNoticePicIdList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
+            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), newNoticePicIdList, StatusEnum.STATUS_1.getCode());
             //新公告富文本中的图片
             String decodeNewContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> newContentImgUrlList = TextUtil.getImgUrlByRichText(decodeNewContent);
             //将新公告富文本中的图片状态置为已使用
             if (CollectionUtil.isNotEmpty(newContentImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), newContentImgUrlList, FileEnum.FileStatus.FILE_STATUS_1.getCode());
+                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), newContentImgUrlList, StatusEnum.STATUS_1.getCode());
             }
         }
     }

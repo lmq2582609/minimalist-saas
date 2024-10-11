@@ -119,6 +119,28 @@
             <version>${ttl.version}</version>
         </dependency>
 
+        <!-- 缩略图处理 -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+
+
+        <!-- spring-file-storage -->
+        <dependency>
+            <groupId>org.dromara.x-file-storage</groupId>
+            <artifactId>x-file-storage-spring</artifactId>
+            <version>${spring-file.version}</version>
+        </dependency>
+
+        <!-- webp-imageio，java处理webp图片需引入 -->
+<!--        <dependency>-->
+<!--            <groupId>com.github.gotson</groupId>-->
+<!--            <artifactId>webp-imageio</artifactId>-->
+<!--            <version>0.2.2</version>-->
+<!--        </dependency>-->
+
     </dependencies>
 
 </project>

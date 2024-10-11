@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.minimalist.basic.entity.enums.NoticeEnum;
-import com.minimalist.basic.entity.vo.file.FileVO;
+import com.minimalist.common.module.entity.vo.file.FileVO;
 import com.minimalist.common.enums.StatusEnum;
 import com.minimalist.common.swagger.SchemaEnum;
 import com.minimalist.common.valid.Add;

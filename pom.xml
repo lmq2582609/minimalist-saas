@@ -32,8 +32,6 @@
         <hutool.version>5.8.32</hutool.version>
         <!-- sa-token -->
         <satoken.version>1.39.0</satoken.version>
-        <!-- servlet -->
-        <servlet.version>4.0.1</servlet.version>
         <!-- knife4j -->
         <knife4j.version>4.1.0</knife4j.version>
         <!-- spring-file -->

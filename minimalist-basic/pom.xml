@@ -20,28 +20,6 @@
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
-        <!-- servlet-api -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet.version}</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- spring-file-storage -->
-        <dependency>
-            <groupId>org.dromara.x-file-storage</groupId>
-            <artifactId>x-file-storage-spring</artifactId>
-            <version>${spring-file.version}</version>
-        </dependency>
-
-        <!-- webp-imageio，java处理webp图片需引入 -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.gotson</groupId>-->
-<!--            <artifactId>webp-imageio</artifactId>-->
-<!--            <version>0.2.2</version>-->
-<!--        </dependency>-->
-
         <!-- spring-boot-test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

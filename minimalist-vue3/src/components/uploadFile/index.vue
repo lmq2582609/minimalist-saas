@@ -66,7 +66,7 @@ const customUploadFile = (option) => {
         proxy.$msg.success(proxy.operationType.upload.success)
     }).catch(e => {
         //上传失败
-        proxy.$msg.error(proxy.operationType.upload.error)
+        option.onError(e)
     })
 }
 //获取上传文件的ID，逗号分割
