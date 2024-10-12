@@ -2,8 +2,8 @@ package com.minimalist.basic.entity.vo.dict;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.swagger.SchemaEnum;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.config.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;

@@ -6,7 +6,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.po.MDict;
 import com.minimalist.basic.entity.vo.dict.DictQueryVO;
-import com.minimalist.common.mybatis.QueryCondition;
+import com.minimalist.basic.config.mybatis.QueryCondition;
 
 import java.util.List;
 
@@ -79,6 +79,19 @@ public interface MDictMapper extends BaseMapper<MDict> {
      */
     default int updateDictByDictId(MDict dict) {
         return update(dict, new LambdaUpdateWrapper<MDict>().eq(MDict::getDictId, dict.getDictId()));
+    }
+
+    /**
+     * 根据字典类型和字典key查询字典数据
+      * @param dictType 字典类型
+     * @param dictKey 字典key
+     * @return 字典数据
+     */
+    default MDict selectDictByDictTypeAndKey(String dictType, String dictKey) {
+        LambdaQueryWrapper<MDict> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(MDict::getDictType, dictType);
+        queryWrapper.eq(MDict::getDictKey, dictKey);
+        return selectOne(queryWrapper);
     }
 
 }

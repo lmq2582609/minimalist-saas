@@ -3,10 +3,10 @@ package com.minimalist.basic.controller;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.service.TenantService;
-import com.minimalist.common.mybatis.bo.PageResp;
-import com.minimalist.common.tenant.IgnoreTenant;
-import com.minimalist.common.valid.Add;
-import com.minimalist.common.valid.Update;
+import com.minimalist.basic.config.mybatis.bo.PageResp;
+import com.minimalist.basic.config.tenant.TenantIgnore;
+import com.minimalist.basic.utils.Add;
+import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ public class TenantController {
     @Autowired
     private TenantService tenantService;
 
-    @IgnoreTenant
+    @TenantIgnore
     @PostMapping("/addTenant")
     @Operation(summary = "添加租户")
     public ResponseEntity<Void> addTenant(@RequestBody @Validated(Add.class) TenantVO tenantVO) {
@@ -33,7 +33,7 @@ public class TenantController {
         return ResponseEntity.ok().build();
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @DeleteMapping("/deleteTenantByTenantId")
     @Operation(summary = "删除租户 -> 根据租户ID删除租户")
     public ResponseEntity<Void> deleteTenantByTenantId(@RequestParam("tenantId")
@@ -43,7 +43,7 @@ public class TenantController {
         return ResponseEntity.ok().build();
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @PutMapping("/updateTenantByTenantId")
     @Operation(summary = "修改租户 -> 根据租户ID修改")
     public ResponseEntity<Void> updateTenantByTenantId(@RequestBody @Validated(Update.class) TenantVO tenantVO) {
@@ -51,14 +51,14 @@ public class TenantController {
         return ResponseEntity.ok().build();
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @GetMapping("/getPageTenantList")
     @Operation(summary = "查询租户(分页)")
     public ResponseEntity<PageResp<TenantVO>> getPageTenantList(TenantQueryVO queryVO) {
         return ResponseEntity.ok(tenantService.getPageTenantList(queryVO));
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @GetMapping("/getTenantByTenantId/{tenantId}")
     @Operation(summary = "根据租户ID查询租户")
     public ResponseEntity<TenantVO> getTenantByTenantId(@PathVariable(value = "tenantId")

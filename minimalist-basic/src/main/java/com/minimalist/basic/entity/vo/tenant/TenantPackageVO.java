@@ -2,11 +2,11 @@ package com.minimalist.basic.entity.vo.tenant;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.common.convert.LongArrJsonSerializer;
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.swagger.SchemaEnum;
-import com.minimalist.common.valid.Add;
-import com.minimalist.common.valid.Update;
+import com.minimalist.basic.config.convert.LongArrJsonSerializer;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.config.swagger.SchemaEnum;
+import com.minimalist.basic.utils.Add;
+import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

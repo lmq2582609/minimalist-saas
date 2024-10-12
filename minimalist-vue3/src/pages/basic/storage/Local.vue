@@ -5,9 +5,10 @@
             tooltip="指的是要将文件存放在什么位置。Windows系统，如`E:\temp`。Linux系统，如`/opt/temp`">
             <a-input v-model="form.storagePath" placeholder="本地存储路径" />
         </a-form-item>
+        <div v-if="proxy.operationType.detail.type !== optType" class="font-bold mb-3">注意：本地存储路径新增或修改后，需重启项目后生效</div>
 
         <!-- 查看时展示 -->
-        <a-descriptions :column="1" bordered  v-if="proxy.operationType.detail.type === optType">
+        <a-descriptions :column="1" bordered v-if="proxy.operationType.detail.type === optType">
             <a-descriptions-item label="本地存储路径">{{ form.storagePath }}</a-descriptions-item>
         </a-descriptions>
 

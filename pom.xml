@@ -12,7 +12,6 @@
     <modules>
         <module>minimalist-basic</module>
         <module>minimalist-application</module>
-        <module>minimalist-common</module>
     </modules>
 
     <properties>

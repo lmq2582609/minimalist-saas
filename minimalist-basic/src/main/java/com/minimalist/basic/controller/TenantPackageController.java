@@ -3,10 +3,10 @@ package com.minimalist.basic.controller;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.minimalist.basic.service.TenantPackageService;
-import com.minimalist.common.mybatis.bo.PageResp;
-import com.minimalist.common.tenant.IgnoreTenant;
-import com.minimalist.common.valid.Add;
-import com.minimalist.common.valid.Update;
+import com.minimalist.basic.config.mybatis.bo.PageResp;
+import com.minimalist.basic.config.tenant.TenantIgnore;
+import com.minimalist.basic.utils.Add;
+import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +25,7 @@ public class TenantPackageController {
     @Autowired
     private TenantPackageService tenantPackageService;
 
-    @IgnoreTenant
+    @TenantIgnore
     @PostMapping("/addTenantPackage")
     @Operation(summary = "添加租户套餐")
     public ResponseEntity<Void> addTenantPackage(@RequestBody @Validated(Add.class) TenantPackageVO tenantPackageVO) {
@@ -33,7 +33,7 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @DeleteMapping("/deleteTenantPackageByTenantPackageId")
     @Operation(summary = "删除租户套餐 -> 根据租户套餐ID删除租户套餐")
     public ResponseEntity<Void> deleteTenantPackageByTenantPackageId(@RequestParam("tenantPackageId")
@@ -43,7 +43,7 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @PutMapping("/updateTenantPackageByTenantPackageId")
     @Operation(summary = "修改租户套餐 -> 根据租户套餐ID修改")
     public ResponseEntity<Void> updateTenantPackageByTenantPackageId(@RequestBody @Validated(Update.class) TenantPackageVO tenantPackageVO) {
@@ -51,14 +51,14 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @GetMapping("/getPageTenantPackageList")
     @Operation(summary = "查询租户套餐(分页)")
     public ResponseEntity<PageResp<TenantPackageVO>> getPageTenantPackageList(TenantPackageQueryVO queryVO) {
         return ResponseEntity.ok(tenantPackageService.getPageTenantPackageList(queryVO));
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @GetMapping("/getTenantPackageByTenantPackageId/{tenantPackageId}")
     @Operation(summary = "根据租户套餐ID查询租户套餐")
     public ResponseEntity<TenantPackageVO> getTenantPackageByTenantPackageId(@PathVariable(value = "tenantPackageId")

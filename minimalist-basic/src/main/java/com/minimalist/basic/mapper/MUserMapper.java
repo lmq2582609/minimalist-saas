@@ -7,8 +7,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.po.MUser;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.minimalist.basic.entity.vo.user.UserQueryVO;
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.mybatis.QueryCondition;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.config.mybatis.QueryCondition;
 import com.minimalist.basic.entity.enums.UserEnum;
 import org.apache.ibatis.annotations.Param;
 

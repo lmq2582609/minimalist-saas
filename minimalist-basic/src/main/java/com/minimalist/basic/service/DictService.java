@@ -1,7 +1,7 @@
 package com.minimalist.basic.service;
 
 import com.minimalist.basic.entity.vo.dict.*;
-import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.basic.config.mybatis.bo.PageResp;
 
 import java.util.List;
 

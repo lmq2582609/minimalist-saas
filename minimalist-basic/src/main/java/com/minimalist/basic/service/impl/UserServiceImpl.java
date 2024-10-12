@@ -12,13 +12,13 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.enums.PermEnum;
-import com.minimalist.basic.entity.enums.TenantEnum;
+import com.minimalist.basic.entity.enums.*;
 import com.minimalist.basic.entity.po.MPerms;
 import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.po.MUserPost;
 import com.minimalist.basic.entity.po.MUserRole;
+import com.minimalist.basic.entity.vo.config.ConfigVO;
 import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.entity.vo.user.ImageCaptchaVO;
@@ -35,20 +35,15 @@ import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
 import com.minimalist.basic.service.*;
-import com.minimalist.common.constant.CommonConstant;
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.exception.BusinessException;
-import com.minimalist.common.constant.RedisKeyConstant;
-import com.minimalist.common.enums.RespEnum;
-import com.minimalist.common.module.entity.vo.config.ConfigVO;
-import com.minimalist.common.module.service.ConfigService;
-import com.minimalist.common.mybatis.EntityService;
-import com.minimalist.common.mybatis.bo.PageResp;
-import com.minimalist.common.redis.RedisManager;
-import com.minimalist.basic.entity.enums.UserEnum;
-import com.minimalist.common.tenant.IgnoreTenant;
-import com.minimalist.common.utils.SafetyUtil;
-import com.minimalist.common.utils.UnqIdUtil;
+import com.minimalist.basic.config.exception.BusinessException;
+import com.minimalist.basic.config.mybatis.EntityService;
+import com.minimalist.basic.config.mybatis.bo.PageResp;
+import com.minimalist.basic.config.redis.RedisManager;
+import com.minimalist.basic.config.tenant.TenantIgnore;
+import com.minimalist.basic.utils.CommonConstant;
+import com.minimalist.basic.utils.RedisKeyConstant;
+import com.minimalist.basic.utils.SafetyUtil;
+import com.minimalist.basic.utils.UnqIdUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -373,7 +368,7 @@ public class UserServiceImpl implements UserService {
         //登录
         StpUtil.login(loginUser.getUserId());
         //在登录时缓存参数 - 缓存租户ID
-        StpUtil.getSession().set(IgnoreTenant.TENANT_ID, loginUser.getTenantId());
+        StpUtil.getSession().set(TenantIgnore.TENANT_ID, loginUser.getTenantId());
         return StpUtil.getTokenInfo();
     }
 

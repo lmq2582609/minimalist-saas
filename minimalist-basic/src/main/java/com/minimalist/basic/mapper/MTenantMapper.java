@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.po.MTenant;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.mybatis.QueryCondition;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.config.mybatis.QueryCondition;
 import java.util.List;
 
 /**

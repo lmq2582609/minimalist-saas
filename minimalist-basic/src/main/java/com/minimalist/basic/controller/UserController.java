@@ -1,14 +1,14 @@
 package com.minimalist.basic.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
 import com.minimalist.basic.entity.vo.user.*;
 import com.minimalist.basic.service.UserService;
-import com.minimalist.common.mybatis.bo.PageResp;
-import com.minimalist.common.tenant.IgnoreTenant;
-import com.minimalist.common.valid.Add;
-import com.minimalist.common.valid.Update;
+import com.minimalist.basic.config.mybatis.bo.PageResp;
+import com.minimalist.basic.config.tenant.TenantIgnore;
+import com.minimalist.basic.utils.Add;
+import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -66,27 +66,28 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByUserId(userId));
     }
 
-    @IgnoreTenant
+    @TenantIgnore
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息(登录后获取，含角色、权限、菜单、部门等)")
     public ResponseEntity<UserInfoVO> getUserInfo() {
         return ResponseEntity.ok(userService.getUserInfo(StpUtil.getLoginIdAsLong()));
     }
 
+    @SaIgnore
     @GetMapping("/getImageCaptcha")
     @Operation(summary = "获取图形验证码")
     public ResponseEntity<ImageCaptchaVO> getImageCaptcha() {
         return ResponseEntity.ok(userService.getImageCaptcha());
     }
 
-    @IgnoreTenant
+    @SaIgnore
+    @TenantIgnore
     @PostMapping("/login")
     @Operation(summary = "用户登录，返回token")
     public ResponseEntity<SaTokenInfo> login(@RequestBody @Valid UserLoginReqVO reqVO) {
         return ResponseEntity.ok(userService.userLogin(reqVO));
     }
 
-    @SaCheckLogin
     @PostMapping("/logout")
     @Operation(summary = "退出登录")
     public ResponseEntity<Void> logout() {
@@ -94,7 +95,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @SaCheckLogin
     @PostMapping("/resetPassword")
     @Operation(summary = "重置密码")
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid RePasswordVO passwordVO) {
@@ -102,7 +102,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @SaCheckLogin
     @PostMapping("/updateUserAvatar")
     @Operation(summary = "修改用户头像")
     public ResponseEntity<Void> updateUserAvatar(@RequestParam("userAvatar")
@@ -112,7 +111,6 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @SaCheckLogin
     @PostMapping("/updateUserInfo")
     @Operation(summary = "修改用户基本信息")
     public ResponseEntity<Void> updateUserInfo(@RequestBody @Valid UserSettingVO settingVO) {

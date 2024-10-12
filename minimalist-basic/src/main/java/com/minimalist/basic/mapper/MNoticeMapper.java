@@ -7,9 +7,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.NoticeEnum;
 import com.minimalist.basic.entity.po.MNotice;
 import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.mybatis.QueryCondition;
-import com.minimalist.common.mybatis.bo.Pager;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.basic.config.mybatis.bo.Pager;
 import java.time.LocalDateTime;
 
 /**

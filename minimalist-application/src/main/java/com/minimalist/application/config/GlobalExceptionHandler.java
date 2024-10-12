@@ -1,9 +1,12 @@
 package com.minimalist.application.config;
 
-import com.minimalist.common.exception.BusinessException;
-import com.minimalist.common.enums.RespEnum;
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
+import com.minimalist.basic.config.exception.BusinessException;
+import com.minimalist.basic.entity.enums.RespEnum;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jdk.jfr.Description;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.mica.xss.core.XssException;
 import org.springframework.core.NestedExceptionUtils;
@@ -73,6 +76,18 @@ public class GlobalExceptionHandler {
         } else {
             return exception(e);
         }
+    }
+
+    @Description("未登录异常处理")
+    @ExceptionHandler(value = {NotLoginException.class})
+    public ResponseEntity<Object> customNotLoginException(Exception e) {
+        return ResponseEntity.status(RespEnum.REQUEST_UNAUTH.getCode()).body(RespEnum.REQUEST_UNAUTH.getDesc());
+    }
+
+    @Description("无权限异常处理")
+    @ExceptionHandler(value = {NotPermissionException.class})
+    public ResponseEntity<Object> customNotPermissionException(Exception e) {
+        return ResponseEntity.status(RespEnum.NO_OPERATION_PERMISSION.getCode()).body(RespEnum.NO_OPERATION_PERMISSION.getDesc());
     }
 
     /**

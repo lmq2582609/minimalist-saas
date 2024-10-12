@@ -1,8 +1,8 @@
 package com.minimalist.basic.entity.vo.tenant;
 
-import com.minimalist.common.enums.StatusEnum;
-import com.minimalist.common.mybatis.bo.Pager;
-import com.minimalist.common.swagger.SchemaEnum;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;

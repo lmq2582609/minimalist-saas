@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.user;
 
-import com.minimalist.common.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.Pager;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;

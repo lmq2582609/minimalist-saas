@@ -3,7 +3,7 @@ package com.minimalist.basic.service;
 import com.minimalist.basic.entity.po.MPerms;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
-import com.minimalist.common.mybatis.bo.PageResp;
+import com.minimalist.basic.config.mybatis.bo.PageResp;
 
 import java.util.List;
 
