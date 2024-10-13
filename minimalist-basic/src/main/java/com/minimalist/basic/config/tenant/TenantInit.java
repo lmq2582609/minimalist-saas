@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
 import com.minimalist.basic.service.ConfigService;
 import com.minimalist.basic.utils.CommonConstant;
+import com.minimalist.basic.utils.SafetyUtil;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -31,6 +32,10 @@ public class TenantInit {
     @PostConstruct
     public void init() {
         configService = applicationContext.getBean(ConfigService.class);
+        //此处忽略多租户
+        SafetyUtil.setIgnoreTenant(true);
+        //刷新配置缓存
+        configService.refreshConfigCache();
     }
 
     /**

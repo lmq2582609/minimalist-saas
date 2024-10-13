@@ -2,12 +2,11 @@
     <a-row class="min-h-screen bg-indigo-400" align="stretch">
         <a-col :lg="16" :md="12" :sm="24" :xs="24" class="flex items-center justify-center">
             <div>
-                <div class="font-bold text-5xl text-light-50 mb-4">欢迎光临</div>
-                <div class="text-gray-200 text-sm">文字说明文字说明文字说明文字说明文字说明</div>
+                <img class="login-pic-animation" style="width: 35em;" src="../assets/login-pic.png" alt="">
             </div>
         </a-col>
         <a-col :lg="8" :md="12" :sm="24" :xs="24" class="flex flex-col items-center justify-center bg-light-50">
-            <h2 class="font-bold text-3xl text-gray-800">欢迎回来</h2>
+            <h2 class="font-bold text-3xl text-gray-800">极简多租户管理系统</h2>
             <div class="flex items-center justify-center my-5 text-gray-400 space-x-2">
                 <span class="h-[1px] w-16 bg-gray-300"></span>
                 <span>账号密码登录</span>
@@ -119,5 +118,12 @@ const getImageCaptcha = () => {
 getImageCaptcha()
 </script>
 <style scoped>
-
+@keyframes floating {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0); }
+}
+.login-pic-animation {
+    animation: floating 3s ease infinite;
+}
 </style>

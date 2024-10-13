@@ -15,9 +15,6 @@ import java.util.List;
 @Configuration
 public class TenantPluginHandler implements TenantLineHandler {
 
-    /** 初始化标识，租户是否处于初始化状态 */
-    public static boolean tenantInit = true;
-
     /**
      * 获取租户 ID 值表达式，只支持单个 ID 值
      * @return 租户 ID 值表达式
@@ -53,12 +50,6 @@ public class TenantPluginHandler implements TenantLineHandler {
      */
     @Override
     public boolean ignoreTable(String tableName) {
-        //TODO
-        if (tenantInit) {
-            //初始化标识=true，表示处于初始化状态，返回false不忽略
-            //因为这里在初始化时会调用这个方法
-            return false;
-        }
         //多租户忽略
         if (SafetyUtil.checkIgnoreTenant()) {
             return true;

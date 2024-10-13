@@ -45,6 +45,7 @@ public interface MFileMapper extends BaseMapper<MFile> {
         return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
                 new QueryCondition<MFile>()
                         .eqNotNull(MFile::getStatus, queryVO.getStatus())
+                        .eqNotNull(MFile::getFileSource, queryVO.getFileSource())
                         .likeNotNull(MFile::getFileName, queryVO.getFileName())
                         .orderByDescc(MFile::getCreateTime)
                 );

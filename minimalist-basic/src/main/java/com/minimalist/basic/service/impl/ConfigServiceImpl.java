@@ -3,6 +3,7 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -125,8 +126,10 @@ public class ConfigServiceImpl implements ConfigService {
         if (ObjectUtil.isNull(configVO)) {
             MConfig mConfig = configMapper.selectConfigByConfigKey(configKey, StatusEnum.STATUS_1.getCode());
             configVO = BeanUtil.copyProperties(mConfig, ConfigVO.class);
+            //随机超时时间
+            int systemConfigCacheEx = RandomUtil.randomInt(0, 500) + RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX;
             //重新放入缓存
-            redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
+            redisManager.set(redisKey, configVO, systemConfigCacheEx);
         }
         return configVO;
     }
@@ -140,7 +143,9 @@ public class ConfigServiceImpl implements ConfigService {
         for (MConfig config : configList) {
             ConfigVO configVO = BeanUtil.copyProperties(config, ConfigVO.class);
             String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
-            redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
+
+            int systemConfigCacheEx = RandomUtil.randomInt(0, 500) + RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX;
+            redisManager.set(redisKey, configVO, systemConfigCacheEx);
         }
     }
 }
