@@ -73,9 +73,19 @@
                             <template #fileSource="{ record }">
                                 <dict-convert :dict-data="dicts[proxy.DICT.fileSource]" :dict-key="record.fileSource" />
                             </template>
-                            <!-- 文件来源 -->
-                            <template #filePlatform="{ record }">
-                                <dict-convert :dict-data="dicts[proxy.DICT.filePlatform]" :dict-key="record.filePlatform" />
+                            <!-- 文件类型 -->
+                            <template #fileType="{ record }">
+                                <template v-if="record.fileType.includes('image')">
+                                    <img src="../../../assets/file-icon/image.svg" alt="">
+                                </template>
+                            </template>
+                            <!-- 存储类型 -->
+                            <template #storageType="{ record }">
+                                <dict-convert :dict-data="dicts[proxy.DICT.storageType]" :dict-key="record.storageType" />
+                            </template>
+                            <!-- 使用源 -->
+                            <template #use="{ record }">
+                                使用源
                             </template>
                             <!-- 文件状态 -->
                             <template #status="{ record }">
@@ -117,7 +127,7 @@ import { getPageFileListApi, deleteFileApi } from "~/api/file.js";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.fileSource])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.fileSource, proxy.DICT.storageType])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单
@@ -138,12 +148,12 @@ const datatable = reactive({
     //列配置
     columns: [
         {title: '文件名称', dataIndex: 'fileName', align: 'center', width: 250, ellipsis: true, tooltip: true},
-        {title: '文件类型', dataIndex: 'fileType', align: 'center', width: 150, ellipsis: true, tooltip: true},
+        {title: '文件类型', dataIndex: 'fileType', slotName: 'fileType', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '文件大小', dataIndex: 'fileSize', align: 'center', width: 150, ellipsis: true, tooltip: true},
-        {title: '使用源', dataIndex: 'fileSize', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '文件来源', dataIndex: 'fileSource', slotName: 'fileSource', align: 'center', width: 150, ellipsis: true, tooltip: true},
-        {title: '文件存储平台', dataIndex: 'filePlatform', slotName: 'filePlatform', align: 'center', width: 150, ellipsis: true, tooltip: true},
+        {title: '存储类型', dataIndex: 'storageType', slotName: 'storageType', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '文件状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100, ellipsis: true, tooltip: true},
+        {title: '使用源', dataIndex: 'use', slotName: 'use', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '备注', dataIndex: 'remark', align: 'center', width: 200, ellipsis: true, tooltip: true},
         {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}
     ],
