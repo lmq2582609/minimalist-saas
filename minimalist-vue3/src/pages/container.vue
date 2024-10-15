@@ -13,7 +13,9 @@
                 hide-trigger
                 :width="siderWidth"
                 :collapsed="siderCollapsed">
-                <m-sider />
+                <div class="sider-div">
+                    <m-sider />
+                </div>
             </a-layout-sider>
             <a-layout-content class="m-content" :style="{left: siderWidth + 'px'}">
                 <!-- tab页 -->
@@ -38,12 +40,10 @@ import MHeader from "../components/MHeader.vue";
 import PageTabList from "../components/PageTabList.vue"
 import { storeToRefs } from 'pinia'
 import { useSysStore } from '~/store/module/sys-store.js'
-
 //缓存
 const sysStore = useSysStore()
 //响应式数据：siderCollapsed: sider是否展开，siderWidth: sider宽度
 const { siderCollapsed, siderWidth } = storeToRefs(sysStore)
-
 </script>
 <style scoped>
 .m-header {
@@ -52,11 +52,37 @@ const { siderCollapsed, siderWidth } = storeToRefs(sysStore)
 }
 .m-sider {
     @apply fixed top-0 left-0 z-40 top-[50px] transition-all;
-    height: calc(100% - 50px)
+    height: calc(100% - 50px);
+    overflow-y: hidden;
 }
 .m-content {
     @apply fixed top-[50px] right-0 bottom-0 overflow-y-auto p-3;
     background-color: var(--color-neutral-1);
+    width: calc(100% - 200px);
     height: calc(100% - 50px)
+}
+/* 隐藏侧边栏的滚动条 */
+:deep(.arco-layout-sider-children) {
+    overflow-y: hidden;
+}
+/* 侧边栏div */
+.sider-div {
+    height: 100%;
+    overflow: auto;
+    overflow-x: hidden;
+}
+/* 侧边栏滚动条 */
+:deep(.arco-menu ::-webkit-scrollbar) {
+    width: 16px;
+    height: 4px;
+}
+:deep(.arco-menu ::-webkit-scrollbar-thumb) {
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: 7px;
+    background-color: var(--color-text-4);
+}
+:deep(.arco-menu ::-webkit-scrollbar-thumb:hover) {
+    background-color: var(--color-text-3);
 }
 </style>

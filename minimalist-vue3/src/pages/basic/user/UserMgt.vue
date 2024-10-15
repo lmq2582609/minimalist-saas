@@ -1,135 +1,138 @@
 <template>
-    <div>
-        <a-card class="p-0" :body-style="{height: 'calc(100vh - 125px)'}">
-            <div class="w-full h-full flex justify-between">
-                <!-- 部门数据 -->
-                <a-row class="w-[250px] h-full border-r p-3">
-                    <a-spin class="w-[100%] h-full" :size="35" :loading="loadDeptListLoading" tip="正在处理, 请稍候...">
-                        <a-scrollbar class="w-[100%] h-[calc(100vh-140px)] overflow-auto" :outer-style="{width: '100%'}" type="track">
-                            <a-tree :data="deptTree" v-if="deptTree.length > 0" class="h-full" show-line  blockNode
+    <a-card :body-style="{height: 'calc(100vh - 125px)'}">
+        <div class="w-full h-full flex justify-between">
+            <!-- 部门数据 -->
+            <a-row class="h-full border-r pr-3">
+                <a-spin class="w-[240px] h-full" :size="35" :loading="loadDeptListLoading" tip="正在处理, 请稍候...">
+                    <a-scrollbar class="w-[100%] h-[calc(100vh-140px)] overflow-auto" :outer-style="{width: '100%'}" type="track">
+                        <a-tree :data="deptTree" v-if="deptTree.length > 0" class="h-full" show-line  blockNode
                                 v-model:selected-keys="selectDept" @select="selectDeptChange" ref="treeRef"
                                 :fieldNames="{
                                     key: 'deptId',
                                     title: 'deptName',
                                     children: 'children'
                                 }" />
-                        </a-scrollbar>
-                    </a-spin>
-                </a-row>
+                    </a-scrollbar>
+                </a-spin>
+            </a-row>
 
-                <!-- 用户数据 -->
-                <a-row class="flex flex-col flex-1 p-3" style="overflow-x: auto;overflow-y: hidden;">
-                    <!-- 查询条件 -->
-                    <a-row v-if="showSearchRow">
-                        <a-form :model="searchForm" layout="inline" label-align="left" size="small">
-                            <a-form-item field="userRealName" label="用户姓名">
-                                <a-input v-model="searchForm.userRealName" placeholder="用户姓名" />
-                            </a-form-item>
-                            <a-form-item field="phone" label="用户手机">
-                                <a-input v-model="searchForm.phone" placeholder="用户手机" />
-                            </a-form-item>
-                            <a-form-item field="status" label="用户状态">
-                                <a-select v-model="searchForm.status" placeholder="用户状态" allow-clear allow-search>
-                                    <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                                </a-select>
-                            </a-form-item>
-                            <a-form-item>
-                                <a-space>
-                                    <a-button type="primary" @click="getPageList(false)">
-                                        <template #icon><icon-search /></template>
-                                        <template #default>查询</template>
-                                    </a-button>
-                                    <a-button @click="getPageList(true)">
-                                        <template #icon><icon-sync /></template>
-                                        <template #default>重置</template>
-                                    </a-button>
-                                </a-space>
-                            </a-form-item>
-                        </a-form>
-                    </a-row>
-
-                    <!-- 分割线 -->
-                    <a-divider v-if="showSearchRow" class="mt-2" />
-
-                    <!-- 数据操作区 -->
-                    <a-row class="w-full flex justify-between">
+            <!-- 用户数据 -->
+            <a-row class="flex flex-1 flex-col py-3 pl-3" style="overflow-x: auto;">
+                <!-- 查询条件 -->
+                <a-row class="w-full" v-if="showSearchRow">
+                    <a-form :model="searchForm" layout="inline" label-align="left" size="small">
+                        <a-form-item field="userRealName" label="用户姓名">
+                            <a-input v-model="searchForm.userRealName" placeholder="用户姓名" />
+                        </a-form-item>
+                        <a-form-item field="phone" label="用户手机">
+                            <a-input v-model="searchForm.phone" placeholder="用户手机" />
+                        </a-form-item>
+                        <a-form-item field="status" label="用户状态">
+                            <a-select v-model="searchForm.status" placeholder="用户状态" allow-clear allow-search>
+                                <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                            </a-select>
+                        </a-form-item>
+                    </a-form>
+                    <a-row justify="center" class="w-full mt-2">
                         <a-space>
-                            <!-- 添加 -->
-                            <a-button type="primary" size="small" @click="addBtnClick()">
-                                <template #icon><icon-plus /></template>
-                                <template #default>添加</template>
+                            <a-button type="primary" @click="getPageList(false)">
+                                <template #icon><icon-search /></template>
+                                <template #default>查询</template>
+                            </a-button>
+                            <a-button @click="getPageList(true)">
+                                <template #icon><icon-sync /></template>
+                                <template #default>重置</template>
                             </a-button>
                         </a-space>
-                        <a-space>
-                            <!-- 刷新 -->
-                            <a-button shape="circle" size="small" @click="getPageList(false)">
-                                <template #icon><icon-refresh /></template>
-                            </a-button>
-                            <!-- 收缩/展开 -->
-                            <a-button shape="circle" size="small" @click="showSearchRow = !showSearchRow">
+                    </a-row>
+                </a-row>
+
+                <!-- 分割线 -->
+                <a-divider v-if="showSearchRow" class="mt-2" />
+
+                <!-- 数据操作区 -->
+                <a-row class="w-full flex justify-between">
+                    <a-space>
+                        <!-- 添加 -->
+                        <a-button type="primary" size="small" @click="addBtnClick()">
+                            <template #icon><icon-plus /></template>
+                            <template #default>添加</template>
+                        </a-button>
+                    </a-space>
+                    <a-space>
+                        <!-- 刷新 -->
+                        <a-button shape="circle" size="small" @click="getPageList(false)">
+                            <template #icon><icon-refresh /></template>
+                        </a-button>
+                        <!-- 收缩/展开 -->
+                        <a-button shape="circle" size="small" @click="showSearchRow = !showSearchRow">
+                            <template #icon>
+                                <icon-caret-up v-if="showSearchRow" />
+                                <icon-caret-down v-else />
+                            </template>
+                        </a-button>
+                    </a-space>
+                </a-row>
+
+                <!-- 数据展示区 -->
+                <a-row class="mt-3 w-full">
+                    <a-table class="w-[100%]" :scroll="{ minWidth: 600, y: '100%' }" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" :pagination="false" table-layout-fixed>
+                        <!-- 用户名称 -->
+                        <template #username="{ record }">
+                            <a-link @click="detailBtnClick(record.userId)" icon>{{ record.username }}</a-link>
+                        </template>
+                        <!-- 用户头像 -->
+                        <template #userAvatar="{ record }">
+                            <a-avatar :size="28">
+                                <img alt="头像" :src="record.userAvatar" v-if="record.userAvatar" />
+                                <img alt="头像" src="../../../assets/default-avatar.jpg" v-else />
+                            </a-avatar>
+                        </template>
+                        <!-- 用户性别 -->
+                        <template #userSex="{ record }">
+                            <dict-convert :dict-data="dicts[proxy.DICT.userSex]" :dict-key="record.userSex" />
+                        </template>
+                        <!-- 用户状态 -->
+                        <template #status="{ record }">
+                            <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
+                        </template>
+                        <!-- 操作 -->
+                        <template #operation="{ record }">
+                            <a-button type="text" size="mini" @click="updateBtnClick(record.userId)">
                                 <template #icon>
-                                    <icon-caret-up v-if="showSearchRow" />
-                                    <icon-caret-down v-else />
+                                    <icon-edit />
                                 </template>
+                                <template #default>修改</template>
                             </a-button>
-                        </a-space>
-                    </a-row>
-
-                    <!-- 数据展示区 -->
-                    <a-row class="mt-3 w-full">
-                        <a-table class="w-[100%]" :scroll="{ minWidth: 600 }" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" :pagination="false" table-layout-fixed>
-                            <!-- 用户名称 -->
-                            <template #username="{ record }">
-                                <a-link @click="detailBtnClick(record.userId)" icon>{{ record.username }}</a-link>
-                            </template>
-                            <!-- 用户头像 -->
-                            <template #userAvatar="{ record }">
-                                <a-avatar :size="28">
-                                    <img alt="头像" :src="record.userAvatar" v-if="record.userAvatar" />
-                                    <img alt="头像" src="../../../assets/default-avatar.jpg" v-else />
-                                </a-avatar>
-                            </template>
-                            <!-- 用户性别 -->
-                            <template #userSex="{ record }">
-                                <dict-convert :dict-data="dicts[proxy.DICT.userSex]" :dict-key="record.userSex" />
-                            </template>
-                            <!-- 用户状态 -->
-                            <template #status="{ record }">
-                                <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
-                            </template>
-                            <!-- 操作 -->
-                            <template #operation="{ record }">
-                                <a-button type="text" size="mini" @click="updateBtnClick(record.userId)">
+                            <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.userId)">
+                                <a-button type="text" status="danger" size="mini">
                                     <template #icon>
-                                        <icon-edit />
+                                        <icon-delete />
                                     </template>
-                                    <template #default>修改</template>
+                                    <template #default>删除</template>
                                 </a-button>
-                                <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.userId)">
-                                    <a-button type="text" status="danger" size="mini">
-                                        <template #icon>
-                                            <icon-delete />
-                                        </template>
-                                        <template #default>删除</template>
-                                    </a-button>
-                                </a-popconfirm>
-                            </template>
-                        </a-table>
-                        <pagination class="mt-5" v-if="datatable.total > 0"
-                                    v-model:page-num="searchForm.pageNum"
-                                    v-model:page-size="searchForm.pageSize"
-                                    :total="datatable.total" @pagination="getPageList(false)" />
-                    </a-row>
+                            </a-popconfirm>
+                        </template>
+                    </a-table>
                 </a-row>
-            </div>
-        </a-card>
+
+                <!-- 分页 -->
+                <a-row class="w-full flex justify-end mt-2">
+                    <pagination v-if="datatable.total > 0"
+                        v-model:page-num="searchForm.pageNum"
+                        v-model:page-size="searchForm.pageSize"
+                        :total="datatable.total" @pagination="getPageList(false)" />
+                </a-row>
+            </a-row>
+        </div>
+
 
         <!-- 添加/修改 -->
         <a-modal v-model:visible="modal.visible" width="50%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
-    </div>
+    </a-card>
 </template>
 
 <script setup>

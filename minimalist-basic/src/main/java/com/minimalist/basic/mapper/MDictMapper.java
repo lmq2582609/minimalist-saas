@@ -58,6 +58,7 @@ public interface MDictMapper extends BaseMapper<MDict> {
                         .likeNotNull(MDict::getDictName, queryVO.getDictName())
                         .likeNotNull(MDict::getDictType, queryVO.getDictType())
                         .eqNotNull(MDict::getStatus, queryVO.getStatus())
+                        .orderByAscc(MDict::getCreateTime)
                         .groupByy(MDict::getDictType));
     }
 

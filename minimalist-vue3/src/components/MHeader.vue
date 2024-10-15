@@ -68,9 +68,6 @@
                 </div>
             </a-space>
         </div>
-        <!-- 退出确认模态框 -->
-        <confirm-modal :visible="confirmModalVisible" status="warning" title="提示" content="是否退出系统？"
-                       @ok="logout()" @cancel="confirmModalVisible = false"/>
     </div>
 </template>
 <script setup>
@@ -81,6 +78,7 @@ import { logoutApi } from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
 import { useCookies } from '@vueuse/integrations/useCookies'
 import {TENANT_ID, TENANT_ID_BASE64} from "~/utils/cookie.js";
+import {Modal} from "@arco-design/web-vue";
 //cookie
 const cookie = useCookies()
 //路由
@@ -91,7 +89,6 @@ const sysStore = useSysStore()
 const {proxy} = getCurrentInstance()
 //加载字典
 const dicts = proxy.LoadDicts([proxy.DICT.tenantList])
-
 
 //主题2种模式，true白天，false黑夜
 const theme = ref(true)
@@ -108,8 +105,8 @@ const themeChange = () => {
 }
 //vue use isFullscreen: 是否全屏，toggle: 切换全屏
 const { isFullscreen, toggle } = useFullscreen()
-//退出登录确认模态框选项
-const confirmModalVisible = ref(false)
+//退出系统loading
+const logoutLoading = ref(false)
 //下拉菜单
 const dropdownSelect = (val) => {
     //用户设置
@@ -119,18 +116,20 @@ const dropdownSelect = (val) => {
     }
     //退出系统
     if (val === 'logout') {
-        confirmModalVisible.value = true
+        Modal.confirm({
+            title: '提示',
+            content: '是否退出系统？',
+            okLoading: logoutLoading.value,
+            onBeforeOk: async () => {
+                await logoutApi()
+                //退出登录后续处理，清除登录信息
+                sysStore.userLogoutHandler()
+                //跳转到登录页
+                await router.push('/login')
+                return true
+            }
+        });
     }
-}
-//退出
-const logout = () => {
-    logoutApi().then(res => {
-        sysStore.userLogoutHandler()
-        //确认对话框
-        confirmModalVisible.value = false
-        //跳转到登录页
-        router.push('/login')
-    })
 }
 //点击logo -> 跳转到首页
 const logoClick = () => {

@@ -14,8 +14,6 @@ export const DICT = {
     noticeType: 'notice-type',
     //文件来源
     fileSource: 'file-source',
-    //文件存储平台
-    filePlatform: 'file-platform',
     //通用状态 - 数字
     commonNumberStatus: 'common-number-status',
     //存储类型

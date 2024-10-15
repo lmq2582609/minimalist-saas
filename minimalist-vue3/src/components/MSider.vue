@@ -1,7 +1,7 @@
 <template>
     <a-menu accordion
-        :collapsed="siderCollapsed" 
-        @collapse="onCollapse" 
+        :collapsed="siderCollapsed"
+        @collapse="onCollapse"
         class="w-[100%] h-[100%]"
         :selected-keys="[$route.path]" auto-open-selected
         show-collapse-button :defaultOpenKeys="['0']" :defaultSelectedKeys="['/']" @menu-item-click="menuClick">

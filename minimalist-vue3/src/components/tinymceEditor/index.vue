@@ -39,6 +39,11 @@ const props = defineProps({
     fileSource: {
         type: Number,
         default: 0
+    },
+    //存储信息ID -> 标识用哪个存储，不穿则使用默认的存储
+    storageId: {
+        type: String,
+        default: null
     }
 })
 //富文本内容
@@ -77,11 +82,13 @@ const tinymceInit = {
         const onUploadProgress = (e) => {
             progress(e.progress * 100)
         }
-        // 上传图片需要，FormData 格式的文件；
+        //单文件上传
         const formData = new FormData();
-        // img  是接口需要的上传的属性名，一般属性名是 file
-        formData.append("file", blobInfo.blob());
-        formData.append("fileSource", props.fileSource);
+        formData.append("file", blobInfo.blob())
+        formData.append("fileSource", props.fileSource)
+        if (props.storageId) {
+            formData.append("storageId", props.storageId)
+        }
         uploadFileApi(formData, onUploadProgress).then(res => {
             //将上传图片后的返回的url放入resolve
             resolve(res.fileUrl);

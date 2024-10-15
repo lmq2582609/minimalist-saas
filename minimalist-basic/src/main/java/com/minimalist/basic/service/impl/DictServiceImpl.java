@@ -1,5 +1,6 @@
 package com.minimalist.basic.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
@@ -29,6 +30,8 @@ import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +131,10 @@ public class DictServiceImpl implements DictService {
                 mDict.setDictType(dictInfoVO.getDictType());
                 mDict.setDictName(dictInfoVO.getDictName());
                 mDict.setDictDesc(dictInfoVO.getDictDesc());
+                mDict.setCreateId(StpUtil.getLoginIdAsLong());
+                mDict.setCreateTime(LocalDateTime.now());
+                mDict.setUpdateId(StpUtil.getLoginIdAsLong());
+                mDict.setUpdateTime(LocalDateTime.now());
                 return mDict;
             }).toList();
             //批量新增
@@ -350,6 +357,8 @@ public class DictServiceImpl implements DictService {
                     MDict mDict = new MDict();
                     if (unqId) {
                         mDict.setDictId(UnqIdUtil.uniqueId());
+                        mDict.setCreateId(StpUtil.getLoginIdAsLong());
+                        mDict.setCreateTime(LocalDateTime.now());
                     } else {
                         mDict.setDictId(dict.getDictId());
                     }
@@ -361,6 +370,8 @@ public class DictServiceImpl implements DictService {
                     mDict.setDictType(dictInfoVO.getDictType());
                     mDict.setDictName(dictInfoVO.getDictName());
                     mDict.setDictDesc(dictInfoVO.getDictDesc());
+                    mDict.setUpdateId(StpUtil.getLoginIdAsLong());
+                    mDict.setUpdateTime(LocalDateTime.now());
                     return mDict;
                 }).toList();
     }

@@ -36,6 +36,8 @@ public class TenantInit {
         SafetyUtil.setIgnoreTenant(true);
         //刷新配置缓存
         configService.refreshConfigCache();
+        //清除忽略多租户
+        SafetyUtil.clearIgnoreTenant();
     }
 
     /**

@@ -1,12 +1,10 @@
 <template>
-    <div class="w-screen flex justify-end">
-        <a-pagination show-total show-jumper show-page-size
-                :total="total"
-                v-model:current="current"
-                v-model:page-size="limit"
-                @change="handleCurrentChange"
-                @page-size-change="handleSizeChange" />
-    </div>
+    <a-pagination show-total show-jumper show-page-size
+            :total="total"
+            v-model:current="current"
+            v-model:page-size="limit"
+            @change="handleCurrentChange"
+            @page-size-change="handleSizeChange" />
 </template>
 
 <script setup>

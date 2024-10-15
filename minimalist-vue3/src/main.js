@@ -54,10 +54,6 @@ app.component('dict-convert', DictValue)
 import Pagination from '~/components/pagination/index.vue'
 app.component('pagination', Pagination)
 
-//确认模态框组件
-import ConfirmModal from '~/components/confirmModal/index.vue'
-app.component('confirm-modal', ConfirmModal)
-
 //自定义权限指令
 import permission from "~/directives/permission.js";
 app.use(permission)

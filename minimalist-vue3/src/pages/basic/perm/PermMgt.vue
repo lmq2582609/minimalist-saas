@@ -1,8 +1,10 @@
 <template>
-    <div>
-        <a-card class="p-0" :body-style="{height: 'calc(100vh - 125px)'}">
+    <a-card :body-style="{height: 'calc(100vh - 125px)'}">
+
+        <!-- 数据列表 -->
+        <a-row class="w-full h-full flex flex-col" style="overflow-x: auto;overflow-y: hidden;">
             <!-- 查询条件 -->
-            <a-row v-if="showSearchRow">
+            <a-row class="w-full" v-if="showSearchRow">
                 <a-form :model="searchForm" layout="inline" label-align="left" size="small">
                     <a-form-item field="permName" label="权限名称">
                         <a-input v-model="searchForm.permName" placeholder="权限名称" />
@@ -12,31 +14,36 @@
                             <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                         </a-select>
                     </a-form-item>
-                    <a-form-item>
-                        <a-space>
-                            <a-button type="primary" @click="getList(false)">
-                                <template #icon><icon-search /></template>
-                                <template #default>查询</template>
-                            </a-button>
-                            <a-button @click="getList(true)">
-                                <template #icon><icon-sync /></template>
-                                <template #default>重置</template>
-                            </a-button>
-                        </a-space>
-                    </a-form-item>
                 </a-form>
+                <a-row justify="center" class="w-full mt-2">
+                    <a-space>
+                        <a-button type="primary" @click="getList(false)">
+                            <template #icon><icon-search /></template>
+                            <template #default>查询</template>
+                        </a-button>
+                        <a-button @click="getList(true)">
+                            <template #icon><icon-sync /></template>
+                            <template #default>重置</template>
+                        </a-button>
+                    </a-space>
+                </a-row>
             </a-row>
 
             <!-- 分割线 -->
             <a-divider v-if="showSearchRow" class="mt-2" />
 
             <!-- 数据操作区 -->
-            <a-row class="flex justify-between">
+            <a-row class="w-full flex justify-between">
                 <a-space>
                     <!-- 添加 -->
                     <a-button type="primary" size="small" @click="addBtnClick()">
                         <template #icon><icon-plus /></template>
                         <template #default>添加</template>
+                    </a-button>
+                    <!-- 展开/折叠 -->
+                    <a-button size="small" @click="treeExpand = !treeExpand">
+                        <template #icon><icon-swap /></template>
+                        <template #default>展开/折叠</template>
                     </a-button>
                 </a-space>
                 <a-space>
@@ -55,8 +62,8 @@
             </a-row>
 
             <!-- 数据展示区 -->
-            <a-row class="mt-3">
-                <a-table :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="permId" :pagination="false" table-layout-fixed>
+            <a-row class="w-full flex-1 mt-3" style="overflow-y: auto">
+                <a-table ref="tableRef" class="w-[100%]" :scroll="{y: '100%'}" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="permId" :pagination="false" table-layout-fixed>
                     <!-- 权限名称 -->
                     <template #permName="{ record }">
                         <a-link @click="detailBtnClick(record.permId)" icon>{{ record.permName }}</a-link>
@@ -98,19 +105,20 @@
                     </template>
                 </a-table>
             </a-row>
-        </a-card>
+        </a-row>
 
         <!-- 添加/修改 -->
         <a-modal v-model:visible="modal.visible" width="50%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
-    </div>
+
+    </a-card>
 </template>
 
 <script setup>
 import FunctionalIcons from "~/components/iconSelect/FunctionalIcons.vue";
-import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
+import {ref, reactive, getCurrentInstance, shallowRef, nextTick, watch, onMounted} from 'vue'
 import PermEdit from "~/pages/basic/perm/PermEdit.vue";
 import PermDetail from "~/pages/basic/perm/PermDetail.vue";
 import {getPermListApi, deletePermByPermIdApi} from '~/api/perm'
@@ -198,6 +206,10 @@ const deleteBtnOkClick = (record) => {
         getList()
     })
 }
+//展开/折叠 - 默认折叠
+const treeExpand = ref(false)
+//表格ref
+const tableRef = ref()
 //查询数据列表
 const getList = (isReset = false) => {
     //重置查询条件
@@ -213,6 +225,12 @@ const getList = (isReset = false) => {
         datatable.loading = false
     })
 }
+//监听展开/折叠
+watch(() => treeExpand.value, (newVal, oldVal) => {
+    if (tableRef.value) {
+        tableRef.value.expandAll(treeExpand.value)
+    }
+}, { deep: true, immediate: true })
 //模态框 -> 确认
 const onOk = () => {
     modal.visible = false
@@ -223,9 +241,11 @@ const onOk = () => {
 const onCancel = () => {
     modal.visible = false
 }
-
-//查询数据列表
-getList()
+//初始化
+onMounted(() => {
+    //查询数据列表
+    getList()
+})
 </script>
 
 <style scoped>

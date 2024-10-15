@@ -28,7 +28,7 @@ const commonRoutes = [
         ]
     },
     {path: '/login', name: 'Login', component: Login, meta: {title: '登录'}},
-    {path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound, meta: {title: '页面不存在'}},
+    {path: '/:pathMatch(.*)*', name: 'NotFound', component: NotFound, meta: {title: ''}},
 ]
 //导入所有路由，动态加载
 const routeAll = import.meta.glob(`../pages/**/*.vue`);
