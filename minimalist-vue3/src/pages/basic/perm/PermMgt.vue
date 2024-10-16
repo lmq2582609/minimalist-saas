@@ -2,7 +2,7 @@
     <a-card :body-style="{height: 'calc(100vh - 125px)'}">
 
         <!-- 数据列表 -->
-        <a-row class="w-full h-full flex flex-col" style="overflow-x: auto;overflow-y: hidden;">
+        <a-row class="w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             <!-- 查询条件 -->
             <a-row class="w-full" v-if="showSearchRow">
                 <a-form :model="searchForm" layout="inline" label-align="left" size="small">
@@ -62,7 +62,7 @@
             </a-row>
 
             <!-- 数据展示区 -->
-            <a-row class="w-full flex-1 mt-3" style="overflow-y: auto">
+            <a-row class="w-full flex-1 mt-3 overflow-y-auto">
                 <a-table ref="tableRef" class="w-[100%]" :scroll="{y: '100%'}" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="permId" :pagination="false" table-layout-fixed>
                     <!-- 权限名称 -->
                     <template #permName="{ record }">

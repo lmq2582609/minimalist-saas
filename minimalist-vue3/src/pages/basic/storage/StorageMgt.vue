@@ -1,8 +1,10 @@
 <template>
-    <div>
-        <a-card class="p-0" :body-style="{height: 'calc(100vh - 125px)'}">
+    <a-card :body-style="{height: 'calc(100vh - 125px)'}">
+
+        <!-- 数据列表 -->
+        <a-row class="w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
             <!-- 查询条件 -->
-            <a-row v-if="showSearchRow">
+            <a-row class="w-full" v-if="showSearchRow">
                 <a-form :model="searchForm" layout="inline" label-align="left" size="small">
                     <a-form-item field="storageName" label="存储名称">
                         <a-input v-model="searchForm.storageName" placeholder="存储名称" />
@@ -36,7 +38,7 @@
             <a-divider v-if="showSearchRow" class="mt-2" />
 
             <!-- 数据操作区 -->
-            <a-row class="flex justify-between">
+            <a-row class="w-full flex justify-between">
                 <a-space>
                     <!-- 添加 -->
                     <a-button type="primary" size="small" @click="addBtnClick()">
@@ -60,8 +62,8 @@
             </a-row>
 
             <!-- 数据展示区 -->
-            <a-row class="mt-3">
-                <a-table :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" :pagination="false" table-layout-fixed>
+            <a-row class="w-full flex-1 mt-3 overflow-y-auto">
+                <a-table class="w-[100%]" :scroll="{ minWidth: 600, y: '100%' }" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" :pagination="false" table-layout-fixed>
                     <!-- 存储名称 -->
                     <template #storageName="{ record }">
                         <a-link @click="detailBtnClick(record.storageId)" icon>{{ record.storageName }}</a-link>
@@ -96,19 +98,24 @@
                         </a-popconfirm>
                     </template>
                 </a-table>
-                <pagination class="mt-5" v-if="datatable.total > 0"
+            </a-row>
+
+            <!-- 分页 -->
+            <a-row class="w-full flex justify-end mt-2">
+                <pagination v-if="datatable.total > 0"
                             v-model:page-num="searchForm.pageNum"
                             v-model:page-size="searchForm.pageSize"
                             :total="datatable.total" @pagination="getPageList(false)" />
             </a-row>
-        </a-card>
+        </a-row>
 
         <!-- 添加/修改 -->
         <a-modal v-model:visible="modal.visible" width="700px" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
-    </div>
+
+    </a-card>
 </template>
 
 <script setup>

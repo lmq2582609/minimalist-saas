@@ -10,13 +10,96 @@
     <artifactId>minimalist-application</artifactId>
     <name>minimalist-application Maven Webapp</name>
     <description>启动</description>
+    <packaging>jar</packaging>
 
     <dependencies>
+        <!-- spring-web -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.cn</groupId>
             <artifactId>minimalist-basic</artifactId>
             <version>1.0.0-SNAPSHOT</version>
         </dependency>
+
     </dependencies>
+
+    <build>
+        <finalName>minimalist-saas-backend</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${springboot.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <!--创建一个自动可执行的jar或war文件 -->
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <!-- 打包指定启动类 -->
+                    <mainClass>com.minimalist.application.MinimalistBasicApplication</mainClass>
+                    <!-- 打包为可执行文件 -->
+                    <classifier>exec</classifier>
+                    <!-- 打包时忽略的包 -->
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                        <exclude>
+                            <groupId>org.apache.velocity</groupId>
+                            <artifactId>velocity-engine-core</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+    </build>
+
+    <!-- 项目中所使用的maven插件从哪里下载 -->
+    <pluginRepositories>
+        <pluginRepository>
+            <id>spring-milestones</id>
+            <name>Spring Milestones</name>
+            <url>https://repo.spring.io/milestone</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <profiles>
+        <profile>
+            <!--不同环境Profile的唯一id-->
+            <id>dev</id>
+            <!--默认激活dev 环境-->
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- spring.profiles.active是在application.yml自定义的字段（名字随便起），自定义字段可以有多个，确保能对应上就行-->
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>

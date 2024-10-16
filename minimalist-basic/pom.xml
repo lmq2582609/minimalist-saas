@@ -11,9 +11,9 @@
     <artifactId>minimalist-basic</artifactId>
     <name>minimalist-basic</name>
     <description>基础模块</description>
+    <packaging>jar</packaging>
 
     <dependencies>
-
 
         <!-- aop -->
         <dependency>
@@ -121,21 +121,6 @@
             <artifactId>thumbnailator</artifactId>
             <version>0.4.20</version>
         </dependency>
-
-
-        <!-- spring-file-storage -->
-        <dependency>
-            <groupId>org.dromara.x-file-storage</groupId>
-            <artifactId>x-file-storage-spring</artifactId>
-            <version>${spring-file.version}</version>
-        </dependency>
-
-        <!-- webp-imageio，java处理webp图片需引入 -->
-        <!--        <dependency>-->
-        <!--            <groupId>com.github.gotson</groupId>-->
-        <!--            <artifactId>webp-imageio</artifactId>-->
-        <!--            <version>0.2.2</version>-->
-        <!--        </dependency>-->
 
         <!-- spring-boot-test -->
         <dependency>

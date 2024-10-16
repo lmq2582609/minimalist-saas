@@ -1,23 +1,22 @@
 <template>
     <a-card :body-style="{height: 'calc(100vh - 125px)'}">
+
         <div class="w-full h-full flex justify-between">
             <!-- 部门数据 -->
             <a-row class="h-full border-r pr-3">
                 <a-spin class="w-[240px] h-full" :size="35" :loading="loadDeptListLoading" tip="正在处理, 请稍候...">
-                    <a-scrollbar class="w-[100%] h-[calc(100vh-140px)] overflow-auto" :outer-style="{width: '100%'}" type="track">
-                        <a-tree :data="deptTree" v-if="deptTree.length > 0" class="h-full" show-line  blockNode
-                                v-model:selected-keys="selectDept" @select="selectDeptChange" ref="treeRef"
-                                :fieldNames="{
-                                    key: 'deptId',
-                                    title: 'deptName',
-                                    children: 'children'
-                                }" />
-                    </a-scrollbar>
+                    <a-tree class="w-full h-full overflow-y-auto" :data="deptTree" v-if="deptTree.length > 0" show-line  blockNode
+                            v-model:selected-keys="selectDept" @select="selectDeptChange" ref="treeRef"
+                            :fieldNames="{
+                            key: 'deptId',
+                            title: 'deptName',
+                            children: 'children'
+                        }" />
                 </a-spin>
             </a-row>
 
             <!-- 用户数据 -->
-            <a-row class="flex flex-1 flex-col py-3 pl-3" style="overflow-x: auto;">
+            <a-row class="flex flex-1 flex-col pl-3 overflow-x-auto overflow-y-hidden">
                 <!-- 查询条件 -->
                 <a-row class="w-full" v-if="showSearchRow">
                     <a-form :model="searchForm" layout="inline" label-align="left" size="small">
@@ -75,7 +74,7 @@
                 </a-row>
 
                 <!-- 数据展示区 -->
-                <a-row class="mt-3 w-full">
+                <a-row class="w-full flex-1 mt-3 overflow-y-auto">
                     <a-table class="w-[100%]" :scroll="{ minWidth: 600, y: '100%' }" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" :pagination="false" table-layout-fixed>
                         <!-- 用户名称 -->
                         <template #username="{ record }">
@@ -126,12 +125,12 @@
             </a-row>
         </div>
 
-
         <!-- 添加/修改 -->
         <a-modal v-model:visible="modal.visible" width="50%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
+
     </a-card>
 </template>
 
@@ -278,4 +277,19 @@ onMounted(() => {
     getDeptList()
 })
 </script>
-<style scoped></style>
+<style scoped>
+/* 侧边栏滚动条 */
+:deep(.arco-tree::-webkit-scrollbar) {
+    width: 16px;
+    height: 4px;
+}
+:deep(.arco-tree::-webkit-scrollbar-thumb) {
+    border: 4px solid transparent;
+    background-clip: padding-box;
+    border-radius: 7px;
+    background-color: var(--color-text-4);
+}
+:deep(.arco-tree::-webkit-scrollbar-thumb:hover) {
+    background-color: var(--color-text-3);
+}
+</style>

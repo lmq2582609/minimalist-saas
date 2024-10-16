@@ -1,17 +1,21 @@
 <template>
-    <a-card :body-style="{minHeight: 'calc(100vh - 125px)'}">
-        <!-- 查询条件 -->
-        <a-row v-if="showSearchRow">
-            <a-form :model="searchForm" layout="inline" label-align="left" size="small">
-                <a-form-item field="deptName" label="部门名称">
-                    <a-input v-model="searchForm.deptName" placeholder="部门名称" allow-clear />
-                </a-form-item>
-                <a-form-item field="status" label="部门状态">
-                    <a-select v-model="searchForm.status" placeholder="部门状态" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
-                <a-form-item>
+    <a-card :body-style="{height: 'calc(100vh - 125px)'}">
+
+        <!-- 数据列表 -->
+        <a-row class="w-full h-full flex flex-col overflow-x-auto overflow-y-hidden">
+            <!-- 查询条件 -->
+            <a-row class="w-full" v-if="showSearchRow">
+                <a-form :model="searchForm" layout="inline" label-align="left" size="small">
+                    <a-form-item field="deptName" label="部门名称">
+                        <a-input v-model="searchForm.deptName" placeholder="部门名称" allow-clear />
+                    </a-form-item>
+                    <a-form-item field="status" label="部门状态">
+                        <a-select v-model="searchForm.status" placeholder="部门状态" allow-clear>
+                            <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        </a-select>
+                    </a-form-item>
+                </a-form>
+                <a-row justify="center" class="w-full mt-2">
                     <a-space>
                         <a-button type="primary" @click="getList(false)">
                             <template #icon><icon-search /></template>
@@ -22,82 +26,83 @@
                             <template #default>重置</template>
                         </a-button>
                     </a-space>
-                </a-form-item>
-            </a-form>
-        </a-row>
+                </a-row>
+            </a-row>
 
-        <!-- 分割线 -->
-        <a-divider v-if="showSearchRow" class="mt-2" />
+            <!-- 分割线 -->
+            <a-divider v-if="showSearchRow" class="mt-2" />
 
-        <!-- 数据操作区 -->
-        <a-row class="flex justify-between">
-            <a-space>
-                <!-- 添加 -->
-                <a-button type="primary" size="small" @click="addBtnClick()">
-                    <template #icon><icon-plus /></template>
-                    <template #default>添加</template>
-                </a-button>
-                <!-- 展开/折叠 -->
-                <a-button size="small" @click="treeExpand = !treeExpand">
-                    <template #icon><icon-swap /></template>
-                    <template #default>展开/折叠</template>
-                </a-button>
-            </a-space>
-            <a-space>
-                <!-- 刷新 -->
-                <a-button shape="circle" size="small" @click="getList(false)">
-                    <template #icon><icon-refresh /></template>
-                </a-button>
-                <!-- 收缩/展开 -->
-                <a-button shape="circle" size="small" @click="showSearchRow = !showSearchRow">
-                    <template #icon>
-                        <icon-caret-up v-if="showSearchRow" />
-                        <icon-caret-down v-else />
-                    </template>
-                </a-button>
-            </a-space>
-        </a-row>
-
-        <!-- 数据展示区 -->
-        <a-row class="mt-3">
-            <a-table ref="tableRef" :scroll="{y: '100%'}" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="deptId" :pagination="false" table-layout-fixed>
-                <!-- 部门名称 -->
-                <template #deptName="{ record }">
-                    <a-link @click="detailBtnClick(record.deptId)" icon>{{ record.deptName }}</a-link>
-                </template>
-                <!-- 部门负责人 -->
-                <template #deptLeader="{ record }">
-                    <dict-convert :dict-data="dicts[proxy.DICT.userList]" :dict-key="record.deptLeader" />
-                </template>
-                <!-- 部门状态 -->
-                <template #status="{ record }">
-                    <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
-                </template>
-                <!-- 操作 -->
-                <template #operation="{ record }">
-                    <a-button type="text" size="mini" @click="addRowBtnClick(record)" style="padding: 0 5px">
-                        <template #icon>
-                            <icon-plus />
-                        </template>
+            <!-- 数据操作区 -->
+            <a-row class="w-full flex justify-between">
+                <a-space>
+                    <!-- 添加 -->
+                    <a-button type="primary" size="small" @click="addBtnClick()">
+                        <template #icon><icon-plus /></template>
                         <template #default>添加</template>
                     </a-button>
-                    <a-button type="text" size="mini" @click="updateBtnClick(record.deptId)" style="padding: 0 5px">
-                        <template #icon>
-                            <icon-edit />
-                        </template>
-                        <template #default>修改</template>
+                    <!-- 展开/折叠 -->
+                    <a-button size="small" @click="treeExpand = !treeExpand">
+                        <template #icon><icon-swap /></template>
+                        <template #default>展开/折叠</template>
                     </a-button>
-                    <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record)">
-                        <a-button type="text" status="danger" size="mini" style="padding: 0 5px">
+                </a-space>
+                <a-space>
+                    <!-- 刷新 -->
+                    <a-button shape="circle" size="small" @click="getList(false)">
+                        <template #icon><icon-refresh /></template>
+                    </a-button>
+                    <!-- 收缩/展开 -->
+                    <a-button shape="circle" size="small" @click="showSearchRow = !showSearchRow">
+                        <template #icon>
+                            <icon-caret-up v-if="showSearchRow" />
+                            <icon-caret-down v-else />
+                        </template>
+                    </a-button>
+                </a-space>
+            </a-row>
+
+            <!-- 数据展示区 -->
+            <a-row class="w-full flex-1 mt-3 overflow-y-auto">
+                <a-table ref="tableRef" class="w-[100%]" :scroll="{y: '100%'}" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="deptId" :pagination="false" table-layout-fixed>
+                    <!-- 部门名称 -->
+                    <template #deptName="{ record }">
+                        <a-link @click="detailBtnClick(record.deptId)" icon>{{ record.deptName }}</a-link>
+                    </template>
+                    <!-- 部门负责人 -->
+                    <template #deptLeader="{ record }">
+                        <dict-convert :dict-data="dicts[proxy.DICT.userList]" :dict-key="record.deptLeader" />
+                    </template>
+                    <!-- 部门状态 -->
+                    <template #status="{ record }">
+                        <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
+                    </template>
+                    <!-- 操作 -->
+                    <template #operation="{ record }">
+                        <a-button type="text" size="mini" @click="addRowBtnClick(record)" style="padding: 0 5px">
                             <template #icon>
-                                <icon-delete />
+                                <icon-plus />
                             </template>
-                            <template #default>删除</template>
+                            <template #default>添加</template>
                         </a-button>
-                    </a-popconfirm>
-                </template>
-            </a-table>
+                        <a-button type="text" size="mini" @click="updateBtnClick(record.deptId)" style="padding: 0 5px">
+                            <template #icon>
+                                <icon-edit />
+                            </template>
+                            <template #default>修改</template>
+                        </a-button>
+                        <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record)">
+                            <a-button type="text" status="danger" size="mini" style="padding: 0 5px">
+                                <template #icon>
+                                    <icon-delete />
+                                </template>
+                                <template #default>删除</template>
+                            </a-button>
+                        </a-popconfirm>
+                    </template>
+                </a-table>
+            </a-row>
         </a-row>
+
 
         <!-- 添加/修改 -->
         <a-modal v-model:visible="modal.visible" width="50%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">

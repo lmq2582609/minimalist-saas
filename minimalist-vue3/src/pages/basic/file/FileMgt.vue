@@ -18,7 +18,7 @@
             </a-row>
 
             <!-- 文件数据 -->
-            <a-row class="w-full flex flex-1 flex-col py-3 pl-3" style="overflow-x: auto;">
+            <a-row class="w-full flex flex-1 flex-col pl-3 overflow-x-auto overflow-y-hidden">
                 <!-- 查询条件 -->
                 <a-row class="w-full" v-if="showSearchRow">
                     <a-form :model="searchForm" layout="inline" label-align="left" size="small">
@@ -67,7 +67,7 @@
                 </a-row>
 
                 <!-- 数据展示区 -->
-                <a-row class="w-full flex-1 mt-3" style="overflow-y: auto">
+                <a-row class="w-full flex-1 mt-3 overflow-y-auto">
                     <a-table class="w-[100%]" :scroll="{ minWidth: 600, y: '100%' }" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" :pagination="false" table-layout-fixed>
                         <!-- 文件名称 -->
                         <template #fileName="{ record }">

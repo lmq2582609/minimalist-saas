@@ -48,3 +48,5 @@ const onCollapse = (val, type) => {
 }
 
 </script>
+<style scoped>
+</style>

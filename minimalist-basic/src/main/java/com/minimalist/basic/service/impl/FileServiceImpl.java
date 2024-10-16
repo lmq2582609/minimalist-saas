@@ -2,11 +2,8 @@ package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.lang.Assert;
-import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
@@ -22,21 +19,13 @@ import com.minimalist.basic.entity.vo.file.*;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.service.FileService;
-import com.minimalist.basic.utils.UnqIdUtil;
-import org.dromara.x.file.storage.core.FileInfo;
-import org.dromara.x.file.storage.core.FileStorageService;
-import org.dromara.x.file.storage.core.upload.UploadPretreatment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 
 @Service
 public class FileServiceImpl implements FileService {
-
-    @Autowired
-    private FileStorageService fileStorageService;
 
     @Autowired
     private MFileMapper fileMapper;
@@ -117,83 +106,6 @@ public class FileServiceImpl implements FileService {
         //数据转换
         List<FileVO> fileVOList = BeanUtil.copyToList(filePage.getRecords(), FileVO.class);
         return new PageResp<>(fileVOList, filePage.getTotal());
-    }
-
-    /**
-     * 上传文件
-     * @param file 文件
-     * @param fileSource 文件来源
-     * @param platform 文件存储平台
-     * @return 文件实体
-     */
-    private MFile uploadFile(MultipartFile file, Integer fileSource, String platform) {
-        //文件后缀
-        String fileSuffix = FileNameUtil.extName(file.getOriginalFilename());
-        //原文件名
-        String oldFileName = file.getOriginalFilename();
-        //新文件名
-        String newFileName = IdUtil.objectId() + "." + fileSuffix;
-        //文件ID
-        long fileId = UnqIdUtil.uniqueId();
-        //上传文件前配置
-        FileInfo fileInfo = null;
-        try {
-            UploadPretreatment uploadPretreatment = fileStorageService.of(file)
-                    //设置原文件名
-                    .setOriginalFilename(oldFileName)
-                    //设置新文件名
-                    .setName(newFileName)
-                    //设置存储平台，可以自行选择
-                    .setPlatform(platform);
-                    //设置相对路径
-                    //.setPath(FileEnum.FileSource.getPath(fileSource));
-            //如果是图片，则生成缩略图
-            if (StrUtil.isNotBlank(file.getContentType()) && file.getContentType().contains("image")) {
-                uploadPretreatment.thumbnailOf(file);
-            }
-            //上传
-            fileInfo = uploadPretreatment.upload();
-        } catch (Exception e) {
-            throw new BusinessException(FileEnum.ErrorMsg.FILE_UPLOAD_FAIL.getDesc());
-        }
-        //文件实体
-        MFile mFile = new MFile();
-        mFile.setFileId(fileId);
-        mFile.setFileName(oldFileName);
-        mFile.setNewFileName(fileInfo.getFilename());
-        mFile.setFileSize(fileInfo.getSize());
-        mFile.setFileType(fileInfo.getContentType());
-        mFile.setFilePath(fileInfo.getPath());
-        mFile.setFileBasePath(fileInfo.getBasePath());
-        mFile.setFileUrl(fileInfo.getUrl());
-        mFile.setFileSource(fileSource);
-        //mFile.setFilePlatform(fileInfo.getPlatform());
-        mFile.setFileThUrl(fileInfo.getThUrl());
-        mFile.setFileThFilename(fileInfo.getThFilename());
-        mFile.setFileThSize(fileInfo.getThSize());
-        //返回文件实体
-        return mFile;
-    }
-
-    /**
-     * 文件实体转换为FileInfo
-     * @param file 文件
-     * @return FileInfo
-     */
-    private FileInfo fileToFileInfo(MFile file) {
-        FileInfo fileInfo = new FileInfo();
-        fileInfo.setUrl(file.getFileUrl());
-        fileInfo.setSize(file.getFileSize());
-        fileInfo.setFilename(file.getNewFileName());
-        fileInfo.setOriginalFilename(file.getFileName());
-        fileInfo.setBasePath(file.getFileBasePath());
-        fileInfo.setPath(file.getFilePath());
-        fileInfo.setContentType(file.getFileType());
-        //fileInfo.setPlatform(file.getFilePlatform());
-        fileInfo.setThUrl(file.getFileThUrl());
-        fileInfo.setThFilename(file.getFileThFilename());
-        fileInfo.setThSize(file.getFileThSize());
-        return fileInfo;
     }
 
     /**

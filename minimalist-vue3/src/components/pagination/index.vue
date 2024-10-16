@@ -1,6 +1,6 @@
 <template>
     <a-pagination show-total show-jumper show-page-size
-            :total="total"
+            :total="total" size="medium"
             v-model:current="current"
             v-model:page-size="limit"
             @change="handleCurrentChange"
