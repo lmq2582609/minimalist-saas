@@ -1,5 +1,6 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.minimalist.basic.entity.vo.dict.*;
 import com.minimalist.basic.service.DictService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
@@ -24,6 +25,7 @@ public class DictController {
     private DictService dictService;
 
     @PostMapping("/addDict")
+    @SaCheckPermission("basic:dict:add")
     @Operation(summary = "添加字典")
     public ResponseEntity<Void> addDict(@RequestBody @Validated DictInfoVO dictInfoVO) {
         dictService.addDict(dictInfoVO);
@@ -31,6 +33,7 @@ public class DictController {
     }
 
     @DeleteMapping("/deleteDictByDictId")
+    @SaCheckPermission("basic:dict:delete")
     @Operation(summary = "删除字典 -> 根据字典ID删除")
     public ResponseEntity<Void> deleteDictByDictId(@RequestParam("dictId")
                                             @NotNull(message = "字典ID不能为空")
@@ -40,6 +43,7 @@ public class DictController {
     }
 
     @DeleteMapping("/deleteDictByDictType")
+    @SaCheckPermission("basic:dict:delete")
     @Operation(summary = "删除字典 -> 根据字典类型删除")
     public ResponseEntity<Void> deleteDictByDictType(@RequestParam("dictType")
                                             @NotNull(message = "字典类型不能为空")
@@ -49,6 +53,7 @@ public class DictController {
     }
 
     @PutMapping("/updateDictByDictId")
+    @SaCheckPermission("basic:dict:update")
     @Operation(summary = "修改字典")
     public ResponseEntity<Void> updateDictByDictId(@RequestBody @Validated DictInfoVO dictInfoVO) {
         dictService.updateDictByDictId(dictInfoVO);
@@ -56,12 +61,14 @@ public class DictController {
     }
 
     @GetMapping("/getPageDictList")
+    @SaCheckPermission("basic:dict:get")
     @Operation(summary = "查询字典列表(分页)")
     public ResponseEntity<PageResp<DictVO>> getPageDictList(DictQueryVO queryVO) {
         return ResponseEntity.ok(dictService.getPageDictList(queryVO));
     }
 
     @GetMapping("/getDictByDictType/{dictType}")
+    @SaCheckPermission("basic:dict:get")
     @Operation(summary = "根据字典类型查询字典 -> 用于字典管理页面")
     public ResponseEntity<DictInfoVO> getDictByDictType(@PathVariable(value = "dictType")
                                             @Parameter(name = "dictType", description = "字典类型", required = true) String dictType) {

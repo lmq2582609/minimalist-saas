@@ -122,22 +122,4 @@ public class UserManager {
         entityService.delete(MUserDept::getUserId, userId);
     }
 
-    /**
-     * 根据用户ID获取权限编码集合
-     * @param userId 用户ID
-     * @return 权限编码集合
-     */
-    public List<String> getUserPermissions(long userId) {
-        return null;
-    }
-
-    /**
-     * 根据用户ID获取角色编码集合
-     * @param userId 用户ID
-     * @return 角色编码集合
-     */
-    public List<String> getUserRoles(long userId) {
-        return null;
-    }
-
 }

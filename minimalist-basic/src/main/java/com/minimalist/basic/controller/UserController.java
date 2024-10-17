@@ -1,5 +1,7 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaIgnore;
 import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
@@ -30,6 +32,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/addUser")
+    @SaCheckPermission("basic:user:add")
     @Operation(summary = "添加用户")
     public ResponseEntity<Void> addUser(@RequestBody @Validated(Add.class) UserVO userVO) {
         userService.addUser(userVO);
@@ -37,6 +40,7 @@ public class UserController {
     }
 
     @DeleteMapping("/deleteUserByUserId")
+    @SaCheckPermission("basic:user:delete")
     @Operation(summary = "删除用户 -> 根据用户ID删除")
     public ResponseEntity<Void> deleteUserByUserId(@RequestParam("userId")
                                             @NotNull(message = "用户ID不能为空")
@@ -46,6 +50,7 @@ public class UserController {
     }
 
     @PutMapping("/updateUserByUserId")
+    @SaCheckPermission("basic:user:update")
     @Operation(summary = "修改用户")
     public ResponseEntity<Void> updateUserByUserId(@RequestBody @Validated(Update.class) UserVO userVO) {
         userService.updateUserByUserId(userVO);
@@ -53,13 +58,15 @@ public class UserController {
     }
 
     @GetMapping("/getPageUserList")
+    @SaCheckPermission("basic:user:get")
     @Operation(summary = "查询用户(分页)")
     public ResponseEntity<PageResp<UserVO>> getPageUserList(UserQueryVO queryVO) {
         return ResponseEntity.ok(userService.getPageUserList(queryVO));
     }
 
     @GetMapping("/getUserByUserId/{userId}")
-    @Operation(summary = "根据用户ID查询用户")
+    @SaCheckPermission("basic:user:get")
+    @Operation(summary = "根据用户ID查询用户 -> 用户管理页使用")
     public ResponseEntity<UserVO> getUserByUserId(@PathVariable(value = "userId")
                                                   @NotNull(message = "用户ID不能为空")
                                                   @Parameter(name = "userId", description = "用户ID", required = true) Long userId) {
@@ -95,6 +102,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @SaCheckLogin
     @PostMapping("/resetPassword")
     @Operation(summary = "重置密码")
     public ResponseEntity<Void> resetPassword(@RequestBody @Valid RePasswordVO passwordVO) {
@@ -102,6 +110,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @SaCheckLogin
     @PostMapping("/updateUserAvatar")
     @Operation(summary = "修改用户头像")
     public ResponseEntity<Void> updateUserAvatar(@RequestParam("userAvatar")
@@ -111,6 +120,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @SaCheckLogin
     @PostMapping("/updateUserInfo")
     @Operation(summary = "修改用户基本信息")
     public ResponseEntity<Void> updateUserInfo(@RequestBody @Valid UserSettingVO settingVO) {

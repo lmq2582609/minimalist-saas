@@ -35,7 +35,3 @@ export function getConfigByConfigIdApi(configId) {
     return axios.get(`/basic/config/getConfigByConfigId/${configId}`)
 }
 
-//刷新参数缓存
-export function refreshConfigApi() {
-    return axios.get('/basic/config/refreshConfigCache')
-}

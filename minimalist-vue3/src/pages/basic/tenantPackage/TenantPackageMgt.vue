@@ -36,7 +36,7 @@
             <a-row class="w-full flex justify-between">
                 <a-space>
                     <!-- 添加 -->
-                    <a-button type="primary" size="small" @click="addBtnClick()">
+                    <a-button v-perm="['basic:tenantPackage:add']" type="primary" size="small" @click="addBtnClick()">
                         <template #icon><icon-plus /></template>
                         <template #default>添加</template>
                     </a-button>
@@ -69,14 +69,14 @@
                     </template>
                     <!-- 操作 -->
                     <template #operation="{ record }">
-                        <a-button type="text" size="mini" @click="updateBtnClick(record.packageId)">
+                        <a-button v-perm="['basic:tenantPackage:update']" type="text" size="mini" @click="updateBtnClick(record.packageId)">
                             <template #icon>
                                 <icon-edit />
                             </template>
                             <template #default>修改</template>
                         </a-button>
                         <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.packageId)">
-                            <a-button type="text" status="danger" size="mini">
+                            <a-button v-perm="['basic:tenantPackage:delete']" type="text" status="danger" size="mini">
                                 <template #icon>
                                     <icon-delete />
                                 </template>

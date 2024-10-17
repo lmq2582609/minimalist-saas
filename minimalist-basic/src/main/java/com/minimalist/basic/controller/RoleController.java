@@ -1,5 +1,6 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
 import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.minimalist.basic.service.RoleService;
@@ -25,6 +26,7 @@ public class RoleController {
     private RoleService roleService;
 
     @PostMapping("/addRole")
+    @SaCheckPermission("basic:role:add")
     @Operation(summary = "添加角色")
     public ResponseEntity<Void> addRole(@RequestBody @Validated(Add.class) RoleVO roleVO) {
         roleService.addRole(roleVO);
@@ -32,6 +34,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/deleteRoleByRoleId")
+    @SaCheckPermission("basic:role:delete")
     @Operation(summary = "删除角色 -> 根据角色ID删除角色")
     public ResponseEntity<Void> deleteRoleByRoleId(@RequestParam("roleId")
                                                    @NotNull(message = "角色ID不能为空")
@@ -41,6 +44,7 @@ public class RoleController {
     }
 
     @PutMapping("/updateRoleByRoleId")
+    @SaCheckPermission("basic:role:update")
     @Operation(summary = "修改角色 -> 根据角色ID修改")
     public ResponseEntity<Void> updateRoleByRoleId(@RequestBody @Validated(Update.class) RoleVO roleVO) {
         roleService.updateRoleByRoleId(roleVO);
@@ -48,12 +52,14 @@ public class RoleController {
     }
 
     @GetMapping("/getPageRoleList")
+    @SaCheckPermission("basic:role:get")
     @Operation(summary = "查询角色(分页) -> 角色管理使用")
     public ResponseEntity<PageResp<RoleVO>> getPageRoleList(RoleQueryVO queryVO) {
         return ResponseEntity.ok(roleService.getPageRoleList(queryVO));
     }
 
     @GetMapping("/getRoleByRoleId/{roleId}")
+    @SaCheckPermission("basic:role:get")
     @Operation(summary = "根据角色ID查询角色")
     public ResponseEntity<RoleVO> getRoleByRoleId(@PathVariable(value = "roleId")
                                                   @NotNull(message = "角色ID不能为空")

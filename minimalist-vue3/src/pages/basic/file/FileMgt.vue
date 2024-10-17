@@ -95,14 +95,14 @@
                         </template>
                         <!-- 操作 -->
                         <template #operation="{ record }">
-                            <a-button type="text" size="mini" @click="downloadBtnClick(record)">
+                            <a-button v-perm="['basic:file:download']" type="text" size="mini" @click="downloadBtnClick(record)">
                                 <template #icon>
                                     <icon-download />
                                 </template>
                                 <template #default>下载</template>
                             </a-button>
                             <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.fileId)">
-                                <a-button type="text" status="danger" size="mini">
+                                <a-button v-perm="['basic:file:delete']" type="text" status="danger" size="mini">
                                     <template #icon>
                                         <icon-delete />
                                     </template>

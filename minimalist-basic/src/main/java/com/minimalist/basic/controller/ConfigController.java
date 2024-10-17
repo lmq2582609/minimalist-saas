@@ -1,5 +1,6 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.entity.vo.config.ConfigQueryVO;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
@@ -25,6 +26,7 @@ public class ConfigController {
     private ConfigService configService;
 
     @PostMapping("/addConfig")
+    @SaCheckPermission("basic:config:add")
     @Operation(summary = "添加参数")
     public ResponseEntity<Void> addConfig(@RequestBody @Validated(Add.class) ConfigVO configVO) {
         configService.addConfig(configVO);
@@ -32,6 +34,7 @@ public class ConfigController {
     }
 
     @DeleteMapping("/deleteConfigByConfigId")
+    @SaCheckPermission("basic:config:delete")
     @Operation(summary = "删除参数 -> 根据参数ID删除")
     public ResponseEntity<Void> deleteConfigByConfigId(@RequestParam("configId")
                                                     @NotNull(message = "参数ID不能为空")
@@ -41,6 +44,7 @@ public class ConfigController {
     }
 
     @PutMapping("/updateConfigByConfigId")
+    @SaCheckPermission("basic:config:update")
     @Operation(summary = "修改参数")
     public ResponseEntity<Void> updateConfigByConfigId(@RequestBody @Validated(Update.class) ConfigVO configVO) {
         configService.updateConfigByConfigId(configVO);
@@ -48,24 +52,19 @@ public class ConfigController {
     }
 
     @GetMapping("/getPageConfigList")
+    @SaCheckPermission("basic:config:get")
     @Operation(summary = "查询参数配置列表(分页)")
     public ResponseEntity<PageResp<ConfigVO>> getPageConfigList(ConfigQueryVO queryVO) {
         return ResponseEntity.ok(configService.getPageConfigList(queryVO));
     }
 
     @GetMapping("/getConfigByConfigId/{configId}")
+    @SaCheckPermission("basic:config:get")
     @Operation(summary = "根据参数ID查询参数")
     public ResponseEntity<ConfigVO> getConfigByConfigId(@PathVariable(value = "configId")
                                                   @NotNull(message = "参数ID不能为空")
                                                   @Parameter(name = "configId", description = "参数ID", required = true) Long configId) {
         return ResponseEntity.ok(configService.getConfigByConfigId(configId));
-    }
-
-    @GetMapping("/refreshConfigCache")
-    @Operation(summary = "刷新配置缓存")
-    public ResponseEntity<Void> refreshConfigCache() {
-        configService.refreshConfigCache();
-        return ResponseEntity.ok().build();
     }
 
 }

@@ -2,7 +2,6 @@ mybatis-plus:
     configuration:
         map-underscore-to-camel-case: true
         auto-mapping-behavior: full
-        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     mapper-locations:
         - classpath*:mappers/**/*.xml
     global-config:
@@ -157,3 +156,10 @@ sa-token:
     token-style: simple-uuid
     # 是否输出操作日志
     is-log: true
+
+# 日志配置
+logging:
+    level:
+        com.minimalist: debug
+        org.springframework: warn
+    config: classpath:logback-dev.xml

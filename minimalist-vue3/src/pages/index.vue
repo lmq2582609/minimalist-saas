@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="w-[100%]" style="height: calc(100% - 50px)">
         <a-card class="w-[100%] text-2xl py-1">
             您好，{{sysStore.user?.username}}，祝您生活愉快!
         </a-card>
@@ -8,7 +8,7 @@
                 <a-collapse :bordered="false">
                     <a-collapse-item header="V 1.0.0" key="1.0.0">
                         <template #extra>
-                            2023-07-26
+                            2024-11-01
                         </template>
                         <div>架构上的重大改变或者其他重大改变，修改第一位版本号</div>
                         <div>版本迭代，修改第二个版本号</div>

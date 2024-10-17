@@ -29,9 +29,14 @@
         </encoder>
     </appender>
 
-
     <root level="info">
         <appender-ref ref="FILE" />
         <appender-ref ref="STDOUT" />
     </root>
+
+    <!-- 系统模块日志级别控制  -->
+    <logger name="com.minimalist" level="info" />
+    <!-- Spring日志级别控制  -->
+    <logger name="org.springframework" level="warn" />
+
 </configuration>

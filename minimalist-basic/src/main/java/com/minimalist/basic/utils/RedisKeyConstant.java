@@ -37,4 +37,19 @@ public class RedisKeyConstant {
      */
     public static final int SYSTEM_CONFIG_CACHE_EX = 30 * 24 * 60 * 60;
 
+    /**
+     * 用户角色 redis key
+     */
+    public static final String USER_ROLE_CACHE_KEY = "user_role:{0}";
+
+    /**
+     * 用户权限 perm key
+     */
+    public static final String USER_PERM_CACHE_KEY = "user_perm:{0}";
+
+    /**
+     * 用户权限超时时间
+     */
+    public static final int USER_PERM_CACHE_EX = 7 * 24 * 60 * 60;
+
 }

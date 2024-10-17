@@ -1,5 +1,6 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.service.DeptService;
@@ -25,6 +26,7 @@ public class DeptController {
     private DeptService deptService;
 
     @PostMapping("/addDept")
+    @SaCheckPermission("basic:dept:add")
     @Operation(summary = "添加部门")
     public ResponseEntity<Void> addDept(@RequestBody @Validated(Add.class) DeptVO deptVO) {
         deptService.addDept(deptVO);
@@ -32,6 +34,7 @@ public class DeptController {
     }
 
     @DeleteMapping("/deleteDeptByDeptId")
+    @SaCheckPermission("basic:dept:delete")
     @Operation(summary = "删除部门 -> 根据部门ID删除")
     public ResponseEntity<Void> deleteDeptByDeptId(@RequestParam("deptId")
                                                    @NotNull(message = "部门ID不能为空")
@@ -41,6 +44,7 @@ public class DeptController {
     }
 
     @PutMapping("/updateDeptByDeptId")
+    @SaCheckPermission("basic:dept:update")
     @Operation(summary = "修改部门 -> 根据部门ID修改")
     public ResponseEntity<Void> updateDeptByDeptId(@RequestBody @Validated(Update.class) DeptVO deptVO) {
         deptService.updateDeptByDeptId(deptVO);
@@ -48,18 +52,21 @@ public class DeptController {
     }
 
     @GetMapping("/getDeptList")
+    @SaCheckPermission("basic:dept:get")
     @Operation(summary = "查询部门列表(不分页，获取全部数据) -> 部门管理使用")
     public ResponseEntity<List<DeptVO>> getDeptList(DeptQueryVO queryVO) {
         return ResponseEntity.ok(deptService.getDeptList(queryVO));
     }
 
     @GetMapping("/getEnableDeptList")
+    @SaCheckPermission("basic:dept:get")
     @Operation(summary = "查询部门树 -> 只获取正常状态的部门")
     public ResponseEntity<List<DeptVO>> getEnableDeptList() {
         return ResponseEntity.ok(deptService.getEnableDeptList());
     }
 
     @GetMapping("/getDeptByDeptId/{deptId}")
+    @SaCheckPermission("basic:dept:get")
     @Operation(summary = "根据部门ID查询部门")
     public ResponseEntity<DeptVO> getDeptByDeptId(@PathVariable(value = "deptId")
                                                   @NotNull(message = "部门ID不能为空")

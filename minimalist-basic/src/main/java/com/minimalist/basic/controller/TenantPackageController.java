@@ -1,5 +1,6 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.minimalist.basic.service.TenantPackageService;
@@ -27,6 +28,7 @@ public class TenantPackageController {
 
     @TenantIgnore
     @PostMapping("/addTenantPackage")
+    @SaCheckPermission("basic:tenantPackage:add")
     @Operation(summary = "添加租户套餐")
     public ResponseEntity<Void> addTenantPackage(@RequestBody @Validated(Add.class) TenantPackageVO tenantPackageVO) {
         tenantPackageService.addTenantPackage(tenantPackageVO);
@@ -35,6 +37,7 @@ public class TenantPackageController {
 
     @TenantIgnore
     @DeleteMapping("/deleteTenantPackageByTenantPackageId")
+    @SaCheckPermission("basic:tenantPackage:delete")
     @Operation(summary = "删除租户套餐 -> 根据租户套餐ID删除租户套餐")
     public ResponseEntity<Void> deleteTenantPackageByTenantPackageId(@RequestParam("tenantPackageId")
                                                    @NotNull(message = "租户套餐ID不能为空")
@@ -45,6 +48,7 @@ public class TenantPackageController {
 
     @TenantIgnore
     @PutMapping("/updateTenantPackageByTenantPackageId")
+    @SaCheckPermission("basic:tenantPackage:update")
     @Operation(summary = "修改租户套餐 -> 根据租户套餐ID修改")
     public ResponseEntity<Void> updateTenantPackageByTenantPackageId(@RequestBody @Validated(Update.class) TenantPackageVO tenantPackageVO) {
         tenantPackageService.updateTenantPackageByTenantPackageId(tenantPackageVO);
@@ -53,6 +57,7 @@ public class TenantPackageController {
 
     @TenantIgnore
     @GetMapping("/getPageTenantPackageList")
+    @SaCheckPermission("basic:tenantPackage:get")
     @Operation(summary = "查询租户套餐(分页)")
     public ResponseEntity<PageResp<TenantPackageVO>> getPageTenantPackageList(TenantPackageQueryVO queryVO) {
         return ResponseEntity.ok(tenantPackageService.getPageTenantPackageList(queryVO));
@@ -60,6 +65,7 @@ public class TenantPackageController {
 
     @TenantIgnore
     @GetMapping("/getTenantPackageByTenantPackageId/{tenantPackageId}")
+    @SaCheckPermission("basic:tenantPackage:get")
     @Operation(summary = "根据租户套餐ID查询租户套餐")
     public ResponseEntity<TenantPackageVO> getTenantPackageByTenantPackageId(@PathVariable(value = "tenantPackageId")
                                                   @NotNull(message = "租户套餐ID不能为空")

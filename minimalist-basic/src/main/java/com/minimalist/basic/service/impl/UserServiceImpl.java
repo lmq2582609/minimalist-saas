@@ -36,7 +36,6 @@ import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
 import com.minimalist.basic.service.*;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.config.tenant.TenantIgnore;
@@ -71,9 +70,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private PermService permService;
-
-    @Autowired
-    private EntityService entityService;
 
     @Autowired
     private RedisManager redisManager;
@@ -126,7 +122,7 @@ public class UserServiceImpl implements UserService {
         if (StrUtil.isNotBlank(userVO.getPassword())) {
             user.setPassword(userManager.passwordEncrypt(userVO.getPassword(), salt));
         } else {
-            //设置默认密码
+            //设置默认密码 123456qwerty
             user.setPassword(userManager.passwordEncrypt("123456qwerty", salt));
         }
         userMapper.insert(user);
@@ -163,7 +159,6 @@ public class UserServiceImpl implements UserService {
         tenantManager.checkTenantPackage(SafetyUtil.getLonginUserTenantId());
         //检查租户ID，要修改的用户的租户必须与本次操作人的租户一致
         MUser optUser = tenantManager.checkTenantEqual(userVO.getUserId(), StpUtil.getLoginIdAsLong());
-
         //修改用户信息
         MUser newUser = BeanUtil.copyProperties(userVO, MUser.class);
         //是否需要修改密码
@@ -279,6 +274,9 @@ public class UserServiceImpl implements UserService {
             userInfoVO.setPerms(permCodes);
             //将菜单存入用户实体
             userInfoVO.setMenus(permService.permsToTree(menuList));
+            //将权限数据向redis存储一份
+            redisManager.set(StrUtil.indexedFormat(RedisKeyConstant.USER_ROLE_CACHE_KEY, userId), roleCodes, RedisKeyConstant.USER_PERM_CACHE_EX);
+            redisManager.set(StrUtil.indexedFormat(RedisKeyConstant.USER_PERM_CACHE_KEY, userId), permCodes, RedisKeyConstant.USER_PERM_CACHE_EX);
         }
         //用户岗位
         userInfoVO.setPostList(postService.getPostByUserId(userId));
@@ -389,8 +387,7 @@ public class UserServiceImpl implements UserService {
         //乐观锁参数赋值
         user.updateBeforeSetVersion(user.getVersion());
         //修改
-        int updateCount = userMapper.updateUserByUserId(user);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        userMapper.updateUserByUserId(user);
     }
 
     /**
@@ -408,8 +405,7 @@ public class UserServiceImpl implements UserService {
         //乐观锁参数赋值
         updateUser.updateBeforeSetVersion(user.getVersion());
         //修改
-        int updateCount = userMapper.updateUserByUserId(updateUser);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        userMapper.updateUserByUserId(updateUser);
     }
 
     /**

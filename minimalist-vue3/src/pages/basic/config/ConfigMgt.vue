@@ -39,14 +39,9 @@
             <a-row class="w-full flex justify-between">
                 <a-space>
                     <!-- 添加 -->
-                    <a-button type="primary" size="small" @click="addBtnClick()">
+                    <a-button v-perm="['basic:config:add']" type="primary" size="small" @click="addBtnClick()">
                         <template #icon><icon-plus /></template>
                         <template #default>添加</template>
-                    </a-button>
-                    <!-- 刷新缓存 -->
-                    <a-button type="primary" status="danger" size="small" @click="refreshConfigBtnClick()" :loading="refreshConfigLoading">
-                        <template #icon><icon-refresh /></template>
-                        <template #default>刷新缓存</template>
                     </a-button>
                 </a-space>
                 <a-space>
@@ -77,13 +72,13 @@
                     </template>
                     <!-- 操作 -->
                     <template #operation="{ record }">
-                        <a-button type="text" size="mini" @click="updateBtnClick(record.configId)">
+                        <a-button v-perm="['basic:config:update']" type="text" size="mini" @click="updateBtnClick(record.configId)">
                             <template #icon>
                                 <icon-edit />
                             </template>
                             <template #default>修改</template>
                         </a-button>
-                        <a-popconfirm content="确认要删除吗?" @ok="deleteBtnOkClick(record.configId)">
+                        <a-popconfirm v-perm="['basic:config:delete']" content="确认要删除吗?" @ok="deleteBtnOkClick(record.configId)">
                             <a-button type="text" status="danger" size="mini">
                                 <template #icon>
                                     <icon-delete />
@@ -115,7 +110,7 @@
 
 <script setup>
 import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
-import {deleteConfigByConfigIdApi, getPageConfigListApi, refreshConfigApi} from "~/api/config.js";
+import {deleteConfigByConfigIdApi, getPageConfigListApi} from "~/api/config.js";
 import ConfigEdit from "~/pages/basic/config/ConfigEdit.vue";
 import ConfigDetail from "~/pages/basic/config/ConfigDetail.vue";
 

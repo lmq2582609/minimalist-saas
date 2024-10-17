@@ -1,5 +1,6 @@
 package com.minimalist.basic.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.minimalist.basic.entity.vo.perm.PermQueryVO;
 import com.minimalist.basic.entity.vo.perm.PermVO;
 import com.minimalist.basic.service.PermService;
@@ -25,6 +26,7 @@ public class PermController {
     private PermService permService;
 
     @PostMapping("/addPerm")
+    @SaCheckPermission("basic:perm:add")
     @Operation(summary = "添加权限")
     public ResponseEntity<Void> addPerm(@RequestBody @Validated(Add.class) PermVO permVO) {
         permService.addPerm(permVO);
@@ -32,6 +34,7 @@ public class PermController {
     }
 
     @DeleteMapping("/deletePermByPermId")
+    @SaCheckPermission("basic:perm:delete")
     @Operation(summary = "删除权限 -> 根据权限ID删除")
     public ResponseEntity<Void> deletePermByPermId(@RequestParam("permId")
                                                    @NotNull(message = "权限ID不能为空")
@@ -41,6 +44,7 @@ public class PermController {
     }
 
     @PutMapping("/updatePermByPermId")
+    @SaCheckPermission("basic:perm:update")
     @Operation(summary = "修改权限 -> 根据权限ID修改")
     public ResponseEntity<Void> updatePermByPermId(@RequestBody @Validated(Update.class) PermVO permVO) {
         permService.updatePermByPermId(permVO);
@@ -48,6 +52,7 @@ public class PermController {
     }
 
     @GetMapping("/getPermList")
+    @SaCheckPermission("basic:perm:get")
     @Operation(summary = "查询权限列表(不分页，获取全部数据) -> 权限管理使用")
     public ResponseEntity<List<PermVO>> getPermList(PermQueryVO queryVO) {
         return ResponseEntity.ok(permService.getPermList(queryVO));
@@ -66,6 +71,7 @@ public class PermController {
     }
 
     @GetMapping("/getPermByPermId/{permId}")
+    @SaCheckPermission("basic:perm:get")
     @Operation(summary = "根据权限ID查询权限")
     public ResponseEntity<PermVO> getPermByPermId(@PathVariable(value = "permId")
                                                         @NotNull(message = "权限ID不能为空")
