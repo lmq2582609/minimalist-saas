@@ -5,10 +5,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.ConfigEnum;
-import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
@@ -20,10 +17,11 @@ import com.minimalist.basic.mapper.MConfigMapper;
 import com.minimalist.basic.service.ConfigService;
 import com.minimalist.basic.utils.RedisKeyConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -43,7 +41,8 @@ public class ConfigServiceImpl implements ConfigService {
     @Transactional(rollbackFor = Exception.class)
     public void addConfig(ConfigVO configVO) {
         //检查键名唯一性
-        MConfig config = configMapper.selectConfigByConfigKey(configVO.getConfigKey(), null);
+        MConfig config = configMapper.selectOneByQuery(
+                QueryWrapper.create().eq(MConfig::getConfigKey, configVO.getConfigKey()));
         Assert.isNull(config, () -> new BusinessException(ConfigEnum.ErrorMsg.CONTAIN_CONFIG_KEY.getDesc()));
         MConfig insertConfig = BeanUtil.copyProperties(configVO, MConfig.class);
         insertConfig.setConfigId(UnqIdUtil.uniqueId());
@@ -59,12 +58,11 @@ public class ConfigServiceImpl implements ConfigService {
      */
     @Override
     public void deleteConfigByConfigId(Long configId) {
-        MConfig config = configMapper.selectConfigByConfigId(configId);
+        MConfig config = configMapper.selectOneByQuery(QueryWrapper.create().eq(MConfig::getConfigId, configId));
         Assert.notNull(config, () -> new BusinessException(ConfigEnum.ErrorMsg.NONENTITY_CONFIG.getDesc()));
         Assert.isFalse(config.getConfigKey().startsWith("system."),
                 () -> new BusinessException(ConfigEnum.ErrorMsg.CANNOT_DEL_SYSTEM_CONFIG.getDesc()));
-        int deleteCount = configMapper.deleteConfigByConfigId(configId);
-        Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        configMapper.deleteByQuery(QueryWrapper.create().eq(MConfig::getConfigId, configId));
         //从缓存中删除参数
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, config.getConfigKey());
         redisManager.delete(redisKey);
@@ -77,16 +75,18 @@ public class ConfigServiceImpl implements ConfigService {
     @Override
     public void updateConfigByConfigId(ConfigVO configVO) {
         //检查键名唯一性
-        MConfig config = configMapper.selectConfigByConfigKey(configVO.getConfigKey(), null);
-        if (ObjectUtil.isNotNull(config) && !configVO.getConfigId().equals(config.getConfigId())) {
-            throw new BusinessException(ConfigEnum.ErrorMsg.CONTAIN_CONFIG_KEY.getDesc());
-        }
-        MConfig oldConfig = configMapper.selectConfigByConfigId(configVO.getConfigId());
+        MConfig config = configMapper.selectOneByQuery(
+                QueryWrapper.create()
+                        .eq(MConfig::getConfigKey, configVO.getConfigKey())
+                        .ne(MConfig::getConfigId, configVO.getConfigId())
+        );
+        Assert.isNull(config, () -> new BusinessException(ConfigEnum.ErrorMsg.CONTAIN_CONFIG_KEY.getDesc()));
+        MConfig oldConfig = configMapper.selectOneByQuery(QueryWrapper.create().eq(MConfig::getConfigId, configVO.getConfigId()));
         Assert.notNull(oldConfig, () -> new BusinessException(ConfigEnum.ErrorMsg.NONENTITY_CONFIG.getDesc()));
         MConfig updateConfig = BeanUtil.copyProperties(configVO, MConfig.class);
         //乐观锁字段赋值
         updateConfig.updateBeforeSetVersion(oldConfig.getVersion());
-        configMapper.updateConfigByConfigId(updateConfig);
+        configMapper.updateByQuery(updateConfig, QueryWrapper.create().eq(MConfig::getConfigId, updateConfig.getConfigId()));
         //添加后将配置放入缓存
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
         redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
@@ -99,9 +99,12 @@ public class ConfigServiceImpl implements ConfigService {
      */
     @Override
     public PageResp<ConfigVO> getPageConfigList(ConfigQueryVO queryVO) {
-        Page<MConfig> configPage = configMapper.selectPageRoleList(queryVO);
-        List<ConfigVO> configVOList = BeanUtil.copyToList(configPage.getRecords(), ConfigVO.class);
-        return new PageResp<>(configVOList, configPage.getTotal());
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .eq(MConfig::getStatus, queryVO.getStatus())
+                .like(MConfig::getConfigName, queryVO.getConfigName())
+                .like(MConfig::getConfigKey, queryVO.getConfigKey());
+        Page<ConfigVO> paginate = configMapper.paginateAs(queryVO.getPageNum(), queryVO.getPageSize(), queryWrapper, ConfigVO.class);
+        return new PageResp<>(paginate.getRecords(), paginate.getTotalRow());
     }
 
     /**
@@ -111,7 +114,10 @@ public class ConfigServiceImpl implements ConfigService {
      */
     @Override
     public ConfigVO getConfigByConfigId(Long configId) {
-        return BeanUtil.copyProperties(configMapper.selectConfigByConfigId(configId), ConfigVO.class);
+        return configMapper.selectOneByQueryAs(
+                QueryWrapper.create().eq(MConfig::getConfigId, configId),
+                ConfigVO.class
+        );
     }
 
     /**
@@ -124,8 +130,13 @@ public class ConfigServiceImpl implements ConfigService {
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configKey);
         ConfigVO configVO = redisManager.get(redisKey);
         if (ObjectUtil.isNull(configVO)) {
-            MConfig mConfig = configMapper.selectConfigByConfigKey(configKey, StatusEnum.STATUS_1.getCode());
-            configVO = BeanUtil.copyProperties(mConfig, ConfigVO.class);
+            //查询有效配置
+            configVO = configMapper.selectOneByQueryAs(
+                    QueryWrapper.create()
+                            .eq(MConfig::getConfigKey, configVO.getConfigKey())
+                            .eq(MConfig::getStatus, StatusEnum.STATUS_1.getCode()),
+                            ConfigVO.class
+                    );
             //随机超时时间
             int systemConfigCacheEx = RandomUtil.randomInt(0, 500) + RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX;
             //重新放入缓存
@@ -139,7 +150,8 @@ public class ConfigServiceImpl implements ConfigService {
      */
     @Override
     public void refreshConfigCache() {
-        List<MConfig> configList = configMapper.selectList(new LambdaQueryWrapper<>());
+        List<MConfig> configList = configMapper.selectListByQuery(
+                QueryWrapper.create().eq(MConfig::getConfigId, StatusEnum.STATUS_1.getCode()));
         for (MConfig config : configList) {
             ConfigVO configVO = BeanUtil.copyProperties(config, ConfigVO.class);
             String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());

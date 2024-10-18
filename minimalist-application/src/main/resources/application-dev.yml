@@ -1,16 +1,12 @@
-mybatis-plus:
+mybatis-flex:
     configuration:
         map-underscore-to-camel-case: true
         auto-mapping-behavior: full
     mapper-locations:
         - classpath*:mappers/**/*.xml
     global-config:
-        # 逻辑删除配置
-        db-config:
-            # 删除前
-            logic-not-delete-value: 1
-            # 删除后
-            logic-delete-value: 0
+        # 逻辑删除字段
+        logic-delete-column: deleted
     # 别名包扫描路径
     type-aliases-package: com.minimalist.**.entity
 # springdoc-openapi 项目文档配置

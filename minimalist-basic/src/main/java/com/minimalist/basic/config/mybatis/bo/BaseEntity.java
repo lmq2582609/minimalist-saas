@@ -2,6 +2,9 @@ package com.minimalist.basic.config.mybatis.bo;
 
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.annotation.*;
+import com.mybatisflex.annotation.Column;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,31 +15,29 @@ import java.time.LocalDateTime;
 public class BaseEntity {
 
     /** ID自增 */
-    @TableId(value = "id", type = IdType.AUTO)
+    @Id(keyType = KeyType.Auto)
     private Long id;
 
-    /** 逻辑删除  0已删除  1未删除 */
-    @TableLogic
+    /** 逻辑删除 */
+    @Column(isLogicDelete = true)
     private Boolean deleted;
 
     /** 创建人ID */
-    @TableField(value = "create_id", fill = FieldFill.INSERT)
     private Long createId;
 
-    /** 创建时间 */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
     /** 更新人ID */
-    @TableField(value = "update_id", fill = FieldFill.INSERT_UPDATE)
     private Long updateId;
 
+    /** 创建时间 */
+    @Column(onInsertValue = "now()")
+    private LocalDateTime createTime;
+
     /** 更新时间 */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    @Column(onInsertValue = "now()", onUpdateValue = "now()")
     private LocalDateTime updateTime;
 
     /** 版本号 */
-    @Version
+    @Column(version = true, onInsertValue = "0", onUpdateValue = "version + 1")
     private Integer version;
 
     /**

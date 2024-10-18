@@ -1,7 +1,7 @@
 package com.minimalist.basic.config.tenant;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.minimalist.basic.utils.SafetyUtil;
+import com.mybatisflex.core.tenant.TenantManager;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -25,22 +25,14 @@ public class TenantIgnoreAspect {
         if (ObjectUtil.isNull(it)) {
             return joinPoint.proceed();
         }
-        boolean checkAdmin = it.checkAdmin();
-        //需要校验是否为 系统租户
-        if (checkAdmin) {
-            //是系统租户，查询全部数据
-            boolean isAdmin = SafetyUtil.checkIsSystemTenant();
-            //不是系统租户，按租户查询
-            SafetyUtil.setIgnoreTenant(!isAdmin);
-        } else {
-            //忽略租户查询条件
-            SafetyUtil.setIgnoreTenant(true);
-        }
         try {
+            //忽略多租户
+            TenantManager.ignoreTenantCondition();
+            //执行目标方法
             return joinPoint.proceed();
         } finally {
-            //清除
-            SafetyUtil.clearIgnoreTenant();
+            //恢复多租户
+            TenantManager.restoreTenantCondition();
         }
     }
 

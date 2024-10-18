@@ -21,6 +21,10 @@
         <redisson.version>3.36.0</redisson.version>
         <!-- mysql驱动版本 -->
         <mysql.version>8.0.33</mysql.version>
+        <!-- mybatis-flex版本 -->
+        <mybatis-flex.version>1.9.7</mybatis-flex.version>
+        <!-- mybatis-flex代码生成 -->
+        <mybatis-flex.codegen.version>1.8.3</mybatis-flex.codegen.version>
         <!-- mybatis-plus版本 -->
         <mp.version>3.5.3.1</mp.version>
         <!-- mybatis-plus 生成代码 -->
