@@ -5,14 +5,13 @@ import cn.hutool.core.lang.func.Func1;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.minimalist.basic.config.mybatis.bo.DeleteParams;
 import com.minimalist.basic.config.mybatis.bo.FieldParams;
 import com.minimalist.basic.config.mybatis.bo.InsertBatchParams;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.mapper.EntityMapper;
+import com.mybatisflex.annotation.Table;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -76,7 +75,7 @@ public class EntityService {
             return insertBatchParams;
         }
         //获取表名
-        TableName tableName = aClass.getAnnotation(TableName.class);
+        Table tableName = aClass.getAnnotation(Table.class);
         if (ObjectUtil.isNull(tableName) || StrUtil.isBlank(tableName.value())) {
             log.warn("获取注解失败，未获取到TableName注解值");
             throw new BusinessException(RespEnum.FAILED.getDesc());
@@ -131,7 +130,7 @@ public class EntityService {
             }
             String declaredClass = serializedLambda.getImplClass().replace("/", ".");
             Class<?> aClass = Class.forName(declaredClass, false, ClassUtils.getDefaultClassLoader());
-            TableName tableName = aClass.getAnnotation(TableName.class);
+            Table tableName = aClass.getAnnotation(Table.class);
             if (ObjectUtil.isNull(tableName) || StrUtil.isBlank(tableName.value())) {
                 log.warn("获取注解失败，未获取到TableName注解值");
                 throw new BusinessException(RespEnum.FAILED.getDesc());
@@ -141,14 +140,14 @@ public class EntityService {
                 log.warn("获取字段异常，字段名【" + fieldName + "】");
                 throw new BusinessException(RespEnum.FAILED.getDesc());
             }
-            TableField tableField = field.getAnnotation(TableField.class);
-            if (ObjectUtil.isNull(tableField) || StrUtil.isBlank(tableField.value())) {
-                log.warn("获取字段异常，字段名【" + fieldName + "】，获取注解失败，未获取到TableField注解值");
-                throw new BusinessException(RespEnum.FAILED.getDesc());
-            }
+//            TableField tableField = field.getAnnotation(TableField.class);
+//            if (ObjectUtil.isNull(tableField) || StrUtil.isBlank(tableField.value())) {
+//                log.warn("获取字段异常，字段名【" + fieldName + "】，获取注解失败，未获取到TableField注解值");
+//                throw new BusinessException(RespEnum.FAILED.getDesc());
+//            }
             DeleteParams deleteParams = new DeleteParams();
             deleteParams.setTable_name(tableName.value());
-            deleteParams.setKey(tableField.value());
+//            deleteParams.setKey(tableField.value());
             deleteParams.setValue(value);
             return deleteParams;
         } catch (Exception e) {
@@ -171,10 +170,10 @@ public class EntityService {
             if (fields[i].getName().equals("id") || fields[i].getName().equals("deleted") || fields[i].getName().equals("version")) {
                 continue;
             }
-            TableField tableField = fields[i].getAnnotation(TableField.class);
-            if (ObjectUtil.isNotNull(tableField) && StrUtil.isNotBlank(tableField.value())) {
-                columns.add(new FieldParams(tableField.value(), fields[i].getName()));
-            }
+//            TableField tableField = fields[i].getAnnotation(TableField.class);
+//            if (ObjectUtil.isNotNull(tableField) && StrUtil.isNotBlank(tableField.value())) {
+//                columns.add(new FieldParams(tableField.value(), fields[i].getName()));
+//            }
         }
         if (CollectionUtil.isEmpty(columns)) {
             log.warn("获取字段异常，未获取到字段，请检查实体类");

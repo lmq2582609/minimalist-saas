@@ -1,43 +1,37 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.enums.NoticeEnum;
-import com.minimalist.basic.entity.po.MNotice;
-import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
-import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
 import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.entity.enums.NoticeEnum;
+import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MNotice;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+
 import java.time.LocalDateTime;
 
 /**
- * <p>
- * 通知公告表 Mapper 接口
- * </p>
+ * 通知公告表 映射层。
  *
- * @author baomidou
- * @since 2023-07-18
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MNoticeMapper extends BaseMapper<MNotice> {
-
     /**
      * 根据公告ID删除公告
      * @param noticeId 公告ID
-     * @return 受影响行数
      */
-    default int deleteNoticeByNoticeId(Long noticeId) {
-        return delete(new LambdaQueryWrapper<MNotice>().eq(MNotice::getNoticeId, noticeId));
+    default void deleteNoticeByNoticeId(Long noticeId) {
+        deleteByQuery(QueryWrapper.create().eq(MNotice::getNoticeId, noticeId));
     }
 
     /**
      * 根据公告ID修改公告
      * @param notice 公告数据
-     * @return 受影响行数
      */
-    default int updateNoticeByNoticeId(MNotice notice) {
-        return update(notice, new LambdaUpdateWrapper<MNotice>().eq(MNotice::getNoticeId, notice.getNoticeId()));
+    default void updateNoticeByNoticeId(MNotice notice) {
+        updateByQuery(notice, QueryWrapper.create().eq(MNotice::getNoticeId, notice.getNoticeId()));
     }
 
     /**
@@ -46,14 +40,13 @@ public interface MNoticeMapper extends BaseMapper<MNotice> {
      * @return 公告分页数据
      */
     default Page<MNotice> selectPageNoticeList(NoticeQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MNotice>()
-                        .likeNotNull(MNotice::getNoticeTitle, queryVO.getNoticeTitle())
-                        .eqNotNull(MNotice::getStatus, queryVO.getStatus())
-                        .eqNotNull(MNotice::getNoticeType, queryVO.getNoticeType())
-                        .orderByAscc(MNotice::getNoticeSort)
-                        .orderByDescc(MNotice::getNoticeTop)
-        );
+        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+                QueryWrapper.create()
+                        .eq(MNotice::getStatus, queryVO.getStatus())
+                        .eq(MNotice::getNoticeType, queryVO.getNoticeType())
+                        .like(MNotice::getNoticeTitle, queryVO.getNoticeTitle())
+                        .orderBy(MNotice::getNoticeTop, false)
+                        .orderBy(MNotice::getNoticeSort, true));
     }
 
     /**
@@ -62,21 +55,21 @@ public interface MNoticeMapper extends BaseMapper<MNotice> {
      * @return 公告实体
      */
     default MNotice selectNoticeByNoticeId(Long noticeId) {
-        return selectOne(new LambdaQueryWrapper<MNotice>().eq(MNotice::getNoticeId, noticeId));
+        return selectOneByQuery(QueryWrapper.create().eq(MNotice::getNoticeId, noticeId));
     }
 
     /**
      * 查询公告列表(分页) -> 首页使用
-     * @return
+     * @return 公告列表
      */
     default Page<MNotice> selectHomePageNoticeList(Pager pager) {
-        return selectPage(new Page<>(pager.getPageNum(), pager.getPageSize()),
-                new LambdaQueryWrapper<MNotice>()
+        return paginate(pager.getPageNum(), pager.getPageSize(),
+                QueryWrapper.create()
                         .eq(MNotice::getStatus, StatusEnum.STATUS_1.getCode())
                         .eq(MNotice::getNoticeType, NoticeEnum.NoticeType.NOTICE.getCode())
-                        .orderByAsc(MNotice::getNoticeSort)
-                        .orderByDesc(MNotice::getNoticeTop)
                         .le(MNotice::getPublishTime, LocalDateTime.now())
+                        .orderBy(MNotice::getNoticeTop, false)
+                        .orderBy(MNotice::getNoticeSort, true)
         );
     }
 }

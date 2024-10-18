@@ -16,16 +16,16 @@ import java.io.Serial;
 /**
  * 角色与部门关联表 1角色-N部门 实体类。
  *
- * @author asus
+ * @author 小太阳
  * @since 2024-10-18
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Table(value = "m_role_dept", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
-public class MRoleDept extends BaseEntity implements Serializable {
+public class MRoleDept implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
@@ -23,6 +22,7 @@ import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -163,7 +163,7 @@ public class TenantServiceImpl implements TenantService {
                 }
             });
         }
-        return new PageResp<>(tenantVOList, mTenantPage.getTotal());
+        return new PageResp<>(tenantVOList, mTenantPage.getTotalRow());
     }
 
     /**

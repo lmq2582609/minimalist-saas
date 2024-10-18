@@ -1,18 +1,15 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MRolePerm;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- * 角色与权限关联表 1角色-N权限 Mapper 接口
- * </p>
+ * 角色与权限关联表 1角色-N权限 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MRolePermMapper extends BaseMapper<MRolePerm> {
 
@@ -22,9 +19,7 @@ public interface MRolePermMapper extends BaseMapper<MRolePerm> {
      * @return 角色与权限关联数据
      */
     default List<MRolePerm> selectRolePermByRoleIds(List<Long> roleIds) {
-        return selectList(new LambdaQueryWrapper<MRolePerm>()
-                .select(MRolePerm::getRoleId, MRolePerm::getPermId)
-                .in(MRolePerm::getRoleId, roleIds));
+        return selectListByQuery(QueryWrapper.create().in(MRolePerm::getRoleId, roleIds));
     }
 
     /**
@@ -33,9 +28,7 @@ public interface MRolePermMapper extends BaseMapper<MRolePerm> {
      * @return 角色与权限关联数据
      */
     default List<MRolePerm> selectRolePermByRoleId(Long roleId) {
-        return selectList(new LambdaQueryWrapper<MRolePerm>()
-                .select(MRolePerm::getRoleId, MRolePerm::getPermId)
-                .eq(MRolePerm::getRoleId, roleId));
+        return selectListByQuery(QueryWrapper.create().eq(MRolePerm::getRoleId, roleId));
     }
 
 }

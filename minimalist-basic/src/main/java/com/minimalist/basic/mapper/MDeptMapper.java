@@ -1,21 +1,17 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.minimalist.basic.entity.po.MDept;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MDept;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- * 部门表 Mapper 接口
- * </p>
+ * 部门表 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MDeptMapper extends BaseMapper<MDept> {
 
@@ -25,21 +21,16 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 下级数量
      */
     default long selectChildrenCountByDeptId(Long deptId) {
-        return selectCount(
-                new LambdaQueryWrapper<MDept>()
-                        .apply("FIND_IN_SET("  + deptId +", ancestors)")
-        );
+        return selectCountByQuery(QueryWrapper.create().where("FIND_IN_SET("  + deptId +", ancestors)"));
     }
 
     /**
      * 根据部门ID删除部门
      * @param deptId 部门ID
-     * @return 受影响行数
      */
-    default int deleteDeptByDeptId(Long deptId) {
-        LambdaQueryWrapper<MDept> pQuery = new LambdaQueryWrapper<>();
-        pQuery.eq(MDept::getDeptId, deptId);
-        return delete(pQuery);
+    default void deleteDeptByDeptId(Long deptId) {
+        deleteByQuery(QueryWrapper.create()
+                .eq(MDept::getDeptId, deptId));
     }
 
     /**
@@ -48,7 +39,7 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 部门实体
      */
     default MDept selectDeptByDeptId(Long deptId) {
-        return selectOne(new LambdaQueryWrapper<MDept>().eq(MDept::getDeptId, deptId));
+        return selectOneByQuery(QueryWrapper.create().eq(MDept::getDeptId, deptId));
     }
 
     /**
@@ -57,16 +48,16 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 部门实体列表
      */
     default List<MDept> selectDeptByDeptIds(List<Long> deptIds) {
-        return selectList(new LambdaQueryWrapper<MDept>().in(MDept::getDeptId, deptIds));
+        return selectListByQuery(QueryWrapper.create().in(MDept::getDeptId, deptIds));
     }
 
     /**
      * 根据部门ID修改部门
      * @param mDept 部门实体
-     * @return 受影响行数
      */
-    default int updateDeptByDeptId(MDept mDept) {
-        return update(mDept, new LambdaUpdateWrapper<MDept>().eq(MDept::getDeptId, mDept.getDeptId()));
+    default void updateDeptByDeptId(MDept mDept) {
+        updateByQuery(mDept,
+                QueryWrapper.create().eq(MDept::getDeptId, mDept.getDeptId()));
     }
 
     /**
@@ -75,9 +66,9 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 部门列表
      */
     default List<MDept> selectDeptList(DeptQueryVO queryVO) {
-        return selectList(new QueryCondition<MDept>()
-                .likeNotNull(MDept::getDeptName, queryVO.getDeptName())
-                .eqNotNull(MDept::getStatus, queryVO.getStatus()));
+        return selectListByQuery(QueryWrapper.create()
+                .eq(MDept::getStatus, queryVO.getStatus())
+                .like(MDept::getDeptName, queryVO.getDeptName()));
     }
 
     /**
@@ -85,10 +76,8 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 部门列表
      */
     default List<MDept> selectDeptDict() {
-        LambdaQueryWrapper<MDept> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(MDept::getDeptId, MDept::getParentDeptId, MDept::getDeptName, MDept::getDeptSort);
-        queryWrapper.eq(MDept::getStatus, StatusEnum.STATUS_1.getCode());
-        return selectList(queryWrapper);
+        return selectListByQuery(QueryWrapper.create()
+                .eq(MDept::getStatus, StatusEnum.STATUS_1.getCode()));
     }
 
     /**
@@ -97,10 +86,6 @@ public interface MDeptMapper extends BaseMapper<MDept> {
      * @return 子集部门列表
      */
     default List<MDept> selectChildrenDeptByDeptId(Long deptId) {
-        return selectList(
-                new LambdaQueryWrapper<MDept>()
-                        .apply("FIND_IN_SET("  + deptId +", ancestors)")
-        );
+        return selectListByQuery(QueryWrapper.create().where("FIND_IN_SET("  + deptId +", ancestors)"));
     }
-
 }

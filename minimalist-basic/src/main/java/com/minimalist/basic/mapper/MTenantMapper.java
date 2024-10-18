@@ -1,32 +1,27 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.po.MTenant;
-import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MTenant;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- *  Mapper 接口
- * </p>
+ * 租户表 映射层。
  *
- * @author baomidou
- * @since 2023-07-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MTenantMapper extends BaseMapper<MTenant> {
-
     /**
      * 根据租户套餐ID查询租户数量
      * @param tenantPackageId 租户套餐ID
      * @return 租户数量
      */
     default long selectTenantCountByTenantPackageId(Long tenantPackageId) {
-        return selectCount(new LambdaQueryWrapper<MTenant>().eq(MTenant::getPackageId, tenantPackageId));
+        return selectCountByQuery(QueryWrapper.create().eq(MTenant::getPackageId, tenantPackageId));
     }
 
     /**
@@ -35,7 +30,7 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      * @return 租户数量
      */
     default List<MTenant> selectTenantByTenantPackageId(Long tenantPackageId) {
-        return selectList(new LambdaQueryWrapper<MTenant>().eq(MTenant::getPackageId, tenantPackageId));
+        return selectListByQuery(QueryWrapper.create().eq(MTenant::getPackageId, tenantPackageId));
     }
 
     /**
@@ -44,7 +39,7 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      * @return 租户实体
      */
     default MTenant selectTenantByTenantName(String tenantName) {
-        return selectOne(new LambdaQueryWrapper<MTenant>().eq(MTenant::getTenantName, tenantName));
+        return selectOneByQuery(QueryWrapper.create().eq(MTenant::getTenantName, tenantName));
     }
 
     /**
@@ -53,25 +48,23 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      * @return 租户实体
      */
     default MTenant selectTenantByTenantId(Long tenantId) {
-        return selectOne(new LambdaQueryWrapper<MTenant>().eq(MTenant::getTenantId, tenantId));
+        return selectOneByQuery(QueryWrapper.create().eq(MTenant::getTenantId, tenantId));
     }
 
     /**
      * 根据租户ID删除租户
      * @param tenantId 租户ID
-     * @return 受影响行数
      */
-    default int deleteTenantByTenantId(Long tenantId) {
-        return delete(new LambdaQueryWrapper<MTenant>().eq(MTenant::getTenantId, tenantId));
+    default void deleteTenantByTenantId(Long tenantId) {
+        deleteByQuery(QueryWrapper.create().eq(MTenant::getTenantId, tenantId));
     }
 
     /**
      * 根据租户ID更新租户
      * @param tenant 租户信息
-     * @return 受影响行数
      */
-    default int updateTenantByTenantId(MTenant tenant) {
-        return update(tenant, new LambdaUpdateWrapper<MTenant>().eq(MTenant::getTenantId, tenant.getTenantId()));
+    default void updateTenantByTenantId(MTenant tenant) {
+        updateByQuery(tenant, QueryWrapper.create().eq(MTenant::getTenantId, tenant.getTenantId()));
     }
 
     /**
@@ -80,20 +73,11 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      * @return 租户分页数据
      */
     default Page<MTenant> selectPageTenantList(TenantQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MTenant>()
-                        .likeNotNull(MTenant::getTenantName, queryVO.getTenantName())
-                        .eqNotNull(MTenant::getStatus, queryVO.getStatus())
-                );
-    }
-
-    /**
-     * 根据用户ID查询租户
-     * @param userId 用户ID
-     * @return 租户实体
-     */
-    default MTenant selectTenantByUserId(Long userId) {
-        return selectOne(new LambdaQueryWrapper<MTenant>().eq(MTenant::getUserId, userId));
+        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+                QueryWrapper.create()
+                        .eq(MTenant::getStatus, queryVO.getStatus())
+                        .like(MTenant::getTenantName, queryVO.getTenantName())
+        );
     }
 
     /**
@@ -101,10 +85,7 @@ public interface MTenantMapper extends BaseMapper<MTenant> {
      * @return 部门列表
      */
     default List<MTenant> selectTenantDict() {
-        LambdaQueryWrapper<MTenant> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(MTenant::getTenantId, MTenant::getTenantName);
-        queryWrapper.eq(MTenant::getStatus, StatusEnum.STATUS_1.getCode());
-        return selectList(queryWrapper);
+        return selectListByQuery(QueryWrapper.create().eq(MTenant::getStatus, StatusEnum.STATUS_1.getCode()));
     }
 
 }

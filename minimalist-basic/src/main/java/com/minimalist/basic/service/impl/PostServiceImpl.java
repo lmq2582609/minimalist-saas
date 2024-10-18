@@ -3,7 +3,6 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.PostEnum;
 import com.minimalist.basic.entity.po.MPost;
 import com.minimalist.basic.entity.po.MUserPost;
@@ -17,6 +16,7 @@ import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -88,7 +88,7 @@ public class PostServiceImpl implements PostService {
         Page<MPost> mPostPage = postMapper.selectPagePostList(queryVO);
         //数据转换
         List<PostVO> postVOList = BeanUtil.copyToList(mPostPage.getRecords(), PostVO.class);
-        return new PageResp<>(postVOList, mPostPage.getTotal());
+        return new PageResp<>(postVOList, mPostPage.getTotalRow());
     }
 
     /**

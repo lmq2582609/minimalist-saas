@@ -1,17 +1,15 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MUserPost;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- * 用户与岗位关联表 1用户-N岗位 Mapper 接口
- * </p>
+ * 用户与岗位关联表 1用户-N岗位 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MUserPostMapper extends BaseMapper<MUserPost> {
 
@@ -21,7 +19,7 @@ public interface MUserPostMapper extends BaseMapper<MUserPost> {
      * @return 用户与岗位关联数据
      */
     default List<MUserPost> selectUserPostRelation(Long userId) {
-        return selectList(new LambdaQueryWrapper<MUserPost>().eq(MUserPost::getUserId, userId));
+        return selectListByQuery(QueryWrapper.create().eq(MUserPost::getUserId, userId));
     }
 
 }

@@ -1,22 +1,18 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.po.MPost;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.minimalist.basic.entity.vo.post.PostQueryVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.basic.entity.vo.post.PostQueryVO;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MPost;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- * 岗位表 Mapper 接口
- * </p>
+ * 岗位表 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MPostMapper extends BaseMapper<MPost> {
 
@@ -26,16 +22,15 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @return 岗位实体
      */
     default MPost selectPostByPostCode(String postCode) {
-        return selectOne(new LambdaQueryWrapper<MPost>().eq(MPost::getPostCode, postCode));
+        return selectOneByQuery(QueryWrapper.create().eq(MPost::getPostCode, postCode));
     }
 
     /**
      * 根据岗位ID删除岗位
      * @param postId 岗位ID
-     * @return 受影响行数
      */
-    default int deletePostByPostId(Long postId) {
-        return delete(new LambdaQueryWrapper<MPost>().eq(MPost::getPostId, postId));
+    default void deletePostByPostId(Long postId) {
+        deleteByQuery(QueryWrapper.create().eq(MPost::getPostId, postId));
     }
 
     /**
@@ -44,7 +39,7 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @return 岗位实体
      */
     default MPost selectPostByPostId(Long postId) {
-        return selectOne(new LambdaQueryWrapper<MPost>().eq(MPost::getPostId, postId));
+        return selectOneByQuery(QueryWrapper.create().eq(MPost::getPostId, postId));
     }
 
     /**
@@ -53,16 +48,15 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @return 岗位实体列表
      */
     default List<MPost> selectPostByPostIds(List<Long> postIds) {
-        return selectList(new LambdaQueryWrapper<MPost>().in(MPost::getPostId, postIds));
+        return selectListByQuery(QueryWrapper.create().in(MPost::getPostId, postIds));
     }
 
     /**
      * 根据岗位ID修改岗位
      * @param mPost 岗位数据
-     * @return 受影响行数
      */
-    default int updatePostByPostId(MPost mPost) {
-        return update(mPost, new LambdaUpdateWrapper<MPost>().eq(MPost::getPostId, mPost.getPostId()));
+    default void updatePostByPostId(MPost mPost) {
+        updateByQuery(mPost, QueryWrapper.create().eq(MPost::getPostId, mPost.getPostId()));
     }
 
     /**
@@ -71,12 +65,13 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @return 岗位分页数据
      */
     default Page<MPost> selectPagePostList(PostQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MPost>()
-                        .likeNotNull(MPost::getPostName, queryVO.getPostName())
-                        .likeNotNull(MPost::getPostCode, queryVO.getPostCode())
-                        .eqNotNull(MPost::getStatus, queryVO.getStatus())
-                        .orderByAscc(MPost::getPostSort));
+        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+                QueryWrapper.create()
+                        .eq(MPost::getStatus, queryVO.getStatus())
+                        .like(MPost::getPostName, queryVO.getPostName())
+                        .like(MPost::getPostCode, queryVO.getPostCode())
+                        .orderBy(MPost::getPostSort, true)
+        );
     }
 
     /**
@@ -84,10 +79,6 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @return 部门列表
      */
     default List<MPost> selectPostDict() {
-        LambdaQueryWrapper<MPost> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(MPost::getPostId, MPost::getPostName);
-        queryWrapper.eq(MPost::getStatus, StatusEnum.STATUS_1.getCode());
-        return selectList(queryWrapper);
+        return selectListByQuery(QueryWrapper.create().eq(MPost::getStatus, StatusEnum.STATUS_1.getCode()));
     }
-
 }

@@ -1,22 +1,18 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.po.MRole;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.minimalist.basic.entity.vo.role.RoleQueryVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.basic.entity.vo.role.RoleQueryVO;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MRole;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- * 角色表 Mapper 接口
- * </p>
+ * 角色表 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MRoleMapper extends BaseMapper<MRole> {
 
@@ -26,7 +22,7 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @return 角色实体
      */
     default MRole selectRoleByRoleCode(String roleCode) {
-        return selectOne(new LambdaQueryWrapper<MRole>().eq(MRole::getRoleCode, roleCode));
+        return selectOneByQuery(QueryWrapper.create().eq(MRole::getRoleCode, roleCode));
     }
 
     /**
@@ -35,7 +31,7 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @return 角色实体
      */
     default MRole selectRoleByRoleId(Long roleId) {
-        return selectOne(new LambdaQueryWrapper<MRole>().eq(MRole::getRoleId, roleId));
+        return selectOneByQuery(QueryWrapper.create().eq(MRole::getRoleId, roleId));
     }
 
     /**
@@ -44,25 +40,23 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @return 角色实体
      */
     default List<MRole> selectRoleByRoleIds(List<Long> roleId) {
-        return selectList(new LambdaQueryWrapper<MRole>().in(MRole::getRoleId, roleId));
+        return selectListByQuery(QueryWrapper.create().in(MRole::getRoleId, roleId));
     }
 
     /**
      * 根据角色ID删除角色
      * @param roleId 角色ID
-     * @return 受影响行数
      */
-    default int deleteRoleByRoleId(Long roleId) {
-        return delete(new LambdaQueryWrapper<MRole>().eq(MRole::getRoleId, roleId));
+    default void deleteRoleByRoleId(Long roleId) {
+        deleteByQuery(QueryWrapper.create().eq(MRole::getRoleId, roleId));
     }
 
     /**
      * 根据角色ID修改角色
      * @param role 角色实体
-     * @return 受影响行数
      */
-    default int updateRoleByRoleId(MRole role) {
-        return update(role, new LambdaUpdateWrapper<MRole>().eq(MRole::getRoleId, role.getRoleId()));
+    default void updateRoleByRoleId(MRole role) {
+        updateByQuery(role, QueryWrapper.create().eq(MRole::getRoleId, role.getRoleId()));
     }
 
     /**
@@ -71,11 +65,12 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @return 角色分页数据
      */
     default Page<MRole> selectPageRoleList(RoleQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MRole>()
-                        .likeNotNull(MRole::getRoleName, queryVO.getRoleName())
-                        .likeNotNull(MRole::getRoleCode, queryVO.getRoleCode())
-                        .eqNotNull(MRole::getStatus, queryVO.getStatus()));
+        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+                QueryWrapper.create()
+                        .eq(MRole::getStatus, queryVO.getStatus())
+                        .like(MRole::getRoleCode, queryVO.getRoleCode())
+                        .like(MRole::getRoleName, queryVO.getRoleName())
+        );
     }
 
     /**
@@ -83,10 +78,7 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @return 部门列表
      */
     default List<MRole> selectRoleDict() {
-        LambdaQueryWrapper<MRole> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(MRole::getRoleId, MRole::getRoleName);
-        queryWrapper.eq(MRole::getStatus, StatusEnum.STATUS_1.getCode());
-        return selectList(queryWrapper);
+        return selectListByQuery(QueryWrapper.create().eq(MRole::getStatus, StatusEnum.STATUS_1.getCode()));
     }
 
 }

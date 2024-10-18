@@ -1,21 +1,17 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.minimalist.basic.entity.po.MPerms;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.minimalist.basic.entity.vo.perm.PermQueryVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
+import com.minimalist.basic.entity.vo.perm.PermQueryVO;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MPerms;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- * 权限表 Mapper 接口
- * </p>
+ * 权限表 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MPermsMapper extends BaseMapper<MPerms> {
 
@@ -25,9 +21,7 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
      * @return 权限集合
      */
     default List<MPerms> selectPermsByPermsIds(List<Long> permsIds) {
-        LambdaQueryWrapper<MPerms> pQuery = new LambdaQueryWrapper<>();
-        pQuery.in(MPerms::getPermId, permsIds);
-        return selectList(pQuery);
+        return selectListByQuery(QueryWrapper.create().in(MPerms::getPermId, permsIds));
     }
 
     /**
@@ -36,18 +30,15 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
      * @return 权限实体
      */
     default MPerms selectPermsByPermId(Long permId) {
-        LambdaQueryWrapper<MPerms> pQuery = new LambdaQueryWrapper<>();
-        pQuery.eq(MPerms::getPermId, permId);
-        return selectOne(pQuery);
+        return selectOneByQuery(QueryWrapper.create().eq(MPerms::getPermId, permId));
     }
 
     /**
      * 根据权限ID修改权限
      * @param perms 权限实体
-     * @return 受影响行数
      */
-    default int updatePermsByPermId(MPerms perms) {
-        return update(perms, new LambdaUpdateWrapper<MPerms>().eq(MPerms::getPermId, perms.getPermId()));
+    default void updatePermsByPermId(MPerms perms) {
+        updateByQuery(perms, QueryWrapper.create().eq(MPerms::getPermId, perms.getPermId()));
     }
 
     /**
@@ -56,20 +47,15 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
      * @return 下级数量
      */
     default long selectChildrenCountByPermId(Long permId) {
-        LambdaQueryWrapper<MPerms> pQuery = new LambdaQueryWrapper<>();
-        pQuery.eq(MPerms::getParentPermId, permId);
-        return selectCount(pQuery);
+        return selectCountByQuery(QueryWrapper.create().eq(MPerms::getParentPermId, permId));
     }
 
     /**
      * 根据权限ID删除权限
      * @param permId 权限ID
-     * @return 受影响行数
      */
-    default int deletePermsByPermId(Long permId) {
-        LambdaQueryWrapper<MPerms> pQuery = new LambdaQueryWrapper<>();
-        pQuery.eq(MPerms::getPermId, permId);
-        return delete(pQuery);
+    default void deletePermsByPermId(Long permId) {
+        deleteByQuery(QueryWrapper.create().eq(MPerms::getPermId, permId));
     }
 
     /**
@@ -78,10 +64,10 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
      * @return 权限列表
      */
     default List<MPerms> selectPermList(PermQueryVO queryVO) {
-        return selectList(new QueryCondition<MPerms>()
-                .likeNotNull(MPerms::getPermName, queryVO.getPermName())
-                .likeNotNull(MPerms::getPermType, queryVO.getPermType())
-                .eqNotNull(MPerms::getStatus, queryVO.getStatus())
+        return selectListByQuery(QueryWrapper.create()
+                .eq(MPerms::getStatus, queryVO.getStatus())
+                .like(MPerms::getPermName, queryVO.getPermName())
+                .like(MPerms::getPermType, queryVO.getPermType())
         );
     }
 
@@ -90,8 +76,6 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
      * @return 权限列表
      */
     default List<MPerms> getEnablePermList() {
-        return selectList(new LambdaQueryWrapper<MPerms>()
-                .eq(MPerms::getStatus, StatusEnum.STATUS_1.getCode()));
+        return selectListByQuery(QueryWrapper.create().eq(MPerms::getStatus, StatusEnum.STATUS_1.getCode()));
     }
-
 }

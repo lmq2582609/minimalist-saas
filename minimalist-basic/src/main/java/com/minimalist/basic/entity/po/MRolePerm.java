@@ -16,16 +16,16 @@ import java.io.Serial;
 /**
  * 角色与权限关联表 1角色-N权限 实体类。
  *
- * @author asus
+ * @author 小太阳
  * @since 2024-10-18
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Table(value = "m_role_perm", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
-public class MRolePerm extends BaseEntity implements Serializable {
+public class MRolePerm implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

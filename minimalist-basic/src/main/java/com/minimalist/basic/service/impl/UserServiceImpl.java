@@ -11,7 +11,6 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.*;
 import com.minimalist.basic.entity.po.MPerms;
 import com.minimalist.basic.entity.po.MUser;
@@ -43,6 +42,7 @@ import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.RedisKeyConstant;
 import com.minimalist.basic.utils.SafetyUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -183,10 +183,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public PageResp<UserVO> getPageUserList(UserQueryVO queryVO) {
-        Page<MUser> userPage = userMapper.selectPageUserList(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()), queryVO);
+        Page<MUser> userPage = userMapper.selectPageUserList(queryVO);
         //数据转换
         List<UserVO> userVOList = BeanUtil.copyToList(userPage.getRecords(), UserVO.class);
-        return new PageResp<>(userVOList, userPage.getTotal());
+        return new PageResp<>(userVOList, userPage.getTotalRow());
     }
 
     /**
@@ -430,8 +430,7 @@ public class UserServiceImpl implements UserService {
         updateUser.setUserAvatar(userAvatar);
         //乐观锁字段赋值
         updateUser.updateBeforeSetVersion(user.getVersion());
-        int updateCount = userMapper.updateUserByUserId(updateUser);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        userMapper.updateUserByUserId(updateUser);
     }
 
 }

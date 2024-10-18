@@ -1,50 +1,42 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.po.MDict;
 import com.minimalist.basic.entity.vo.dict.DictQueryVO;
-import com.minimalist.basic.config.mybatis.QueryCondition;
-
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MDict;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.util.List;
 
 /**
- * <p>
- *  Mapper 接口
- * </p>
+ * 字典表 映射层。
  *
- * @author baomidou
- * @since 2023-05-27
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MDictMapper extends BaseMapper<MDict> {
-
     /**
      * 根据字典ID查询字典
      * @param dictId 字典ID
      * @return 字典数据
      */
     default MDict selectDictByDictId(Long dictId) {
-        return selectOne(new QueryCondition<MDict>().eqNotNull(MDict::getDictId, dictId));
+        return selectOneByQuery(QueryWrapper.create().eq(MDict::getDictId, dictId));
     }
 
     /**
      * 根据字典ID删除字典
      * @param dictId 字典ID
-     * @return 受影响行数
      */
-    default int deleteDictByDictId(Long dictId) {
-        return delete(new LambdaQueryWrapper<MDict>().eq(MDict::getDictId, dictId));
+    default void deleteDictByDictId(Long dictId) {
+        deleteByQuery(QueryWrapper.create().eq(MDict::getDictId, dictId));
     }
 
     /**
      * 根据字典类型删除字典
      * @param dictType 字典类型
-     * @return 受影响行数
      */
-    default int deleteDictByDictType(String dictType) {
-        return delete(new LambdaQueryWrapper<MDict>().eq(MDict::getDictType, dictType));
+    default void deleteDictByDictType(String dictType) {
+        deleteByQuery(QueryWrapper.create().eq(MDict::getDictType, dictType));
     }
 
     /**
@@ -53,13 +45,12 @@ public interface MDictMapper extends BaseMapper<MDict> {
      * @return 分页数据
      */
     default Page<MDict> selectPageDictList(DictQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MDict>()
-                        .likeNotNull(MDict::getDictName, queryVO.getDictName())
-                        .likeNotNull(MDict::getDictType, queryVO.getDictType())
-                        .eqNotNull(MDict::getStatus, queryVO.getStatus())
-                        .orderByAscc(MDict::getCreateTime)
-                        .groupByy(MDict::getDictType));
+        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+                QueryWrapper.create().eq(MDict::getStatus, queryVO.getStatus())
+                        .like(MDict::getDictName, queryVO.getDictName())
+                        .like(MDict::getDictType, queryVO.getDictType())
+                        .orderBy(MDict::getDictOrder, true)
+                        .groupBy(MDict::getDictType));
     }
 
     /**
@@ -68,31 +59,26 @@ public interface MDictMapper extends BaseMapper<MDict> {
      * @return 字典列表
      */
     default List<MDict> selectDictListByDictType(List<String> dictTypeList) {
-        return selectList(new LambdaQueryWrapper<MDict>()
-                .in(MDict::getDictType, dictTypeList)
-                .orderByAsc(MDict::getDictOrder));
+        return selectListByQuery(QueryWrapper.create().in(MDict::getDictType, dictTypeList).orderBy(MDict::getDictOrder, true));
     }
 
     /**
      * 根据字典ID修改字典
      * @param dict 字典实体
-     * @return 受影响行数
      */
-    default int updateDictByDictId(MDict dict) {
-        return update(dict, new LambdaUpdateWrapper<MDict>().eq(MDict::getDictId, dict.getDictId()));
+    default void updateDictByDictId(MDict dict) {
+        updateByQuery(dict, QueryWrapper.create().eq(MDict::getDictId, dict.getDictId()));
     }
 
     /**
      * 根据字典类型和字典key查询字典数据
-      * @param dictType 字典类型
+     * @param dictType 字典类型
      * @param dictKey 字典key
      * @return 字典数据
      */
     default MDict selectDictByDictTypeAndKey(String dictType, String dictKey) {
-        LambdaQueryWrapper<MDict> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MDict::getDictType, dictType);
-        queryWrapper.eq(MDict::getDictKey, dictKey);
-        return selectOne(queryWrapper);
+        return selectOneByQuery(QueryWrapper.create()
+                .eq(MDict::getDictType, dictType)
+                .eq(MDict::getDictKey, dictKey));
     }
-
 }

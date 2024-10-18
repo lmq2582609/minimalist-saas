@@ -24,9 +24,6 @@ public class MyBatisFlexConfiguration {
                 logger.info("{},{} ms", auditMessage.getFullSql(), auditMessage.getElapsedTime())
         );
 
-        //配置租户字段，配置后实体类字段不用在添加@Column(tenantId = true)
-        FlexGlobalConfig.getDefaultConfig().setTenantColumn(TenantIgnore.TENANT_ID);
-
         //获取租户ID，目前支持返回一个租户ID
         TenantManager.setTenantFactory(() -> {
             //校验系统多租户是否开启

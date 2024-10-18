@@ -1,13 +1,11 @@
 package com.minimalist.basic.config.mybatis.bo;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.annotation.*;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Getter

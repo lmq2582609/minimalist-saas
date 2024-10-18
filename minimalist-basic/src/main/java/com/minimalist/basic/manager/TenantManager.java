@@ -3,7 +3,6 @@ package com.minimalist.basic.manager;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.minimalist.basic.entity.enums.*;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.mapper.MRolePermMapper;
@@ -12,6 +11,7 @@ import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.EntityService;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.time.Duration;
@@ -108,10 +108,10 @@ public class TenantManager {
             } else {
                 //如果是其他角色，删除超出的权限
                 if (CollectionUtil.isNotEmpty(permIds)) {
-                    LambdaQueryWrapper<MRolePerm> queryWrapper = new LambdaQueryWrapper<>();
-                    queryWrapper.eq(MRolePerm::getRoleId, role.getRoleId());
-                    queryWrapper.notIn(MRolePerm::getPermId, permIds);
-                    rolePermMapper.delete(queryWrapper);
+                    rolePermMapper.deleteByQuery(QueryWrapper.create()
+                            .eq(MRolePerm::getRoleId, role.getRoleId())
+                            .notIn(MRolePerm::getPermId, permIds)
+                    );
                 }
             }
         }

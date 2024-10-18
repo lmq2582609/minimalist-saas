@@ -8,8 +8,6 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.config.eDict.BeanMethod;
 import com.minimalist.basic.entity.enums.DictEnum;
 import com.minimalist.basic.entity.enums.RespEnum;
@@ -26,6 +24,8 @@ import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.utils.RedisKeyConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,8 +81,7 @@ public class DictServiceImpl implements DictService {
         MDict mDict = dictMapper.selectDictByDictId(dictId);
         Assert.notNull(mDict, () -> new BusinessException(DictEnum.ErrorMsg.NONENTITY_DICT.getDesc()));
         //删除字典
-        int deleteCount = dictMapper.deleteDictByDictId(dictId);
-        Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        dictMapper.deleteDictByDictId(dictId);
         //删除缓存
         String dictCacheKey = StrUtil.indexedFormat(RedisKeyConstant.DICT_CACHE_KEY, mDict.getDictType());
         redisManager.delete(dictCacheKey);
@@ -95,8 +94,7 @@ public class DictServiceImpl implements DictService {
     @Override
     public void deleteDictByDictType(String dictType) {
         //删除字典
-        int deleteCount = dictMapper.deleteDictByDictType(dictType);
-        Assert.isTrue(deleteCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        dictMapper.deleteDictByDictType(dictType);
         //删除缓存
         String dictCacheKey = StrUtil.indexedFormat(RedisKeyConstant.DICT_CACHE_KEY, dictType);
         redisManager.delete(dictCacheKey);
@@ -144,11 +142,9 @@ public class DictServiceImpl implements DictService {
         //处理修改的数据
         if (CollectionUtil.isNotEmpty(dictInfoVO.getDictDataList())) {
             List<MDict> dictList = buildDictData(dictInfoVO, false);
-            int updateCount = 0;
             for (MDict mDict : dictList) {
-                updateCount += dictMapper.updateDictByDictId(mDict);
+                dictMapper.updateDictByDictId(mDict);
             }
-            Assert.isTrue(updateCount == dictList.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
         }
         //缓存处理
         setDictCacheHandler(CollectionUtil.list(false, dictInfoVO.getDictType()));
@@ -165,7 +161,7 @@ public class DictServiceImpl implements DictService {
         Page<MDict> mDictPage = dictMapper.selectPageDictList(queryVO);
         //数据转换
         List<DictVO> dictVOList = BeanUtil.copyToList(mDictPage.getRecords(), DictVO.class);
-        return new PageResp<>(dictVOList, mDictPage.getTotal());
+        return new PageResp<>(dictVOList, mDictPage.getTotalRow());
     }
 
     /**
@@ -266,9 +262,9 @@ public class DictServiceImpl implements DictService {
         List<MDict> mDicts;
         if (CollectionUtil.isEmpty(dictType)) {
             //查询全部
-            LambdaQueryWrapper<MDict> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.orderByAsc(MDict::getDictOrder);
-            mDicts = dictMapper.selectList(queryWrapper);
+            mDicts = dictMapper.selectListByQuery(QueryWrapper.create()
+                    .eq(MDict::getStatus, StatusEnum.STATUS_1.getCode())
+                    .orderBy(MDict::getDictOrder, true));
         } else {
             //按字典类型查询
             mDicts = dictMapper.selectDictListByDictType(dictType);

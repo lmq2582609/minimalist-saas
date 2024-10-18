@@ -16,16 +16,16 @@ import java.io.Serial;
 /**
  * 用户与岗位关联表 1用户-N岗位 实体类。
  *
- * @author asus
+ * @author 小太阳
  * @since 2024-10-18
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 @Table(value = "m_user_post", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
-public class MUserPost extends BaseEntity implements Serializable {
+public class MUserPost implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

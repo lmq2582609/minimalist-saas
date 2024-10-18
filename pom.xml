@@ -25,6 +25,8 @@
         <mybatis-flex.version>1.9.7</mybatis-flex.version>
         <!-- mybatis-flex代码生成 -->
         <mybatis-flex.codegen.version>1.8.3</mybatis-flex.codegen.version>
+        <!-- mybatis-flex使用的连接池 -->
+        <mybatis-flex.hikariCP.version>4.0.3</mybatis-flex.hikariCP.version>
         <!-- mybatis-plus版本 -->
         <mp.version>3.5.3.1</mp.version>
         <!-- mybatis-plus 生成代码 -->

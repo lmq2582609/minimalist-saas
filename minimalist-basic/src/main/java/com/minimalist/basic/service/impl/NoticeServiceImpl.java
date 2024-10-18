@@ -6,7 +6,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.enums.NoticeEnum;
@@ -23,6 +22,7 @@ import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.config.mybatis.bo.Pager;
 import com.minimalist.basic.utils.TextUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,8 +108,7 @@ public class NoticeServiceImpl implements NoticeService {
         //内容处理 -> 编码
         newNotice.setNoticeContent(TextUtil.encode(noticeVO.getNoticeContent()));
         //修改
-        int updateCount = noticeMapper.updateNoticeByNoticeId(newNotice);
-        Assert.isTrue(updateCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        noticeMapper.updateNoticeByNoticeId(newNotice);
         //公告相关文件处理
         fileStatusHandler(mNotice, BeanUtil.copyProperties(newNotice, NoticeVO.class), null);
     }
@@ -157,7 +156,7 @@ public class NoticeServiceImpl implements NoticeService {
             //将内容清空，因为列表不需要展示内容
             noticeVOS.forEach(n -> n.setNoticeContent(null));
         }
-        return new PageResp<>(noticeVOS, mNoticePage.getTotal());
+        return new PageResp<>(noticeVOS, mNoticePage.getTotalRow());
     }
 
     /**
@@ -193,7 +192,7 @@ public class NoticeServiceImpl implements NoticeService {
         List<NoticeVO> noticeVOS = BeanUtil.copyToList(mNoticePage.getRecords(), NoticeVO.class);
         //将内容清空，因为列表不需要展示内容
         noticeVOS.forEach(n -> n.setNoticeContent(null));
-        return new PageResp<>(noticeVOS, mNoticePage.getTotal());
+        return new PageResp<>(noticeVOS, mNoticePage.getTotalRow());
     }
 
     /**

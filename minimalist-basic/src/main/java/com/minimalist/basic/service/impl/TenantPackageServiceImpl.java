@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
@@ -19,6 +18,7 @@ import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -104,7 +104,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         //插入新租户套餐与权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), newTenantPackage.getPackageId());
         entityService.insertBatch(mTenantPackagePerms);
-
         //查询套餐的权限
         List<MTenantPackagePerm> oldPerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageVO.getPackageId());
         String op = oldPerms.stream().map(p -> p.getPermId().toString()).collect(Collectors.joining(","));
@@ -135,7 +134,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         //数据转换
         List<TenantPackageVO> tenantPackageVOList = BeanUtil.copyToList(packagePage.getRecords(), TenantPackageVO.class);
         //返回数据时，不查询每个套餐的权限
-        return new PageResp<>(tenantPackageVOList, packagePage.getTotal());
+        return new PageResp<>(tenantPackageVOList, packagePage.getTotalRow());
     }
 
     /**

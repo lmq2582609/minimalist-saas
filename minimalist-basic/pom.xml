@@ -35,19 +35,19 @@
             <version>${mysql.version}</version>
         </dependency>
 
-        <!-- mybatis-plus -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
-            <version>${mp.version}</version>
-        </dependency>
+<!--        &lt;!&ndash; mybatis-plus &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.baomidou</groupId>-->
+<!--            <artifactId>mybatis-plus-boot-starter</artifactId>-->
+<!--            <version>${mp.version}</version>-->
+<!--        </dependency>-->
 
-        <!-- mybatis-plus-generator -->
-        <dependency>
-            <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-generator</artifactId>
-            <version>${mpg.version}</version>
-        </dependency>
+<!--        &lt;!&ndash; mybatis-plus-generator &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>com.baomidou</groupId>-->
+<!--            <artifactId>mybatis-plus-generator</artifactId>-->
+<!--            <version>${mpg.version}</version>-->
+<!--        </dependency>-->
 
         <!-- velocity-engine-core mybatisplus生成代码用 -->
         <dependency>
@@ -149,6 +149,13 @@
             <groupId>com.mybatis-flex</groupId>
             <artifactId>mybatis-flex-codegen</artifactId>
             <version>${mybatis-flex.codegen.version}</version>
+        </dependency>
+
+        <!-- hikariCP连接池 -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>${mybatis-flex.hikariCP.version}</version>
         </dependency>
 
     </dependencies>

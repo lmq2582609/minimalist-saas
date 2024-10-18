@@ -96,8 +96,7 @@ public class PermServiceImpl implements PermService {
         //检查是否包含下级，包含下级不允许删除
         long childrenCount = permsMapper.selectChildrenCountByPermId(permId);
         Assert.isFalse(childrenCount > 0, () -> new BusinessException(PermEnum.ErrorMsg.CONTAIN_CHILDREN.getDesc()));
-        int deleteCount = permsMapper.deletePermsByPermId(permId);
-        Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        permsMapper.deletePermsByPermId(permId);
     }
 
     /**
@@ -113,8 +112,7 @@ public class PermServiceImpl implements PermService {
         //乐观锁字段赋值
         newPerms.updateBeforeSetVersion(mPerms.getVersion());
         //修改
-        int updateCount = permsMapper.updatePermsByPermId(newPerms);
-        Assert.isTrue(updateCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        permsMapper.updatePermsByPermId(newPerms);
     }
 
     /**

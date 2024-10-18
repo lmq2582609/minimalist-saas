@@ -4,7 +4,6 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
@@ -19,6 +18,7 @@ import com.minimalist.basic.entity.vo.file.*;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.service.FileService;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -105,7 +105,7 @@ public class FileServiceImpl implements FileService {
         Page<MFile> filePage = fileMapper.selectPageFileList(queryVO);
         //数据转换
         List<FileVO> fileVOList = BeanUtil.copyToList(filePage.getRecords(), FileVO.class);
-        return new PageResp<>(fileVOList, filePage.getTotal());
+        return new PageResp<>(fileVOList, filePage.getTotalRow());
     }
 
     /**

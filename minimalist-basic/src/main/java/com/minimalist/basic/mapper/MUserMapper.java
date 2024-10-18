@@ -1,37 +1,28 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.entity.po.MUser;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.minimalist.basic.entity.vo.user.UserQueryVO;
+import cn.hutool.core.util.ObjectUtil;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.QueryCondition;
-import com.minimalist.basic.entity.enums.UserEnum;
+import com.minimalist.basic.entity.po.table.MDeptTableDef;
+import com.minimalist.basic.entity.po.table.MUserDeptTableDef;
+import com.minimalist.basic.entity.po.table.MUserTableDef;
+import com.minimalist.basic.entity.vo.user.UserQueryVO;
+import com.minimalist.basic.utils.CommonConstant;
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MUser;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryColumn;
+import com.mybatisflex.core.query.QueryMethods;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.apache.ibatis.annotations.Param;
-
 import java.util.List;
 
 /**
- * <p>
- * 用户表 Mapper 接口
- * </p>
+ * 用户表 映射层。
  *
- * @author baomidou
- * @since 2023-05-04
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MUserMapper extends BaseMapper<MUser> {
-
-    /**
-     * 根据用户名查询用户数量
-     * @param username 用户名
-     * @return 用户PO
-     */
-    default long selectUserCountByUsername(String username) {
-        return selectCount(new LambdaQueryWrapper<MUser>().eq(MUser::getUsername, username));
-    }
 
     /**
      * 根据用户名查询用户
@@ -39,7 +30,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 用户PO
      */
     default MUser selectUserByUsername(String username) {
-        return selectOne(new LambdaQueryWrapper<MUser>().eq(MUser::getUsername, username));
+        return selectOneByQuery(QueryWrapper.create().eq(MUser::getUsername, username));
     }
 
     /**
@@ -48,7 +39,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 用户PO
      */
     default MUser selectUserByUserId(Long userId) {
-        return selectOne(new LambdaQueryWrapper<MUser>().eq(MUser::getUserId, userId));
+        return selectOneByQuery(QueryWrapper.create().eq(MUser::getUserId, userId));
     }
 
     /**
@@ -57,7 +48,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 用户PO
      */
     default List<MUser> selectUserByUserIds(List<Long> userIdList) {
-        return selectList(new LambdaQueryWrapper<MUser>().in(MUser::getUserId, userIdList));
+        return selectListByQuery(QueryWrapper.create().in(MUser::getUserId, userIdList));
     }
 
     /**
@@ -65,10 +56,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 用户列表
      */
     default List<MUser> selectUserDict() {
-        LambdaQueryWrapper<MUser> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.select(MUser::getUserId, MUser::getNickname);
-        queryWrapper.eq(MUser::getStatus, StatusEnum.STATUS_1.getCode());
-        return selectList(queryWrapper);
+        return selectListByQuery(QueryWrapper.create().eq(MUser::getStatus, StatusEnum.STATUS_1.getCode()));
     }
 
     /**
@@ -77,7 +65,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 该租户下的用户数量
      */
     default long selectUserCountByTenantId(Long tenantId) {
-        return selectCount(new LambdaQueryWrapper<MUser>().eq(MUser::getTenantId, tenantId));
+        return selectCountByQuery(QueryWrapper.create().eq(MUser::getTenantId, tenantId));
     }
 
     /**
@@ -86,34 +74,23 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 用户实体
      */
     default MUser selectUserByPhone(String phone) {
-        return selectOne(new LambdaQueryWrapper<MUser>().eq(MUser::getPhone, phone));
-    }
-
-    /**
-     * 根据邮箱查询用户
-     * @param email 邮箱
-     * @return 用户实体
-     */
-    default MUser selectUserByEmail(String email) {
-        return selectOne(new LambdaQueryWrapper<MUser>().eq(MUser::getEmail, email));
+        return selectOneByQuery(QueryWrapper.create().eq(MUser::getPhone, phone));
     }
 
     /**
      * 根据用户ID删除用户
      * @param userId 用户ID
-     * @return 受影响行数
      */
-    default int deleteUserByUserId(Long userId) {
-        return delete(new LambdaQueryWrapper<MUser>().eq(MUser::getUserId, userId));
+    default void deleteUserByUserId(Long userId) {
+        deleteByQuery(QueryWrapper.create().eq(MUser::getUserId, userId));
     }
 
     /**
      * 根据用户ID修改用户
      * @param user 用户数据
-     * @return 受影响行数
      */
-    default int updateUserByUserId(MUser user) {
-        return update(user, new LambdaUpdateWrapper<MUser>().eq(MUser::getUserId, user.getUserId()));
+    default void updateUserByUserId(MUser user) {
+        updateByQuery(user, QueryWrapper.create().eq(MUser::getUserId, user.getUserId()));
     }
 
     /**
@@ -124,7 +101,7 @@ public interface MUserMapper extends BaseMapper<MUser> {
     default long selectUserCountByDeptIds(List<Long> deptIds) {
         long result = 0;
         for (Long deptId : deptIds) {
-            result += selectCount(new LambdaQueryWrapper<MUser>().apply("FIND_IN_SET("  + deptId +", ancestors)"));
+            result += selectCountByQuery(QueryWrapper.create().where("FIND_IN_SET("  + deptId +", ancestors)"));
         }
         return result;
     }
@@ -134,6 +111,28 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @param query 查询条件
      * @return 用户分页数据
      */
-    Page<MUser> selectPageUserList(IPage<?> page, @Param("query") UserQueryVO query);
+    default Page<MUser> selectPageUserList(@Param("query") UserQueryVO query) {
+        QueryWrapper queryWrapper = QueryWrapper.create()
+                .select(MUserTableDef.MUSER.ALL_COLUMNS)
+                .from(MUserTableDef.MUSER)
+                .eq(MUser::getStatus, query.getStatus())
+                .like(MUser::getPhone, query.getPhone())
+                .like(MUser::getUserRealName, query.getUserRealName());
+        if (ObjectUtil.isNotNull(query.getDeptId()) && query.getDeptId().intValue() != CommonConstant.ZERO) {
+            queryWrapper.and(
+                    QueryMethods.exists(
+                        QueryMethods.selectOne()
+                                .from(MUserDeptTableDef.MUSER_DEPT)
+                                .leftJoin(MDeptTableDef.MDEPT).on(MUserDeptTableDef.MUSER_DEPT.DEPT_ID.eq(MDeptTableDef.MDEPT.DEPT_ID))
+                                .where(MUserTableDef.MUSER.USER_ID.eq(MUserDeptTableDef.MUSER_DEPT.USER_ID))
+                                .and(
+                                        MDeptTableDef.MDEPT.DEPT_ID.eq(query.getDeptId())
+                                                .or(QueryMethods.findInSet(QueryMethods.column(query.getDeptId().toString()), MDeptTableDef.MDEPT.ANCESTORS).ge(0))
+                                )
+                    )
+            );
+        }
+        return paginate(query.getPageNum(), query.getPageSize(), queryWrapper);
+    }
 
 }

@@ -2,6 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.minimalist.basic.mapper.MUserMapper">
 
+    <!--
     <select id="selectPageUserList" parameterType="UserQueryVO" resultType="MUser">
         SELECT u.*
         FROM m_user u
@@ -24,5 +25,6 @@
             )
         </if>
     </select>
+    -->
 
 </mapper>

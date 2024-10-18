@@ -14,6 +14,7 @@ public class GeneratorCodeHandler {
     public static final String url = "jdbc:mysql://127.0.0.1:3306/minimalist?characterEncoding=utf-8";
 
     public static final String username = "root";
+
     public static final String password = "123456";
 
     public static void main(String[] args) {

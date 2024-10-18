@@ -3,8 +3,6 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.po.MRole;
@@ -20,6 +18,8 @@ import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,9 +67,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public List<MRole> getRolesByRoles(List<Long> roleIds) {
-        LambdaQueryWrapper<MRole> rQuery = new LambdaQueryWrapper<>();
-        rQuery.in(MRole::getRoleId, roleIds);
-        return roleMapper.selectList(rQuery);
+        return roleMapper.selectListByQuery(QueryWrapper.create().in(MRole::getRoleId, roleIds));
     }
 
     /**
@@ -101,8 +99,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public void deleteRoleByRoleId(Long roleId) {
         //删除角色
-        int deleteCount = roleMapper.deleteRoleByRoleId(roleId);
-        Assert.isTrue(deleteCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        roleMapper.deleteRoleByRoleId(roleId);
         //删除角色与权限关联数据
         entityService.delete(MRolePerm::getRoleId, roleId);
         //删除角色与用户关联数据
@@ -123,8 +120,7 @@ public class RoleServiceImpl implements RoleService {
         //乐观锁字段赋值
         newRole.updateBeforeSetVersion(mRole.getVersion());
         //修改角色
-        int updateCount = roleMapper.updateRoleByRoleId(newRole);
-        Assert.isTrue(updateCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        roleMapper.updateRoleByRoleId(newRole);
         //删除原角色与权限关联信息
         entityService.delete(MRolePerm::getRoleId, roleVO.getRoleId());
         //添加新角色与权限关联信息
@@ -142,7 +138,7 @@ public class RoleServiceImpl implements RoleService {
     public PageResp<RoleVO> getPageRoleList(RoleQueryVO queryVO) {
         Page<MRole> mRolePage = roleMapper.selectPageRoleList(queryVO);
         List<RoleVO> roleVOList = BeanUtil.copyToList(mRolePage.getRecords(), RoleVO.class);
-        return new PageResp<>(roleVOList, mRolePage.getTotal());
+        return new PageResp<>(roleVOList, mRolePage.getTotalRow());
     }
 
     /**
@@ -169,9 +165,7 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public List<MRole> getRoleByTenantId(Long tenantId) {
-        LambdaQueryWrapper<MRole> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(MRole::getTenantId, tenantId);
-        return roleMapper.selectList(queryWrapper);
+        return roleMapper.selectListByQuery(QueryWrapper.create().eq(MRole::getTenantId, tenantId));
     }
 
     /**

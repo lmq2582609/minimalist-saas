@@ -1,39 +1,32 @@
 package com.minimalist.basic.mapper;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.minimalist.basic.config.mybatis.QueryCondition;
-import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.vo.file.FileQueryVO;
-
+import com.mybatisflex.core.BaseMapper;
+import com.minimalist.basic.entity.po.MFile;
+import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * <p>
- *  Mapper 接口
- * </p>
+ * 文件表 映射层。
  *
- * @author baomidou
- * @since 2023-07-18
+ * @author 小太阳
+ * @since 2024-10-18
  */
 public interface MFileMapper extends BaseMapper<MFile> {
-
     /**
      * 根据fileUrl修改文件状态
      * @param userId 用户ID
      * @param status 状态
      * @param urlList 文件url列表
-     * @return 受影响行数
      */
-    default int updateStatusByFileUrl(Long userId, List<String> urlList, Integer status) {
+    default void updateStatusByFileUrl(Long userId, List<String> urlList, Integer status) {
         MFile file = new MFile();
         file.setStatus(status);
         file.setUpdateId(userId);
         file.setUpdateTime(LocalDateTime.now());
-        return update(file, new LambdaUpdateWrapper<MFile>().in(MFile::getFileUrl, urlList));
+        updateByQuery(file, QueryWrapper.create().in(MFile::getFileUrl, urlList));
     }
 
     /**
@@ -42,13 +35,12 @@ public interface MFileMapper extends BaseMapper<MFile> {
      * @return 文件分页数据
      */
     default Page<MFile> selectPageFileList(FileQueryVO queryVO) {
-        return selectPage(new Page<>(queryVO.getPageNum(), queryVO.getPageSize()),
-                new QueryCondition<MFile>()
-                        .eqNotNull(MFile::getStatus, queryVO.getStatus())
-                        .eqNotNull(MFile::getFileSource, queryVO.getFileSource())
-                        .likeNotNull(MFile::getFileName, queryVO.getFileName())
-                        .orderByDescc(MFile::getCreateTime)
-                );
+        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+                QueryWrapper.create()
+                        .eq(MFile::getStatus, queryVO.getStatus())
+                        .eq(MFile::getFileSource, queryVO.getFileSource())
+                        .like(MFile::getFileName, queryVO.getFileName())
+                        .orderBy(MFile::getCreateTime, false));
     }
 
     /**
@@ -57,16 +49,7 @@ public interface MFileMapper extends BaseMapper<MFile> {
      * @return 文件实体
      */
     default MFile selectFileByFileId(Long fileId) {
-        return selectOne(new LambdaQueryWrapper<MFile>().eq(MFile::getFileId, fileId));
-    }
-
-    /**
-     * 根据文件URL查询文件
-     * @param urlList url列表
-     * @return 文件列表
-     */
-    default List<MFile> selectFileByFileUrl(List<String> urlList) {
-        return selectList(new LambdaQueryWrapper<MFile>().in(MFile::getFileUrl, urlList));
+        return selectOneByQuery(QueryWrapper.create().eq(MFile::getFileId, fileId));
     }
 
     /**
@@ -75,21 +58,20 @@ public interface MFileMapper extends BaseMapper<MFile> {
      * @return 文件列表
      */
     default List<MFile> selectFileByFileIds(List<Long> fileIdList) {
-        return selectList(new LambdaQueryWrapper<MFile>().in(MFile::getFileId, fileIdList));
+        return selectListByQuery(QueryWrapper.create().in(MFile::getFileId, fileIdList));
     }
 
     /**
      * 根据文件ID修改文件状态
      * @param fileIdList 文件ID列表
      * @param fileStatus 文件状态
-     * @return 受影响行数
      */
-    default int updateFileStatusByFileIds(Long userId, List<Long> fileIdList, Integer fileStatus) {
+    default void updateFileStatusByFileIds(Long userId, List<Long> fileIdList, Integer fileStatus) {
         MFile file = new MFile();
         file.setStatus(fileStatus);
         file.setUpdateId(userId);
         file.setUpdateTime(LocalDateTime.now());
-        return update(file, new LambdaUpdateWrapper<MFile>().in(MFile::getFileId, fileIdList));
+        updateByQuery(file, QueryWrapper.create().in(MFile::getFileId, fileIdList));
     }
 
 }

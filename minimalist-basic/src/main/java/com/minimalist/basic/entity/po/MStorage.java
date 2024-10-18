@@ -16,7 +16,7 @@ import java.io.Serial;
 /**
  * 存储管理表 实体类。
  *
- * @author asus
+ * @author 小太阳
  * @since 2024-10-18
  */
 @Data

@@ -2,7 +2,6 @@ package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
@@ -14,10 +13,10 @@ import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.service.StorageService;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -91,7 +90,7 @@ public class StorageServiceImpl implements StorageService {
     public PageResp<StorageVO> getPageStorageList(StorageQueryVO queryVO) {
         Page<MStorage> storagePage = storageMapper.selectPageStorageList(queryVO);
         List<StorageVO> storageVOList = BeanUtil.copyToList(storagePage.getRecords(), StorageVO.class);
-        return new PageResp<>(storageVOList, storagePage.getTotal());
+        return new PageResp<>(storageVOList, storagePage.getTotalRow());
     }
 
     /**
