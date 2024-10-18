@@ -8,6 +8,8 @@ public class CommonConstant {
     /** 数字 1 */
     public static final int ONE = 1;
 
+    public static final String TRACE_ID = "traceId";
+
     /** 多租户开关配置 key */
     public static final String SYSTEM_CONFIG_TENANT = "system.config.tenant";
 
