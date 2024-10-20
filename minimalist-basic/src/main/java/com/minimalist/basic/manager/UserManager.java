@@ -9,10 +9,14 @@ import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.po.MUserPost;
 import com.minimalist.basic.entity.po.MUserRole;
+import com.minimalist.basic.mapper.MUserDeptMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.entity.enums.UserEnum;
-import com.minimalist.basic.config.mybatis.EntityService;
+import com.minimalist.basic.mapper.MUserPostMapper;
+import com.minimalist.basic.mapper.MUserRoleMapper;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.util.List;
@@ -28,7 +32,13 @@ public class UserManager {
     private MUserMapper userMapper;
 
     @Autowired
-    private EntityService entityService;
+    private MUserRoleMapper userRoleMapper;
+
+    @Autowired
+    private MUserPostMapper userPostMapper;
+
+    @Autowired
+    private MUserDeptMapper userDeptMapper;
 
     /**
      * 用户密码加密
@@ -85,7 +95,7 @@ public class UserManager {
                 userRole.setRoleId(r);
                 return userRole;
             }).toList();
-            entityService.insertBatch(userRoleList);
+            userRoleMapper.insertBatch(userRoleList);
         }
         //用户与岗位关联关系
         if (CollectionUtil.isNotEmpty(postIds)) {
@@ -95,7 +105,7 @@ public class UserManager {
                 userPost.setPostId(p);
                 return userPost;
             }).toList();
-            entityService.insertBatch(userPostList);
+            userPostMapper.insertBatch(userPostList);
         }
         //用户与部门关联关系
         if (CollectionUtil.isNotEmpty(deptIds)) {
@@ -105,7 +115,7 @@ public class UserManager {
                 userDept.setDeptId(d);
                 return userDept;
             }).toList();
-            entityService.insertBatch(userDeptList);
+            userDeptMapper.insertBatch(userDeptList);
         }
     }
 
@@ -115,11 +125,17 @@ public class UserManager {
      */
     public void deleteUserRelation(Long userId) {
         //删除用户与角色关联关系 -> 真实删除
-        entityService.delete(MUserRole::getUserId, userId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userRoleMapper.deleteByQuery(QueryWrapper.create().eq(MUserRole::getUserId, userId))
+        );
         //删除用户与岗位关联关系 -> 真实删除
-        entityService.delete(MUserPost::getUserId, userId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userPostMapper.deleteByQuery(QueryWrapper.create().eq(MUserPost::getUserId, userId))
+        );
         //删除用户与部门关联关系 -> 真实删除
-        entityService.delete(MUserDept::getUserId, userId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userDeptMapper.deleteByQuery(QueryWrapper.create().eq(MUserDept::getUserId, userId))
+        );
     }
 
 }

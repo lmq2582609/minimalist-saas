@@ -13,10 +13,11 @@ import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.service.PostService;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -29,9 +30,6 @@ public class PostServiceImpl implements PostService {
 
     @Autowired
     private MUserPostMapper userPostMapper;
-
-    @Autowired
-    private EntityService entityService;
 
     /**
      * 添加岗位
@@ -59,7 +57,9 @@ public class PostServiceImpl implements PostService {
         //删除岗位
         postMapper.deletePostByPostId(postId);
         //删除岗位与用户关联关系
-        entityService.delete(MUserPost::getPostId, postId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userPostMapper.deleteByQuery(QueryWrapper.create().eq(MUserPost::getPostId, postId))
+        );
     }
 
     /**

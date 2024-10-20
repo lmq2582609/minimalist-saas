@@ -10,7 +10,7 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -29,9 +29,6 @@ public class TenantManager {
 
     @Autowired
     private MUserMapper userMapper;
-
-    @Autowired
-    private EntityService entityService;
 
     @Autowired
     private MRolePermMapper rolePermMapper;
@@ -96,7 +93,9 @@ public class TenantManager {
             //如果是租户管理员，将套餐所有权限重新分配给租户管理员
             if (RoleEnum.Role.ADMIN.getCode().equals(role.getRoleCode())) {
                 //删除旧关联数据
-                entityService.delete(MRolePerm::getRoleId, role.getRoleId());
+                LogicDeleteManager.execWithoutLogicDelete(()->
+                        rolePermMapper.deleteByQuery(QueryWrapper.create().eq(MRolePerm::getRoleId, role.getRoleId()))
+                );
                 //插入新关联数据
                 List<MRolePerm> rolePerms = newTpp.stream().map(tpp -> {
                     MRolePerm rolePerm = new MRolePerm();
@@ -104,7 +103,7 @@ public class TenantManager {
                     rolePerm.setPermId(tpp.getPermId());
                     return rolePerm;
                 }).toList();
-                entityService.insertBatch(rolePerms);
+                rolePermMapper.insertBatch(rolePerms);
             } else {
                 //如果是其他角色，删除超出的权限
                 if (CollectionUtil.isNotEmpty(permIds)) {

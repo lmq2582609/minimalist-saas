@@ -14,11 +14,12 @@ import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,9 +37,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
 
     @Autowired
     private MTenantMapper tenantMapper;
-
-    @Autowired
-    private EntityService entityService;
 
     @Autowired
     private MPermsMapper permsMapper;
@@ -65,7 +63,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         //构造套餐与权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), tenantPackageId);
         //插入套餐与权限的关联数据
-        entityService.insertBatch(mTenantPackagePerms);
+        tenantPackagePermMapper.insertBatch(mTenantPackagePerms);
     }
 
     /**
@@ -95,22 +93,24 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         //查询租户套餐
         MTenantPackage oldTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageVO.getPackageId());
         Assert.notNull(oldTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
+        //修改租户套餐数据
         MTenantPackage newTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
-        //乐观锁字段复制
-        newTenantPackage.updateBeforeSetVersion(oldTenantPackage.getVersion());
         tenantPackageMapper.updateTenantPackageByTenantPackageId(newTenantPackage);
-        //删除原租户套餐与权限关联数据
-        entityService.delete(MTenantPackagePerm::getPackageId, newTenantPackage.getPackageId());
-        //插入新租户套餐与权限关联数据
-        List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), newTenantPackage.getPackageId());
-        entityService.insertBatch(mTenantPackagePerms);
-        //查询套餐的权限
+        //查询租户套餐的权限 - 修改前的权限
         List<MTenantPackagePerm> oldPerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageVO.getPackageId());
         String op = oldPerms.stream().map(p -> p.getPermId().toString()).collect(Collectors.joining(","));
         //修改后的套餐权限
         String np = tenantPackageVO.getPermissionsIds().stream().map(Object::toString).collect(Collectors.joining(","));
         //如果套餐的旧权限和修改后的新权限不一致，需要修改所有使用改套餐租户的权限
         if (!op.equals(np)) {
+            //套餐的权限修改
+            //1. 删除原套餐与权限关联数据
+            LogicDeleteManager.execWithoutLogicDelete(()->
+                    tenantPackagePermMapper.deleteByQuery(QueryWrapper.create().eq(MTenantPackagePerm::getPackageId, newTenantPackage.getPackageId()))
+            );
+            //2. 插入新套餐与权限关联数据
+            List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), newTenantPackage.getPackageId());
+            tenantPackagePermMapper.insertBatch(mTenantPackagePerms);
             //根据套餐查租户
             List<MTenant> tenants = tenantMapper.selectTenantByTenantPackageId(tenantPackageVO.getPackageId());
             for (MTenant tenant : tenants) {

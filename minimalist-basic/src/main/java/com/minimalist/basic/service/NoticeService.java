@@ -3,7 +3,7 @@ package com.minimalist.basic.service;
 import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
 import com.minimalist.basic.entity.vo.notice.NoticeVO;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 
 public interface NoticeService {
 
@@ -43,6 +43,6 @@ public interface NoticeService {
      * 查询公告列表(分页) -> 首页使用
      * @return 公告分页数据
      */
-    PageResp<NoticeVO> getPageHomeNoticeList(Pager pager);
+    PageResp<NoticeVO> getPageHomeNoticeList(PageReq pageReq);
 
 }

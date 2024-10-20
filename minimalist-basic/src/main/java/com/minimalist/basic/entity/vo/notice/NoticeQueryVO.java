@@ -2,7 +2,7 @@ package com.minimalist.basic.entity.vo.notice;
 
 import com.minimalist.basic.entity.enums.NoticeEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 import com.minimalist.basic.config.swagger.SchemaEnum;
 import com.minimalist.basic.utils.Add;
 import com.minimalist.basic.utils.Update;
@@ -14,7 +14,7 @@ import java.io.Serializable;
 
 @Data
 @Schema(name = "公告查询实体")
-public class NoticeQueryVO extends Pager implements Serializable {
+public class NoticeQueryVO extends PageReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -10,7 +10,6 @@ import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.config.eDict.BeanMethod;
 import com.minimalist.basic.entity.enums.DictEnum;
-import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.po.MDict;
 import com.minimalist.basic.entity.vo.dict.*;
 import com.minimalist.basic.mapper.MDictMapper;
@@ -19,7 +18,6 @@ import com.minimalist.basic.service.EDictService;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.eDict.EDictConstant;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.utils.RedisKeyConstant;
@@ -30,7 +28,6 @@ import org.redisson.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.List;
@@ -51,9 +48,6 @@ public class DictServiceImpl implements DictService {
     @Autowired
     private RedissonClient redissonClient;
 
-    @Autowired
-    private EntityService entityService;
-
     /**
      * 新增字典
      * @param dictInfoVO 字典实体
@@ -65,8 +59,7 @@ public class DictServiceImpl implements DictService {
         //数据转换，构建字典实体数据
         List<MDict> dictList = buildDictData(dictInfoVO, true);
         //批量新增
-        int insertCount = entityService.insertBatch(dictList);
-        Assert.isTrue(insertCount == dictList.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        dictMapper.insertBatch(dictList);
         //缓存处理
         setDictCacheHandler(CollectionUtil.list(false, dictInfoVO.getDictType()));
     }
@@ -136,8 +129,7 @@ public class DictServiceImpl implements DictService {
                 return mDict;
             }).toList();
             //批量新增
-            int insertCount = entityService.insertBatch(dictList);
-            Assert.isTrue(insertCount == dictList.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
+            dictMapper.insertBatch(dictList);
         }
         //处理修改的数据
         if (CollectionUtil.isNotEmpty(dictInfoVO.getDictDataList())) {

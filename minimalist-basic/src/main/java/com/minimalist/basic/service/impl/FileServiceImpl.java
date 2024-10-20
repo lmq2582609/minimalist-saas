@@ -10,7 +10,6 @@ import com.minimalist.basic.config.fileHandler.FileManager;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
 import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.po.MStorage;
@@ -18,7 +17,9 @@ import com.minimalist.basic.entity.vo.file.*;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.service.FileService;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,9 +30,6 @@ public class FileServiceImpl implements FileService {
 
     @Autowired
     private MFileMapper fileMapper;
-
-    @Autowired
-    private EntityService entityService;
 
     @Autowired
     private MStorageMapper storageMapper;
@@ -72,7 +70,7 @@ public class FileServiceImpl implements FileService {
             files.add(mFile);
         }
         //批量插入文件信息
-        entityService.insertBatch(files);
+        fileMapper.insertBatch(files);
         return BeanUtil.copyToList(files, FileUploadRespVO.class);
     }
 
@@ -92,7 +90,9 @@ public class FileServiceImpl implements FileService {
         //删除文件
         fileHandler.deleteFile(fileId);
         //删除数据库文件记录
-        entityService.delete(MFile::getFileId, fileId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                fileMapper.deleteByQuery(QueryWrapper.create().eq(MFile::getFileId, fileId))
+        );
     }
 
     /**

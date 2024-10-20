@@ -18,7 +18,6 @@ import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantService;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
@@ -58,10 +57,10 @@ public class TenantServiceImpl implements TenantService {
     private MUserRoleMapper userRoleMapper;
 
     @Autowired
-    private EntityService entityService;
+    private TenantManager tenantManager;
 
     @Autowired
-    private TenantManager tenantManager;
+    private MRolePermMapper rolePermMapper;
 
     /**
      * 添加租户
@@ -237,7 +236,8 @@ public class TenantServiceImpl implements TenantService {
             rolePerm.setPermId(tpp.getPermId());
             return rolePerm;
         }).toList();
-        entityService.insertBatch(rolePerms);
+        rolePermMapper.insertBatch(rolePerms);
+
     }
 
     private void addTenantUser(UserVO userInfo, Long tenantId) {

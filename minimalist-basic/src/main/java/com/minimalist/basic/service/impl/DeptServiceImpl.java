@@ -11,13 +11,15 @@ import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
 import com.minimalist.basic.mapper.MDeptMapper;
+import com.minimalist.basic.mapper.MUserDeptMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.service.DeptService;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +37,7 @@ public class DeptServiceImpl implements DeptService {
     private MDeptMapper deptMapper;
 
     @Autowired
-    private EntityService entityService;
+    private MUserDeptMapper userDeptMapper;
 
     /**
      * 添加部门
@@ -79,7 +81,9 @@ public class DeptServiceImpl implements DeptService {
         //删除部门
         deptMapper.deleteDeptByDeptId(deptId);
         //删除部门和用户关联关系
-        entityService.delete(MUserDept::getDeptId, deptId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userDeptMapper.deleteByQuery(QueryWrapper.create().eq(MUserDept::getDeptId, deptId))
+        );
     }
 
     /**

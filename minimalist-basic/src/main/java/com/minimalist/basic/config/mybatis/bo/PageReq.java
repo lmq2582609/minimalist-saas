@@ -8,7 +8,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class Pager {
+public class PageReq {
 
     /** 页码 */
     private Long pageNum = 1L;

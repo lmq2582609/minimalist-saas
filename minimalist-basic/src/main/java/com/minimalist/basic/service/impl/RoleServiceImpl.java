@@ -3,7 +3,6 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
-import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.po.MRole;
 import com.minimalist.basic.entity.po.MRolePerm;
@@ -15,9 +14,9 @@ import com.minimalist.basic.mapper.MRolePermMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.config.mybatis.EntityService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,6 @@ public class RoleServiceImpl implements RoleService {
 
     @Autowired
     private MUserRoleMapper userRoleMapper;
-
-    @Autowired
-    private EntityService entityService;
 
     @Autowired
     private MRolePermMapper rolePermMapper;
@@ -89,7 +85,7 @@ public class RoleServiceImpl implements RoleService {
         roleMapper.insert(mRole);
         //插入角色和权限关联数据
         List<MRolePerm> mRolePerms = permIdToRolePerm(roleVO.getPermissionsIds(), roleId);
-        entityService.insertBatch(mRolePerms);
+        rolePermMapper.insertBatch(mRolePerms);
     }
 
     /**
@@ -101,9 +97,13 @@ public class RoleServiceImpl implements RoleService {
         //删除角色
         roleMapper.deleteRoleByRoleId(roleId);
         //删除角色与权限关联数据
-        entityService.delete(MRolePerm::getRoleId, roleId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                rolePermMapper.deleteByQuery(QueryWrapper.create().eq(MRolePerm::getRoleId, roleId))
+        );
         //删除角色与用户关联数据
-        entityService.delete(MUserRole::getRoleId, roleId);
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userRoleMapper.deleteByQuery(QueryWrapper.create().eq(MUserRole::getRoleId, roleId))
+        );
     }
 
     /**
@@ -122,11 +122,13 @@ public class RoleServiceImpl implements RoleService {
         //修改角色
         roleMapper.updateRoleByRoleId(newRole);
         //删除原角色与权限关联信息
-        entityService.delete(MRolePerm::getRoleId, roleVO.getRoleId());
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                rolePermMapper.deleteByQuery(QueryWrapper.create().eq(MRolePerm::getRoleId, roleVO.getRoleId()))
+        );
+
         //添加新角色与权限关联信息
         List<MRolePerm> mRolePerms = permIdToRolePerm(roleVO.getPermissionsIds(), roleVO.getRoleId());
-        int insertBatchCount = entityService.insertBatch(mRolePerms);
-        Assert.isTrue(insertBatchCount == mRolePerms.size(), () -> new BusinessException(RespEnum.FAILED.getDesc()));
+        rolePermMapper.insertBatch(mRolePerms);
     }
 
     /**

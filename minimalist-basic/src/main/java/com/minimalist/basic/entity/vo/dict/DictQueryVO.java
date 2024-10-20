@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.dict;
 
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 import com.minimalist.basic.config.swagger.SchemaEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 @Data
 @Schema(name = "字典查询实体")
-public class DictQueryVO extends Pager implements Serializable {
+public class DictQueryVO extends PageReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

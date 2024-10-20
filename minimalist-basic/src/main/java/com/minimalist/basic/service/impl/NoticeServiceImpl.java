@@ -19,7 +19,7 @@ import com.minimalist.basic.mapper.MNoticeMapper;
 import com.minimalist.basic.service.NoticeService;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 import com.minimalist.basic.utils.TextUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.paginate.Page;
@@ -185,9 +185,9 @@ public class NoticeServiceImpl implements NoticeService {
      * @return 公告分页数据
      */
     @Override
-    public PageResp<NoticeVO> getPageHomeNoticeList(Pager pager) {
+    public PageResp<NoticeVO> getPageHomeNoticeList(PageReq pageReq) {
         //分页查询
-        Page<MNotice> mNoticePage = noticeMapper.selectHomePageNoticeList(pager);
+        Page<MNotice> mNoticePage = noticeMapper.selectHomePageNoticeList(pageReq);
         //数据转换
         List<NoticeVO> noticeVOS = BeanUtil.copyToList(mNoticePage.getRecords(), NoticeVO.class);
         //将内容清空，因为列表不需要展示内容

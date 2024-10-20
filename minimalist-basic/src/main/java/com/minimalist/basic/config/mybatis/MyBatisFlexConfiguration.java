@@ -1,10 +1,8 @@
 package com.minimalist.basic.config.mybatis;
 
 import cn.hutool.core.util.StrUtil;
-import com.minimalist.basic.config.tenant.TenantIgnore;
 import com.minimalist.basic.config.tenant.TenantInit;
 import com.minimalist.basic.utils.SafetyUtil;
-import com.mybatisflex.core.FlexGlobalConfig;
 import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.tenant.TenantManager;
 import org.slf4j.Logger;

@@ -5,7 +5,7 @@ import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
 import com.minimalist.basic.entity.vo.notice.NoticeVO;
 import com.minimalist.basic.service.NoticeService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 import com.minimalist.basic.utils.Add;
 import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,8 +69,8 @@ public class NoticeController {
 
     @GetMapping("/getPageHomeNoticeList")
     @Operation(summary = "查询公告列表(分页) -> 首页使用")
-    public ResponseEntity<PageResp<NoticeVO>> getPageHomeNoticeList(Pager pager) {
-        return ResponseEntity.ok(noticeService.getPageHomeNoticeList(pager));
+    public ResponseEntity<PageResp<NoticeVO>> getPageHomeNoticeList(PageReq pageReq) {
+        return ResponseEntity.ok(noticeService.getPageHomeNoticeList(pageReq));
     }
 
 }

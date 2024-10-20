@@ -1,6 +1,6 @@
 package com.minimalist.basic.entity.vo.user;
 
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.io.Serial;
@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 @Data
 @Schema(name = "用户查询实体")
-public class UserQueryVO extends Pager implements Serializable {
+public class UserQueryVO extends PageReq implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;

@@ -1,6 +1,6 @@
 package com.minimalist.basic.mapper;
 
-import com.minimalist.basic.config.mybatis.bo.Pager;
+import com.minimalist.basic.config.mybatis.bo.PageReq;
 import com.minimalist.basic.entity.enums.NoticeEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
@@ -62,8 +62,8 @@ public interface MNoticeMapper extends BaseMapper<MNotice> {
      * 查询公告列表(分页) -> 首页使用
      * @return 公告列表
      */
-    default Page<MNotice> selectHomePageNoticeList(Pager pager) {
-        return paginate(pager.getPageNum(), pager.getPageSize(),
+    default Page<MNotice> selectHomePageNoticeList(PageReq pageReq) {
+        return paginate(pageReq.getPageNum(), pageReq.getPageSize(),
                 QueryWrapper.create()
                         .eq(MNotice::getStatus, StatusEnum.STATUS_1.getCode())
                         .eq(MNotice::getNoticeType, NoticeEnum.NoticeType.NOTICE.getCode())
