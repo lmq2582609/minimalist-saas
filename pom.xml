@@ -27,12 +27,6 @@
         <mybatis-flex.codegen.version>1.8.3</mybatis-flex.codegen.version>
         <!-- mybatis-flex使用的连接池 -->
         <mybatis-flex.hikariCP.version>4.0.3</mybatis-flex.hikariCP.version>
-        <!-- mybatis-plus版本 -->
-        <mp.version>3.5.3.1</mp.version>
-        <!-- mybatis-plus 生成代码 -->
-        <mpg.version>3.5.3.1</mpg.version>
-        <!-- mybatis-plus 生成代码依赖的velocity-engine-core版本 -->
-        <vec.version>2.3</vec.version>
         <!-- hutool工具包 -->
         <hutool.version>5.8.32</hutool.version>
         <!-- sa-token -->

@@ -51,10 +51,6 @@
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
                         </exclude>
-                        <exclude>
-                            <groupId>org.apache.velocity</groupId>
-                            <artifactId>velocity-engine-core</artifactId>
-                        </exclude>
                     </excludes>
                 </configuration>
             </plugin>

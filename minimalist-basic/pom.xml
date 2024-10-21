@@ -35,27 +35,6 @@
             <version>${mysql.version}</version>
         </dependency>
 
-<!--        &lt;!&ndash; mybatis-plus &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.baomidou</groupId>-->
-<!--            <artifactId>mybatis-plus-boot-starter</artifactId>-->
-<!--            <version>${mp.version}</version>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; mybatis-plus-generator &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.baomidou</groupId>-->
-<!--            <artifactId>mybatis-plus-generator</artifactId>-->
-<!--            <version>${mpg.version}</version>-->
-<!--        </dependency>-->
-
-        <!-- velocity-engine-core mybatisplus生成代码用 -->
-        <dependency>
-            <groupId>org.apache.velocity</groupId>
-            <artifactId>velocity-engine-core</artifactId>
-            <version>${vec.version}</version>
-        </dependency>
-
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
