@@ -43,6 +43,7 @@ public class MinIOFileHandler implements FileHandler {
      */
     @Override
     public MFile uploadFile(MultipartFile multipartFile, Integer fileSource, MStorage storage) {
+        //没做，做了需要引jar包，可自行实现
         return null;
     }
 
@@ -53,6 +54,7 @@ public class MinIOFileHandler implements FileHandler {
      */
     @Override
     public boolean deleteFile(Long fileId) {
+        //没做，做了需要引jar包，可自行实现
         return false;
     }
 
