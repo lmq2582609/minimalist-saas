@@ -1,6 +1,7 @@
 package com.minimalist.basic.mapper;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.po.table.MDeptTableDef;
 import com.minimalist.basic.entity.po.table.MUserDeptTableDef;
@@ -112,26 +113,34 @@ public interface MUserMapper extends BaseMapper<MUser> {
      * @return 用户分页数据
      */
     default Page<MUser> selectPageUserList(@Param("query") UserQueryVO query) {
+        /* select u.* FROM m_user u
+         * inner join m_user_dept ud on u.user_id = ud.user_id
+         * inner join m_dept d on d.dept_id = ud.dept_id
+         * WHERE (
+         *  d.dept_id = 1677964029214371840 or d.dept_id in (select t.dept_id from m_dept t where find_in_set(1677964029214371840, ancestors))
+         * )
+         * group by u.user_id;
+         */
         QueryWrapper queryWrapper = QueryWrapper.create()
                 .select(MUserTableDef.MUSER.ALL_COLUMNS)
                 .from(MUserTableDef.MUSER)
-                .eq(MUser::getStatus, query.getStatus())
-                .like(MUser::getPhone, query.getPhone())
-                .like(MUser::getUserRealName, query.getUserRealName());
-        if (ObjectUtil.isNotNull(query.getDeptId()) && query.getDeptId().intValue() != CommonConstant.ZERO) {
-            queryWrapper.and(
-                    QueryMethods.exists(
-                        QueryMethods.selectOne()
-                                .from(MUserDeptTableDef.MUSER_DEPT)
-                                .leftJoin(MDeptTableDef.MDEPT).on(MUserDeptTableDef.MUSER_DEPT.DEPT_ID.eq(MDeptTableDef.MDEPT.DEPT_ID))
-                                .where(MUserTableDef.MUSER.USER_ID.eq(MUserDeptTableDef.MUSER_DEPT.USER_ID))
-                                .and(
-                                        MDeptTableDef.MDEPT.DEPT_ID.eq(query.getDeptId())
-                                                .or(QueryMethods.findInSet(QueryMethods.column(query.getDeptId().toString()), MDeptTableDef.MDEPT.ANCESTORS).ge(0))
-                                )
-                    )
-            );
-        }
+                .leftJoin(MUserDeptTableDef.MUSER_DEPT).on(MUserDeptTableDef.MUSER_DEPT.USER_ID.eq(MUserTableDef.MUSER.USER_ID))
+                .leftJoin(MDeptTableDef.MDEPT).on(MDeptTableDef.MDEPT.DEPT_ID.eq(MUserDeptTableDef.MUSER_DEPT.DEPT_ID))
+                .where(MUserTableDef.MUSER.STATUS.eq(query.getStatus()))
+                .and(MUserTableDef.MUSER.PHONE.like(query.getPhone()))
+                .and(MUserTableDef.MUSER.USER_REAL_NAME.like(query.getUserRealName()))
+                .and(
+                        MDeptTableDef.MDEPT.DEPT_ID.eq(query.getDeptId())
+                                .or(MDeptTableDef.MDEPT.DEPT_ID.in(
+                                        QueryWrapper.create()
+                                                .select(MDeptTableDef.MDEPT.DEPT_ID)
+                                                .from(MDeptTableDef.MDEPT)
+                                                .where(
+                                                        QueryMethods.findInSet(String.valueOf(query.getDeptId()), MDeptTableDef.MDEPT.ANCESTORS.getName()).gt(0)
+                                                )
+                                ))
+                )
+                .groupBy(MUserTableDef.MUSER.USER_ID);
         return paginate(query.getPageNum(), query.getPageSize(), queryWrapper);
     }
 
