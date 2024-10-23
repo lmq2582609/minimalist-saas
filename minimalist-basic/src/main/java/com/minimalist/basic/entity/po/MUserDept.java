@@ -24,7 +24,7 @@ import java.io.Serial;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Table(value = "m_user_dept", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
+@Table(value = "m_user_dept")
 public class MUserDept implements Serializable {
 
     @Serial

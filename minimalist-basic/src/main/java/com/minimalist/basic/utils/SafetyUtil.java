@@ -2,7 +2,6 @@ package com.minimalist.basic.utils;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.minimalist.basic.config.tenant.TenantIgnore;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,33 +13,6 @@ import java.util.Optional;
  * 安全校验
  */
 public class SafetyUtil {
-
-    /**
-     * 忽略多租户本地变量
-     */
-    private static final TransmittableThreadLocal<Boolean> IGNORE_TENANT = new TransmittableThreadLocal<>();
-
-    /**
-     * 设置是否忽略多租户
-     */
-    public static void setIgnoreTenant(boolean ignoreTenant) {
-        IGNORE_TENANT.set(ignoreTenant);
-    }
-
-    /**
-     * 清除是否忽略多租户
-     */
-    public static void clearIgnoreTenant() {
-        IGNORE_TENANT.remove();
-    }
-
-    /**
-     * 检查是否忽略多租户
-     * @return true忽略，false不忽略
-     */
-    public static boolean checkIgnoreTenant() {
-        return Boolean.TRUE.equals(IGNORE_TENANT.get());
-    }
 
     /**
      * 检查是否为系统租户，系统租户ID = 0

@@ -24,7 +24,7 @@ import java.io.Serial;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Table(value = "m_role_perm", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
+@Table(value = "m_role_perm")
 public class MRolePerm implements Serializable {
 
     @Serial

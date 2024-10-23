@@ -110,7 +110,6 @@ public class UserServiceImpl implements UserService {
         userManager.checkUserEmailUniqueness(userVO.getEmail(), null);
         //校验该租户套餐是否满足条件
         tenantManager.checkTenantPackage(tenantId);
-
         //新增用户数据
         MUser user = BeanUtil.copyProperties(userVO, MUser.class);
         long userId = UnqIdUtil.uniqueId();

@@ -24,7 +24,7 @@ import java.io.Serial;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode
-@Table(value = "m_tenant_package_perm", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
+@Table(value = "m_tenant_package_perm")
 public class MTenantPackagePerm implements Serializable {
 
     @Serial

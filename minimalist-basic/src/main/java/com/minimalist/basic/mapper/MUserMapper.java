@@ -128,19 +128,20 @@ public interface MUserMapper extends BaseMapper<MUser> {
                 .leftJoin(MDeptTableDef.MDEPT).on(MDeptTableDef.MDEPT.DEPT_ID.eq(MUserDeptTableDef.MUSER_DEPT.DEPT_ID))
                 .where(MUserTableDef.MUSER.STATUS.eq(query.getStatus()))
                 .and(MUserTableDef.MUSER.PHONE.like(query.getPhone()))
-                .and(MUserTableDef.MUSER.USER_REAL_NAME.like(query.getUserRealName()))
-                .and(
-                        MDeptTableDef.MDEPT.DEPT_ID.eq(query.getDeptId())
-                                .or(MDeptTableDef.MDEPT.DEPT_ID.in(
-                                        QueryWrapper.create()
-                                                .select(MDeptTableDef.MDEPT.DEPT_ID)
-                                                .from(MDeptTableDef.MDEPT)
-                                                .where(
-                                                        QueryMethods.findInSet(String.valueOf(query.getDeptId()), MDeptTableDef.MDEPT.ANCESTORS.getName()).gt(0)
-                                                )
-                                ))
-                )
-                .groupBy(MUserTableDef.MUSER.USER_ID);
+                .and(MUserTableDef.MUSER.USER_REAL_NAME.like(query.getUserRealName()));
+        //deptId=0表示全部，需要忽略
+        if (ObjectUtil.isNotNull(query.getDeptId()) && CommonConstant.ZERO != query.getDeptId()) {
+            queryWrapper.and(
+                    MDeptTableDef.MDEPT.DEPT_ID.eq(query.getDeptId())
+                            .or(MDeptTableDef.MDEPT.DEPT_ID.in(
+                                    QueryWrapper.create()
+                                            .select(MDeptTableDef.MDEPT.DEPT_ID)
+                                            .from(MDeptTableDef.MDEPT)
+                                            .where("FIND_IN_SET(" + query.getDeptId() + ", ancestors)")
+                            ))
+            );
+        }
+        queryWrapper.groupBy(MUserTableDef.MUSER.USER_ID);
         return paginate(query.getPageNum(), query.getPageSize(), queryWrapper);
     }
 

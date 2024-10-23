@@ -10,6 +10,8 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.config.exception.BusinessException;
+import com.minimalist.basic.utils.CommonConstant;
+import com.minimalist.basic.utils.SafetyUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,10 @@ public class TenantManager {
      * @param tenantId 租户ID
      */
     public void checkTenantPackage(long tenantId) {
+        //管理员则跳过校验
+        if (CommonConstant.ZERO == SafetyUtil.getLonginUserTenantId()) {
+            return;
+        }
         //检查租户下用户数是否满足套餐
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
@@ -75,9 +81,13 @@ public class TenantManager {
      * @param loginUserId 当前登陆人用户ID
      */
     public MUser checkTenantEqual(long optUserId, long loginUserId) {
-        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
         MUser optUser = userMapper.selectUserByUserId(optUserId);
         Assert.notNull(optUser, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_OPT_ACCOUNT.getDesc()));
+        //管理员则跳过校验
+        if (CommonConstant.ZERO == SafetyUtil.getLonginUserTenantId()) {
+            return optUser;
+        }
+        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
         MUser loginUser = userMapper.selectUserByUserId(loginUserId);
         Assert.notNull(loginUser, () -> new BusinessException(UserEnum.ErrorMsg.AUTH_EXPIRED.getDesc()));
         Assert.isTrue(optUser.getTenantId().equals(loginUser.getTenantId()),
