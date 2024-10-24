@@ -2,6 +2,7 @@ package com.minimalist.basic.mapper;
 
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.vo.post.PostQueryVO;
+import com.minimalist.basic.entity.vo.post.PostVO;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MPost;
 import com.mybatisflex.core.paginate.Page;
@@ -47,8 +48,8 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @param postIds 岗位ID列表
      * @return 岗位实体列表
      */
-    default List<MPost> selectPostByPostIds(List<Long> postIds) {
-        return selectListByQuery(QueryWrapper.create().in(MPost::getPostId, postIds));
+    default List<PostVO> selectPostByPostIds(List<Long> postIds) {
+        return selectListByQueryAs(QueryWrapper.create().in(MPost::getPostId, postIds), PostVO.class);
     }
 
     /**
@@ -64,13 +65,14 @@ public interface MPostMapper extends BaseMapper<MPost> {
      * @param queryVO 查询条件
      * @return 岗位分页数据
      */
-    default Page<MPost> selectPagePostList(PostQueryVO queryVO) {
-        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+    default Page<PostVO> selectPagePostList(PostQueryVO queryVO) {
+        return paginateAs(queryVO.getPageNum(), queryVO.getPageSize(),
                 QueryWrapper.create()
                         .eq(MPost::getStatus, queryVO.getStatus())
                         .like(MPost::getPostName, queryVO.getPostName())
                         .like(MPost::getPostCode, queryVO.getPostCode())
-                        .orderBy(MPost::getPostSort, true)
+                        .orderBy(MPost::getPostSort, true),
+                PostVO.class
         );
     }
 

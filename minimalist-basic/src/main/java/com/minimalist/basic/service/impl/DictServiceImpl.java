@@ -149,11 +149,8 @@ public class DictServiceImpl implements DictService {
      */
     @Override
     public PageResp<DictVO> getPageDictList(DictQueryVO queryVO) {
-        //分页查询
-        Page<MDict> mDictPage = dictMapper.selectPageDictList(queryVO);
-        //数据转换
-        List<DictVO> dictVOList = BeanUtil.copyToList(mDictPage.getRecords(), DictVO.class);
-        return new PageResp<>(dictVOList, mDictPage.getTotalRow());
+        Page<DictVO> dictVOPage = dictMapper.selectPageDictList(queryVO);
+        return new PageResp<>(dictVOPage.getRecords(), dictVOPage.getTotalRow());
     }
 
     /**
@@ -164,14 +161,14 @@ public class DictServiceImpl implements DictService {
     @Override
     public DictInfoVO getDictByDictType(String dictType) {
         //查询字典
-        List<MDict> mDicts = dictMapper.selectDictListByDictType(CollectionUtil.list(false, dictType));
-        Assert.notEmpty(mDicts, () -> new BusinessException(DictEnum.ErrorMsg.NONENTITY_DICT.getDesc()));
+        List<MDict> dictList = dictMapper.selectDictListByDictType(CollectionUtil.list(false, dictType));
+        Assert.notEmpty(dictList, () -> new BusinessException(DictEnum.ErrorMsg.NONENTITY_DICT.getDesc()));
         //构建返回数据
         DictInfoVO dictInfoVO = new DictInfoVO();
-        dictInfoVO.setDictName(mDicts.get(0).getDictName());
-        dictInfoVO.setDictDesc(mDicts.get(0).getDictDesc());
-        dictInfoVO.setDictType(mDicts.get(0).getDictType());
-        List<DictDataVO> dictDataVOList = mDicts.stream().map(dict -> {
+        dictInfoVO.setDictName(dictList.get(0).getDictName());
+        dictInfoVO.setDictDesc(dictList.get(0).getDictDesc());
+        dictInfoVO.setDictType(dictList.get(0).getDictType());
+        List<DictDataVO> dictDataVOList = dictList.stream().map(dict -> {
             DictDataVO dictDataVO = new DictDataVO();
             dictDataVO.setDictId(dict.getDictId());
             dictDataVO.setDictKey(dict.getDictKey());

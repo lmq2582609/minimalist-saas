@@ -71,23 +71,19 @@ public class TenantServiceImpl implements TenantService {
     public void addTenant(TenantVO tenantVO) {
         //根据租户名查询租户，租户名不能重复
         checkTenantNameExists(tenantVO.getTenantName());
-        //根据租户套餐ID查询租户套餐，所选择的租户套餐必须为有效套餐
-        MTenantPackage tenantPackage = checkTenantPackageStatus(tenantVO.getPackageId());
         MTenant mTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
-        //生成租户ID
         long tenantId = UnqIdUtil.uniqueId();
 
-        //为租户创建数据
+        //为租户创建用户
         UserVO userInfo = tenantVO.getUser();
         checkAddTenantUser(userInfo);
-        //为租户创建角色
-        long roleId = UnqIdUtil.uniqueId();
-        addTenantRole(roleId, tenantId, tenantPackage.getPackageId());
-        //为租户创建用户
         long userId = UnqIdUtil.uniqueId();
         userInfo.setUserId(userId);
         addTenantUser(userInfo, tenantId);
 
+        //为租户创建角色
+        long roleId = UnqIdUtil.uniqueId();
+        addTenantRole(roleId, tenantId, tenantVO.getPackageId());
         //用户与角色关联关系
         addTenantUserRole(userId, roleId);
 
@@ -103,10 +99,6 @@ public class TenantServiceImpl implements TenantService {
      */
     @Override
     public void deleteTenantByTenantId(Long tenantId) {
-        //根据租户ID查询租户
-        MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
-        Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
-        //删除租户
         tenantMapper.deleteTenantByTenantId(tenantId);
     }
 
@@ -117,14 +109,10 @@ public class TenantServiceImpl implements TenantService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateTenantByTenantId(TenantVO tenantVO) {
-        //根据租户套餐ID查询租户套餐，所选择的租户套餐必须为有效套餐
-        checkTenantPackageStatus(tenantVO.getPackageId());
         //根据租户ID查询租户
         MTenant tenant = tenantMapper.selectTenantByTenantId(tenantVO.getTenantId());
         Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
         MTenant newTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
-        //乐观锁字段赋值
-        newTenant.updateBeforeSetVersion(tenant.getVersion());
         //更新租户
         tenantMapper.updateTenantByTenantId(newTenant);
         //如果租户套餐变更，则修改租户套餐
@@ -144,16 +132,14 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public PageResp<TenantVO> getPageTenantList(TenantQueryVO queryVO) {
         //查询租户分页数据
-        Page<MTenant> mTenantPage = tenantMapper.selectPageTenantList(queryVO);
-        //数据转换
-        List<TenantVO> tenantVOList = BeanUtil.copyToList(mTenantPage.getRecords(), TenantVO.class);
+        Page<TenantVO> tenantVOPage = tenantMapper.selectPageTenantList(queryVO);
         //查询租户绑定的用户信息
-        if (CollectionUtil.isNotEmpty(tenantVOList)) {
-            List<Long> userIdList = tenantVOList.stream().map(TenantVO::getUserId).toList();
+        if (CollectionUtil.isNotEmpty(tenantVOPage.getRecords())) {
+            List<Long> userIdList = tenantVOPage.getRecords().stream().map(TenantVO::getUserId).toList();
             List<MUser> mUserList = userMapper.selectUserByUserIds(userIdList);
             Map<Long, MUser> userMap = mUserList.stream()
                     .collect(Collectors.toMap(MUser::getUserId, Function.identity(), (v1, v2) -> v1));
-            tenantVOList.forEach(t -> {
+            tenantVOPage.getRecords().forEach(t -> {
                 MUser user = userMap.get(t.getUserId());
                 if (ObjectUtil.isNotNull(user)) {
                     t.setContactName(user.getUserRealName());
@@ -162,7 +148,7 @@ public class TenantServiceImpl implements TenantService {
                 }
             });
         }
-        return new PageResp<>(tenantVOList, mTenantPage.getTotalRow());
+        return new PageResp<>(tenantVOPage.getRecords(), tenantVOPage.getTotalRow());
     }
 
     /**
@@ -172,9 +158,7 @@ public class TenantServiceImpl implements TenantService {
      */
     @Override
     public TenantVO getTenantByTenantId(Long tenantId) {
-        //根据租户ID查询租户
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
-        //查询与租户绑定的用户信息
         MUser mUser = userMapper.selectUserByUserId(mTenant.getUserId());
         TenantVO tenantVO = BeanUtil.copyProperties(mTenant, TenantVO.class);
         tenantVO.setContactName(mUser.getUserRealName());
@@ -190,18 +174,6 @@ public class TenantServiceImpl implements TenantService {
     private void checkTenantNameExists(String tenantName) {
         MTenant tenant = tenantMapper.selectTenantByTenantName(tenantName);
         Assert.isNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.EXISTS_TENANT.getDesc()));
-    }
-
-    /**
-     * 校验租户套餐是否有效，被禁用则抛出异常
-     * @param tenantPackageId 租户套餐ID
-     */
-    private MTenantPackage checkTenantPackageStatus(Long tenantPackageId) {
-        MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageId);
-        Assert.notNull(mTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
-        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(mTenantPackage.getStatus()),
-                () -> new BusinessException(TenantEnum.ErrorMsg.STATUS_TENANT_PACKAGE.getDesc()));
-        return mTenantPackage;
     }
 
     /**
@@ -224,7 +196,7 @@ public class TenantServiceImpl implements TenantService {
         role.setRoleName(RoleEnum.Role.ADMIN.getName());
         role.setRoleCode(RoleEnum.Role.ADMIN.getCode());
         role.setRoleSort(CommonConstant.ZERO);
-        role.setRemark("添加租户系统自动创建角色");
+        role.setRemark("系统自动创建角色");
         role.setTenantId(tenantId);
         //插入角色
         roleMapper.insert(role);

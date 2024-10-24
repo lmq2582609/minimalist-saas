@@ -1,5 +1,6 @@
 package com.minimalist.basic.config.mybatis;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.config.tenant.TenantInit;
 import com.minimalist.basic.utils.SafetyUtil;
@@ -31,14 +32,14 @@ public class MyBatisFlexConfiguration {
             }
             //如果是系统租户，并且cookie中携带其他租户ID参数，表示查询其他租户数据
             if (SafetyUtil.checkIsSystemTenant()) {
-                String cookieTenantId = SafetyUtil.getCookieTenantId();
-                if (StrUtil.isNotBlank(cookieTenantId)) {
+                Long cookieTenantId = SafetyUtil.getCookieTenantId();
+                if (ObjectUtil.isNotNull(cookieTenantId)) {
                     //返回cookie中的租户ID
                     return new Object[]{ cookieTenantId };
                 }
             }
             //返回当前登陆人的租户ID
-            return new Object[]{ SafetyUtil.getLonginUserTenantId() };
+            return new Object[]{ SafetyUtil.getLoginUserTenantId() };
         });
 
     }

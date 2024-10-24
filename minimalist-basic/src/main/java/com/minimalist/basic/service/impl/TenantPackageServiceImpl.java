@@ -57,12 +57,9 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         MTenantPackage mTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         long tenantPackageId = UnqIdUtil.uniqueId();
         mTenantPackage.setPackageId(tenantPackageId);
-        mTenantPackage.setStatus(StatusEnum.STATUS_1.getCode());
-        //插入租户套餐
         tenantPackageMapper.insert(mTenantPackage);
-        //构造套餐与权限关联数据
-        List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), tenantPackageId);
         //插入套餐与权限的关联数据
+        List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), tenantPackageId);
         tenantPackagePermMapper.insertBatch(mTenantPackagePerms);
     }
 
@@ -72,14 +69,10 @@ public class TenantPackageServiceImpl implements TenantPackageService {
      */
     @Override
     public void deleteTenantPackageByTenantPackageId(Long tenantPackageId) {
-        Assert.isFalse(CommonConstant.ZERO == tenantPackageId, () -> new BusinessException(TenantEnum.ErrorMsg.SYSTEM_TENANT_PACKAGE.getDesc()));
-        //查询租户套餐
-        MTenantPackage mTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageId);
-        Assert.notNull(mTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
         //检查租户套餐是否被使用，被使用则不能删除
         long tenantCount = tenantMapper.selectTenantCountByTenantPackageId(tenantPackageId);
         Assert.isTrue(tenantCount <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.USE_TENANT_PACKAGE.getDesc()));
-        //删除
+        //删除租户套餐
         tenantPackageMapper.deleteTenantPackageByTenantPackageId(tenantPackageId);
     }
 
@@ -90,9 +83,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateTenantPackageByTenantPackageId(TenantPackageVO tenantPackageVO) {
-        //查询租户套餐
-        MTenantPackage oldTenantPackage = tenantPackageMapper.selectTenantPackageByTenantPackageId(tenantPackageVO.getPackageId());
-        Assert.notNull(oldTenantPackage, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT_PACKAGE.getDesc()));
         //修改租户套餐数据
         MTenantPackage newTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         tenantPackageMapper.updateTenantPackageByTenantPackageId(newTenantPackage);
@@ -129,12 +119,8 @@ public class TenantPackageServiceImpl implements TenantPackageService {
      */
     @Override
     public PageResp<TenantPackageVO> getPageTenantPackageList(TenantPackageQueryVO queryVO) {
-        //分页查询租户套餐
-        Page<MTenantPackage> packagePage = tenantPackageMapper.selectPageTenantPackageList(queryVO);
-        //数据转换
-        List<TenantPackageVO> tenantPackageVOList = BeanUtil.copyToList(packagePage.getRecords(), TenantPackageVO.class);
-        //返回数据时，不查询每个套餐的权限
-        return new PageResp<>(tenantPackageVOList, packagePage.getTotalRow());
+        Page<TenantPackageVO> tenantPackageVOPage = tenantPackageMapper.selectPageTenantPackageList(queryVO);
+        return new PageResp<>(tenantPackageVOPage.getRecords(), tenantPackageVOPage.getTotalRow());
     }
 
     /**
@@ -152,29 +138,6 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         List<String> permIds = tenantPackagePerms.stream().map(p -> p.getPermId().toString()).toList();
         tenantPackageVO.setCheckedPermIds(permIds);
         return tenantPackageVO;
-    }
-
-    /**
-     * 根据租户ID查询权限
-     * @param tenantId 租户ID
-     * @return 权限数据列表
-     */
-    @Override
-    public List<MPerms> getPermsByTenantId(Long tenantId) {
-        //根据租户ID查询租户
-        MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
-        if (ObjectUtil.isNull(mTenant)) {
-            return CollectionUtil.list(false);
-        }
-        //根据租户套餐查询关联的权限ID
-        List<MTenantPackagePerm> mTenantPackagePermList = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(mTenant.getPackageId());
-        if (CollectionUtil.isEmpty(mTenantPackagePermList)) {
-            return CollectionUtil.list(false);
-        }
-        //权限ID集合
-        List<Long> permIds = mTenantPackagePermList.stream().map(MTenantPackagePerm::getPermId).toList();
-        //根据权限ID查询权限
-        return permsMapper.selectPermsByPermsIds(permIds);
     }
 
     /**

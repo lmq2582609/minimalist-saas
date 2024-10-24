@@ -17,13 +17,6 @@ public interface RoleService {
     List<RoleVO> getRolesByUserId(Long userId);
 
     /**
-     * 根据角色ID查询角色
-     * @param roleIds 角色ID集合
-     * @return 角色实体集合
-     */
-    List<MRole> getRolesByRoles(List<Long> roleIds);
-
-    /**
      * 添加角色
      * @param roleVO 角色数据
      */

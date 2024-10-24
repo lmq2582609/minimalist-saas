@@ -71,11 +71,4 @@ public interface MPermsMapper extends BaseMapper<MPerms> {
         );
     }
 
-    /**
-     * 查询权限列表(只查询启用的权限)
-     * @return 权限列表
-     */
-    default List<MPerms> getEnablePermList() {
-        return selectListByQuery(QueryWrapper.create().eq(MPerms::getStatus, StatusEnum.STATUS_1.getCode()));
-    }
 }

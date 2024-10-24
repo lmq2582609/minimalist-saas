@@ -91,13 +91,12 @@ public class NoticeServiceImpl implements NoticeService {
      * @param noticeVO 公告信息
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void updateNoticeByNoticeId(NoticeVO noticeVO) {
         //查询公告
         MNotice mNotice = noticeMapper.selectNoticeByNoticeId(noticeVO.getNoticeId());
         Assert.notNull(mNotice, () -> new BusinessException(NoticeEnum.ErrorMsg.NONENTITY_NOTICE.getDesc()));
         MNotice newNotice = BeanUtil.copyProperties(noticeVO, MNotice.class);
-        //乐观锁字段赋值
-        newNotice.updateBeforeSetVersion(mNotice.getVersion());
         //延期发布处理
         if (ObjectUtil.isNotNull(noticeVO.getNoticeTimeInterval())) {
             //延期发布 -> 发布时间置为延期发布的时间

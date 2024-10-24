@@ -2,6 +2,7 @@ package com.minimalist.basic.mapper;
 
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.vo.role.RoleQueryVO;
+import com.minimalist.basic.entity.vo.role.RoleVO;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MRole;
 import com.mybatisflex.core.paginate.Page;
@@ -39,8 +40,8 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @param roleId 角色ID
      * @return 角色实体
      */
-    default List<MRole> selectRoleByRoleIds(List<Long> roleId) {
-        return selectListByQuery(QueryWrapper.create().in(MRole::getRoleId, roleId));
+    default List<RoleVO> selectRoleByRoleIds(List<Long> roleId) {
+        return selectListByQueryAs(QueryWrapper.create().in(MRole::getRoleId, roleId), RoleVO.class);
     }
 
     /**
@@ -64,12 +65,13 @@ public interface MRoleMapper extends BaseMapper<MRole> {
      * @param queryVO 查询条件
      * @return 角色分页数据
      */
-    default Page<MRole> selectPageRoleList(RoleQueryVO queryVO) {
-        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+    default Page<RoleVO> selectPageRoleList(RoleQueryVO queryVO) {
+        return paginateAs(queryVO.getPageNum(), queryVO.getPageSize(),
                 QueryWrapper.create()
                         .eq(MRole::getStatus, queryVO.getStatus())
                         .like(MRole::getRoleCode, queryVO.getRoleCode())
-                        .like(MRole::getRoleName, queryVO.getRoleName())
+                        .like(MRole::getRoleName, queryVO.getRoleName()),
+                RoleVO.class
         );
     }
 

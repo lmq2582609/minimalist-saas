@@ -22,7 +22,7 @@ public class RoleEnum {
     @Getter
     @AllArgsConstructor
     public enum ErrorMsg {
-        EXISTS_ROLE("角色已存在，请检查角色编码"),
+        EXISTS_ROLE("角色编码已存在"),
         NONENTITY_ROLE("角色不存在"),
         ;
         private final String desc;

@@ -58,12 +58,12 @@ public class UserManager {
      * @param userId 用户ID，可以被忽略的用户ID
      */
     public void checkUsernameUniqueness(String username, Long userId) {
-        MUser mUser = userMapper.selectUserByUsername(username);
-        if (ObjectUtil.isNull(mUser)) {
-            return;
+        QueryWrapper queryWrapper = QueryWrapper.create().eq(MUser::getUsername, username);
+        if (ObjectUtil.isNotNull(userId)) {
+            queryWrapper.ne(MUser::getUserId, userId);
         }
-        Assert.isTrue(ObjectUtil.isNull(mUser) || mUser.getUserId().equals(userId),
-                () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
+        MUser user = userMapper.selectOneByQuery(queryWrapper);
+        Assert.isNull(user, () -> new BusinessException(UserEnum.ErrorMsg.EXISTS_ACCOUNT.getDesc()));
     }
 
     /**
@@ -73,11 +73,13 @@ public class UserManager {
      * @param userId 用户ID，可以被忽略的用户ID
      */
     public void checkUserEmailUniqueness(String email, Long userId) {
-        if (StrUtil.isNotBlank(email)) {
-            MUser mUser = userMapper.selectUserByPhone(email);
-            Assert.isTrue(ObjectUtil.isNull(mUser) || mUser.getUserId().equals(userId),
-                    () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
+        if (StrUtil.isBlank(email)) { return; }
+        QueryWrapper queryWrapper = QueryWrapper.create().eq(MUser::getEmail, email);
+        if (ObjectUtil.isNotNull(userId)) {
+            queryWrapper.ne(MUser::getUserId, userId);
         }
+        MUser user = userMapper.selectOneByQuery(queryWrapper);
+        Assert.isNull(user, () -> new BusinessException(UserEnum.ErrorMsg.EMAIL_ACCOUNT.getDesc()));
     }
 
     /**

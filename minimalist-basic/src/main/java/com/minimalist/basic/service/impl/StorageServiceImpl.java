@@ -68,10 +68,7 @@ public class StorageServiceImpl implements StorageService {
         //校验存储配置
         FileHandler fileHandler = fileManager.getFileHandler(storageVO.getStorageType());
         String storageConfig = fileHandler.valid(storageVO.getStorageConfig());
-        MStorage oldStorage = storageMapper.selectStorageByStorageId(storageVO.getStorageId());
-        Assert.notNull(oldStorage, () -> new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc()));
         MStorage storage = BeanUtil.copyProperties(storageVO, MStorage.class);
-        storage.updateBeforeSetVersion(oldStorage.getVersion());
         storage.setStorageConfig(storageConfig);
         storageMapper.updateStorageByStorageId(storage);
         //如果选择了默认存储
@@ -88,9 +85,8 @@ public class StorageServiceImpl implements StorageService {
      */
     @Override
     public PageResp<StorageVO> getPageStorageList(StorageQueryVO queryVO) {
-        Page<MStorage> storagePage = storageMapper.selectPageStorageList(queryVO);
-        List<StorageVO> storageVOList = BeanUtil.copyToList(storagePage.getRecords(), StorageVO.class);
-        return new PageResp<>(storageVOList, storagePage.getTotalRow());
+        Page<StorageVO> storageVOPage = storageMapper.selectPageStorageList(queryVO);
+        return new PageResp<>(storageVOPage.getRecords(), storageVOPage.getTotalRow());
     }
 
     /**

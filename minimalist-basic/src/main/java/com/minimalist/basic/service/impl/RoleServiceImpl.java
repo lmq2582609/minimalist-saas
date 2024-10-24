@@ -50,20 +50,8 @@ public class RoleServiceImpl implements RoleService {
         if (CollectionUtil.isEmpty(userRoleRelation)) {
             return CollectionUtil.list(false);
         }
-        //角色ids
         List<Long> roleIds = userRoleRelation.stream().map(MUserRole::getRoleId).distinct().toList();
-        //查询角色
-        return BeanUtil.copyToList(roleMapper.selectRoleByRoleIds(roleIds), RoleVO.class);
-    }
-
-    /**
-     * 根据角色ID查询角色
-     * @param roleIds 角色ID集合
-     * @return 角色实体集合
-     */
-    @Override
-    public List<MRole> getRolesByRoles(List<Long> roleIds) {
-        return roleMapper.selectListByQuery(QueryWrapper.create().in(MRole::getRoleId, roleIds));
+        return roleMapper.selectRoleByRoleIds(roleIds);
     }
 
     /**
@@ -77,11 +65,9 @@ public class RoleServiceImpl implements RoleService {
         MRole mRole = roleMapper.selectRoleByRoleCode(roleVO.getRoleCode());
         Assert.isNull(mRole, () -> new BusinessException(RoleEnum.ErrorMsg.EXISTS_ROLE.getDesc()));
         //角色ID
-        long roleId = Optional.ofNullable(roleVO.getRoleId()).orElse(UnqIdUtil.uniqueId());
+        long roleId = UnqIdUtil.uniqueId();
         mRole = BeanUtil.copyProperties(roleVO, MRole.class);
-        //角色ID赋值
         mRole.setRoleId(roleId);
-        //插入角色
         roleMapper.insert(mRole);
         //插入角色和权限关联数据
         List<MRolePerm> mRolePerms = permIdToRolePerm(roleVO.getPermissionsIds(), roleId);
@@ -113,19 +99,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateRoleByRoleId(RoleVO roleVO) {
-        //查询角色
-        MRole mRole = roleMapper.selectRoleByRoleId(roleVO.getRoleId());
-        Assert.notNull(mRole, () -> new BusinessException(RoleEnum.ErrorMsg.NONENTITY_ROLE.getDesc()));
         MRole newRole = BeanUtil.copyProperties(roleVO, MRole.class);
-        //乐观锁字段赋值
-        newRole.updateBeforeSetVersion(mRole.getVersion());
-        //修改角色
         roleMapper.updateRoleByRoleId(newRole);
         //删除原角色与权限关联信息
         LogicDeleteManager.execWithoutLogicDelete(()->
                 rolePermMapper.deleteByQuery(QueryWrapper.create().eq(MRolePerm::getRoleId, roleVO.getRoleId()))
         );
-
         //添加新角色与权限关联信息
         List<MRolePerm> mRolePerms = permIdToRolePerm(roleVO.getPermissionsIds(), roleVO.getRoleId());
         rolePermMapper.insertBatch(mRolePerms);
@@ -138,9 +117,8 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public PageResp<RoleVO> getPageRoleList(RoleQueryVO queryVO) {
-        Page<MRole> mRolePage = roleMapper.selectPageRoleList(queryVO);
-        List<RoleVO> roleVOList = BeanUtil.copyToList(mRolePage.getRecords(), RoleVO.class);
-        return new PageResp<>(roleVOList, mRolePage.getTotalRow());
+        Page<RoleVO> roleVOPage = roleMapper.selectPageRoleList(queryVO);
+        return new PageResp<>(roleVOPage.getRecords(), roleVOPage.getTotalRow());
     }
 
     /**
@@ -150,7 +128,6 @@ public class RoleServiceImpl implements RoleService {
      */
     @Override
     public RoleVO getRoleByRoleId(Long roleId) {
-        //查询角色
         MRole mRole = roleMapper.selectRoleByRoleId(roleId);
         RoleVO roleVO = BeanUtil.copyProperties(mRole, RoleVO.class);
         //根据角色查询权限，回显数据

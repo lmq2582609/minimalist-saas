@@ -10,6 +10,8 @@ import com.minimalist.basic.entity.po.MDept;
 import com.minimalist.basic.entity.po.MUserDept;
 import com.minimalist.basic.entity.vo.dept.DeptQueryVO;
 import com.minimalist.basic.entity.vo.dept.DeptVO;
+import com.minimalist.basic.entity.vo.user.UserQueryVO;
+import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.basic.mapper.MDeptMapper;
 import com.minimalist.basic.mapper.MUserDeptMapper;
 import com.minimalist.basic.mapper.MUserMapper;
@@ -19,6 +21,7 @@ import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
+import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,12 +75,12 @@ public class DeptServiceImpl implements DeptService {
         long childrenCount = deptMapper.selectChildrenCountByDeptId(deptId);
         Assert.isFalse(childrenCount > 0, () -> new BusinessException(DeptEnum.ErrorMsg.CONTAIN_CHILDREN.getDesc()));
         //检查是否有用户在该部门，有用户在该部门不允许删除
-        List<MDept> deptList = deptMapper.selectChildrenDeptByDeptId(deptId);
-        if (CollectionUtil.isNotEmpty(deptList)) {
-            List<Long> deptIds = deptList.stream().map(MDept::getDeptId).toList();
-            long userDeptCount = userMapper.selectUserCountByDeptIds(deptIds);
-            Assert.isFalse(userDeptCount > 0, () -> new BusinessException(DeptEnum.ErrorMsg.USER_DEPT_CHILDREN.getDesc()));
-        }
+        UserQueryVO query = new UserQueryVO();
+        query.setPageNum(1L);
+        query.setPageSize(1L);
+        query.setDeptId(deptId);
+        Page<UserVO> userVOPage = userMapper.selectPageUserList(query);
+        Assert.isFalse(userVOPage.getTotalRow() > 0, () -> new BusinessException(DeptEnum.ErrorMsg.USER_DEPT_CHILDREN.getDesc()));
         //删除部门
         deptMapper.deleteDeptByDeptId(deptId);
         //删除部门和用户关联关系
@@ -111,8 +114,6 @@ public class DeptServiceImpl implements DeptService {
             //修改当前部门所有下级
             updateChildrenDeptAncestors(deptVO.getDeptId(), currentDept.getAncestors(), "");
         }
-        //乐观锁字段赋值
-        updateDept.updateBeforeSetVersion(currentDept.getVersion());
         deptMapper.updateDeptByDeptId(updateDept);
     }
 

@@ -102,19 +102,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
-        //租户ID，用于和新增用户建立绑定关系
-        long tenantId = SafetyUtil.getLonginUserTenantId();
         //校验用户名唯一
         userManager.checkUsernameUniqueness(userVO.getUsername(), null);
         //校验邮箱唯一
         userManager.checkUserEmailUniqueness(userVO.getEmail(), null);
-        //校验该租户套餐是否满足条件
-        tenantManager.checkTenantPackage(tenantId);
+        //校验租户的套餐是否满足条件
+        tenantManager.checkTenantPackage(SafetyUtil.getOperationTenantId());
         //新增用户数据
         MUser user = BeanUtil.copyProperties(userVO, MUser.class);
         long userId = UnqIdUtil.uniqueId();
         user.setUserId(userId);
-        user.setTenantId(tenantId);
         //生成盐值，密码加密
         String salt = RandomUtil.randomString(6);
         user.setSalt(salt);
@@ -136,8 +133,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUserByUserId(Long userId) {
-        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
-        tenantManager.checkTenantEqual(userId, StpUtil.getLoginIdAsLong());
+        //删除用户
         userMapper.deleteUserByUserId(userId);
         //删除用户关联信息
         userManager.deleteUserRelation(userId);
@@ -155,24 +151,22 @@ public class UserServiceImpl implements UserService {
         //校验邮箱唯一
         userManager.checkUserEmailUniqueness(userVO.getEmail(), userVO.getUserId());
         //校验该租户套餐是否满足条件
-        tenantManager.checkTenantPackage(SafetyUtil.getLonginUserTenantId());
-        //检查租户ID，要修改的用户的租户必须与本次操作人的租户一致
-        MUser optUser = tenantManager.checkTenantEqual(userVO.getUserId(), StpUtil.getLoginIdAsLong());
+        tenantManager.checkTenantPackage(SafetyUtil.getOperationTenantId());
+        //查询用户信息
+        MUser oldUser = userMapper.selectUserByUserId(userVO.getUserId());
         //修改用户信息
         MUser newUser = BeanUtil.copyProperties(userVO, MUser.class);
         //是否需要修改密码
         if (StrUtil.isNotBlank(userVO.getPassword())) {
             //密码加密
-            newUser.setPassword(userManager.passwordEncrypt(userVO.getPassword(), optUser.getSalt()));
+            newUser.setPassword(userManager.passwordEncrypt(userVO.getPassword(), oldUser.getSalt()));
         }
-        //乐观锁字段赋值
-        newUser.updateBeforeSetVersion(optUser.getVersion());
         //修改用户
         userMapper.updateUserByUserId(newUser);
         //删除用户关联信息
-        userManager.deleteUserRelation(optUser.getUserId());
+        userManager.deleteUserRelation(userVO.getUserId());
         //新增用户关联信息
-        userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), optUser.getUserId());
+        userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userVO.getUserId());
     }
 
     /**
@@ -182,10 +176,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public PageResp<UserVO> getPageUserList(UserQueryVO queryVO) {
-        Page<MUser> userPage = userMapper.selectPageUserList(queryVO);
-        //数据转换
-        List<UserVO> userVOList = BeanUtil.copyToList(userPage.getRecords(), UserVO.class);
-        return new PageResp<>(userVOList, userPage.getTotalRow());
+        Page<UserVO> userPage = userMapper.selectPageUserList(queryVO);
+        return new PageResp<>(userPage.getRecords(), userPage.getTotalRow());
     }
 
     /**
@@ -210,16 +202,6 @@ public class UserServiceImpl implements UserService {
         List<String> deptIds = userDeptList.stream().map(d -> d.getDeptId().toString()).toList();
         userVO.setCheckedDeptIds(deptIds);
         return userVO;
-    }
-
-    /**
-     * 根据用户名查询用户
-     * @param username 用户名
-     * @return 用户实体
-     */
-    @Override
-    public MUser selectUserByUsername(String username) {
-        return userMapper.selectUserByUsername(username);
     }
 
     /**
@@ -383,8 +365,6 @@ public class UserServiceImpl implements UserService {
         Assert.isTrue(user.getPassword().equals(oldPassword), () -> new BusinessException(UserEnum.ErrorMsg.OLD_PASSWORD_INCORRECT.getDesc()));
         //新密码加密
         user.setPassword(userManager.passwordEncrypt(passwordVO.getNewPassword(), user.getSalt()));
-        //乐观锁参数赋值
-        user.updateBeforeSetVersion(user.getVersion());
         //修改
         userMapper.updateUserByUserId(user);
     }
@@ -401,8 +381,6 @@ public class UserServiceImpl implements UserService {
         MUser updateUser = BeanUtil.copyProperties(settingVO, MUser.class);
         //用户ID
         updateUser.setUserId(user.getUserId());
-        //乐观锁参数赋值
-        updateUser.updateBeforeSetVersion(user.getVersion());
         //修改
         userMapper.updateUserByUserId(updateUser);
     }
@@ -427,8 +405,6 @@ public class UserServiceImpl implements UserService {
         MUser updateUser = new MUser();
         updateUser.setUserId(userId);
         updateUser.setUserAvatar(userAvatar);
-        //乐观锁字段赋值
-        updateUser.updateBeforeSetVersion(user.getVersion());
         userMapper.updateUserByUserId(updateUser);
     }
 

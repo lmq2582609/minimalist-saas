@@ -10,7 +10,7 @@ public class PostEnum {
     @AllArgsConstructor
     public enum ErrorMsg {
         NONENTITY_POST("岗位不存在"),
-        EXISTS_POST("岗位已存在，请检查岗位编码"),
+        EXISTS_POST("岗位编码已存在"),
         ;
         private final String desc;
     }

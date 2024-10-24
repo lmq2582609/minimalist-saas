@@ -43,10 +43,6 @@ public class TenantManager {
      * @param tenantId 租户ID
      */
     public void checkTenantPackage(long tenantId) {
-        //管理员则跳过校验
-        if (CommonConstant.ZERO == SafetyUtil.getLonginUserTenantId()) {
-            return;
-        }
         //检查租户下用户数是否满足套餐
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
@@ -84,7 +80,7 @@ public class TenantManager {
         MUser optUser = userMapper.selectUserByUserId(optUserId);
         Assert.notNull(optUser, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_OPT_ACCOUNT.getDesc()));
         //管理员则跳过校验
-        if (CommonConstant.ZERO == SafetyUtil.getLonginUserTenantId()) {
+        if (CommonConstant.ZERO == SafetyUtil.getLoginUserTenantId()) {
             return optUser;
         }
         //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致

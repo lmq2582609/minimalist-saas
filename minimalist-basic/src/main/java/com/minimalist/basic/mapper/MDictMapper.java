@@ -1,6 +1,7 @@
 package com.minimalist.basic.mapper;
 
 import com.minimalist.basic.entity.vo.dict.DictQueryVO;
+import com.minimalist.basic.entity.vo.dict.DictVO;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MDict;
 import com.mybatisflex.core.paginate.Page;
@@ -44,13 +45,13 @@ public interface MDictMapper extends BaseMapper<MDict> {
      * @param queryVO 查询实体
      * @return 分页数据
      */
-    default Page<MDict> selectPageDictList(DictQueryVO queryVO) {
-        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+    default Page<DictVO> selectPageDictList(DictQueryVO queryVO) {
+        return paginateAs(queryVO.getPageNum(), queryVO.getPageSize(),
                 QueryWrapper.create().eq(MDict::getStatus, queryVO.getStatus())
                         .like(MDict::getDictName, queryVO.getDictName())
                         .like(MDict::getDictType, queryVO.getDictType())
                         .orderBy(MDict::getDictOrder, true)
-                        .groupBy(MDict::getDictType));
+                        .groupBy(MDict::getDictType), DictVO.class);
     }
 
     /**

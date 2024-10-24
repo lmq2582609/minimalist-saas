@@ -42,13 +42,6 @@ public interface UserService {
     UserVO getUserByUserId(Long userId);
 
     /**
-     * 根据用户名查询用户
-     * @param username 用户名
-     * @return 用户实体
-     */
-    MUser selectUserByUsername(String username);
-
-    /**
      * 获取用户信息
      * @param userId 用户ID
      * @return 用户VO

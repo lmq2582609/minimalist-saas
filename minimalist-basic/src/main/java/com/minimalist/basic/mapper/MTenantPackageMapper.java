@@ -2,6 +2,7 @@ package com.minimalist.basic.mapper;
 
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
+import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MTenantPackage;
 import com.mybatisflex.core.paginate.Page;
@@ -46,11 +47,12 @@ public interface MTenantPackageMapper extends BaseMapper<MTenantPackage> {
      * @param queryVO 查询条件
      * @return 租户套餐分页数据
      */
-    default Page<MTenantPackage> selectPageTenantPackageList(TenantPackageQueryVO queryVO) {
-        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+    default Page<TenantPackageVO> selectPageTenantPackageList(TenantPackageQueryVO queryVO) {
+        return paginateAs(queryVO.getPageNum(), queryVO.getPageSize(),
                 QueryWrapper.create()
                         .eq(MTenantPackage::getStatus, queryVO.getStatus())
-                        .like(MTenantPackage::getPackageName, queryVO.getPackageName())
+                        .like(MTenantPackage::getPackageName, queryVO.getPackageName()),
+                TenantPackageVO.class
         );
     }
 

@@ -4,9 +4,8 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.enums.PermEnum;
-import com.minimalist.basic.entity.enums.RespEnum;
+import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.perm.PermQueryVO;
 import com.minimalist.basic.entity.vo.perm.PermVO;
@@ -16,11 +15,11 @@ import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.SafetyUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class PermServiceImpl implements PermService {
@@ -105,13 +104,7 @@ public class PermServiceImpl implements PermService {
      */
     @Override
     public void updatePermByPermId(PermVO permVO) {
-        //查询权限
-        MPerms mPerms = permsMapper.selectPermsByPermId(permVO.getPermId());
-        Assert.notNull(mPerms, () -> new BusinessException(PermEnum.ErrorMsg.NONENTITY_PERM.getDesc()));
         MPerms newPerms = BeanUtil.copyProperties(permVO, MPerms.class);
-        //乐观锁字段赋值
-        newPerms.updateBeforeSetVersion(mPerms.getVersion());
-        //修改
         permsMapper.updatePermsByPermId(newPerms);
     }
 
@@ -131,7 +124,8 @@ public class PermServiceImpl implements PermService {
      */
     @Override
     public List<PermVO> getEnablePermList() {
-        List<MPerms> enablePermList = permsMapper.getEnablePermList();
+        QueryWrapper queryWrapper = QueryWrapper.create().eq(MPerms::getStatus, StatusEnum.STATUS_1.getCode());
+        List<MPerms> enablePermList = permsMapper.selectListByQuery(queryWrapper);
         return permsToTree(enablePermList);
     }
 
@@ -141,21 +135,13 @@ public class PermServiceImpl implements PermService {
      */
     @Override
     public List<PermVO> getTenantEnablePermList() {
-        //检查是否为系统租户
-        boolean isAdmin = SafetyUtil.checkIsSystemTenant();
-        //从cookie中获取租户ID，如果有值表示需要查询这个租户的数据
-        String cookieTenantId = SafetyUtil.getCookieTenantId();
-        if (isAdmin && StrUtil.isBlank(cookieTenantId)) {
-            //如果是系统租户，并且cookie中没有tenantId，则查询perm表所有数据
-            List<MPerms> enablePermList = permsMapper.getEnablePermList();
-            return permsToTree(enablePermList);
+        Long tenantId = SafetyUtil.getOperationTenantId();
+        //如果是系统租户，查询全部
+        if (CommonConstant.ZERO == tenantId) {
+            return getEnablePermList();
         }
-        //租户查询，只查询租户套餐关联的权限
-        long tenantId = Optional.ofNullable(cookieTenantId)
-                .map(Long::parseLong).orElse(SafetyUtil.getLonginUserTenantId());
-        //查询租户
+        //查询租户及套餐权限
         MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
-        //查询租户套餐权限
         List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
         List<Long> permIds = tenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
         List<MPerms> enablePermList = permsMapper.selectPermsByPermsIds(permIds);

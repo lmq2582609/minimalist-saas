@@ -1,6 +1,5 @@
 package com.minimalist.basic.config.mybatis.bo;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.mybatisflex.annotation.Column;
 import com.mybatisflex.annotation.Id;
 import com.mybatisflex.annotation.KeyType;
@@ -37,15 +36,5 @@ public class BaseEntity {
     /** 版本号 */
     @Column(version = true, onInsertValue = "0", onUpdateValue = "version + 1")
     private Integer version;
-
-    /**
-     * 更新时，设置version乐观锁字段
-     * @param version 版本号
-     */
-    public void updateBeforeSetVersion(Integer version) {
-        if (ObjectUtil.isNotNull(version)) {
-            this.version = version;
-        }
-    }
 
 }

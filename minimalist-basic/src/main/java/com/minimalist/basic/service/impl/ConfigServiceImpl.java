@@ -23,7 +23,6 @@ import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Service
@@ -81,11 +80,7 @@ public class ConfigServiceImpl implements ConfigService {
         if (ObjectUtil.isNotNull(config) && !configVO.getConfigId().equals(config.getConfigId())) {
             throw new BusinessException(ConfigEnum.ErrorMsg.CONTAIN_CONFIG_KEY.getDesc());
         }
-        MConfig oldConfig = configMapper.selectConfigByConfigId(configVO.getConfigId());
-        Assert.notNull(oldConfig, () -> new BusinessException(ConfigEnum.ErrorMsg.NONENTITY_CONFIG.getDesc()));
         MConfig updateConfig = BeanUtil.copyProperties(configVO, MConfig.class);
-        //乐观锁字段赋值
-        updateConfig.updateBeforeSetVersion(oldConfig.getVersion());
         configMapper.updateConfigByConfigId(updateConfig);
         //添加后将配置放入缓存
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());

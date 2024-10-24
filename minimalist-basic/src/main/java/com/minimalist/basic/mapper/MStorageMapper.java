@@ -2,6 +2,7 @@ package com.minimalist.basic.mapper;
 
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.vo.storage.StorageQueryVO;
+import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MStorage;
 import com.mybatisflex.core.paginate.Page;
@@ -44,12 +45,13 @@ public interface MStorageMapper extends BaseMapper<MStorage> {
      * @param queryVO 查询条件
      * @return 存储信息列表
      */
-    default Page<MStorage> selectPageStorageList(StorageQueryVO queryVO) {
-        return paginate(queryVO.getPageNum(), queryVO.getPageSize(),
+    default Page<StorageVO> selectPageStorageList(StorageQueryVO queryVO) {
+        return paginateAs(queryVO.getPageNum(), queryVO.getPageSize(),
                 QueryWrapper.create()
                         .eq(MStorage::getStorageType, queryVO.getStorageType())
                         .eq(MStorage::getStatus, queryVO.getStatus())
-                        .like(MStorage::getStorageName, queryVO.getStorageName())
+                        .like(MStorage::getStorageName, queryVO.getStorageName()),
+                StorageVO.class
         );
     }
 

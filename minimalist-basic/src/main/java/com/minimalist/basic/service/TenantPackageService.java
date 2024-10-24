@@ -41,11 +41,4 @@ public interface TenantPackageService {
      */
     TenantPackageVO getTenantPackageByTenantPackageId(Long tenantPackageId);
 
-    /**
-     * 根据租户ID查询权限
-     * @param tenantId 租户ID
-     * @return 权限数据列表
-     */
-    List<MPerms> getPermsByTenantId(Long tenantId);
-
 }
