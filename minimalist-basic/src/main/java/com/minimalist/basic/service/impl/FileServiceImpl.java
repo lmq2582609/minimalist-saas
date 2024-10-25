@@ -83,12 +83,9 @@ public class FileServiceImpl implements FileService {
         //查询文件
         MFile mFile = fileMapper.selectFileByFileId(fileId);
         Assert.notNull(mFile, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
-        //文件已使用，不允许删除
-        Assert.isFalse(StatusEnum.STATUS_1.getCode().equals(mFile.getStatus()),
-                () -> new BusinessException(FileEnum.ErrorMsg.FILE_USED.getDesc()));
         FileHandler fileHandler = fileManager.getFileHandler(mFile.getStorageType());
         //删除文件
-        fileHandler.deleteFile(fileId);
+        fileHandler.deleteFile(mFile);
         //删除数据库文件记录
         LogicDeleteManager.execWithoutLogicDelete(()->
                 fileMapper.deleteByQuery(QueryWrapper.create().eq(MFile::getFileId, fileId))

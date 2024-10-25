@@ -126,7 +126,7 @@ const datatable = reactive({
     columns: [
         {title: '字典名称', dataIndex: 'dictName', slotName: 'dictName', align: 'center'},
         {title: '字典类型', dataIndex: 'dictType', align: 'center'},
-        {title: '字典描述', dataIndex: 'dictDesc', align: 'center'},
+        {title: '字典描述', dataIndex: 'dictDesc', align: 'center', ellipsis: true, tooltip: true},
         {title: '操作', slotName: 'operation', align: 'center', width: 160}
     ],
     //加载

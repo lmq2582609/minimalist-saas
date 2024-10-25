@@ -83,9 +83,16 @@
                     <!-- 封面图 -->
                     <template #noticePicFile="{ record }">
                         <template v-if="record.noticePicFile && record.noticePicFile.length > 0">
+                            <!-- 多图轮播 -->
                             <a-carousel :style="{width: '100%', height: '100px'}" :indicator-type="'never'">
                                 <a-carousel-item v-for="picFile in record.noticePicFile">
-                                    <a-image class="cursor-pointer" style="transform: translateY(-20%)" :src="picFile.fileThUrl" />
+                                    <a-image class="cursor-pointer"
+                                             style="transform: translateY(-20%)"
+                                             :src="picFile.fileThUrl"
+                                            :preview-props="{
+                                                     src: picFile.fileUrl
+                                            }"
+                                    />
                                 </a-carousel-item>
                             </a-carousel>
                         </template>
@@ -149,7 +156,6 @@ import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
 import { getPageNoticeListApi, deleteNoticeByNoticeIdApi } from "~/api/notice.js";
 import NoticeEdit from "~/pages/basic/notice/NoticeEdit.vue";
 import NoticeDetail from "~/pages/basic/notice/NoticeDetail.vue";
-
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典

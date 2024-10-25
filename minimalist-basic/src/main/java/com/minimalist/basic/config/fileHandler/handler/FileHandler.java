@@ -31,9 +31,9 @@ public interface FileHandler {
 
     /**
      * 删除文件
-     * @param fileId 文件ID
+     * @param file 文件信息
      * @return 是否删除成功
      */
-    boolean deleteFile(Long fileId);
+    boolean deleteFile(MFile file);
 
 }

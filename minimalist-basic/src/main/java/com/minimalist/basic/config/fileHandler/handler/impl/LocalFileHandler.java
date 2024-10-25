@@ -106,7 +106,6 @@ public class LocalFileHandler implements FileHandler {
                 File thFile = FileUtil.touch(thPath);
                 Thumbnails.of(file)
                         .scale(0.4)
-                        .outputFormat("jpg")
                         .toFile(thFile);
                 fileInfo.setFileThUrl(url + fileSourcePath + thFileName);
                 fileInfo.setFileThFilename(thFileName);
@@ -123,12 +122,19 @@ public class LocalFileHandler implements FileHandler {
 
     /**
      * 删除文件
-     * @param fileId 文件ID
+     * @param file 文件信息
      * @return 是否删除成功
      */
     @Override
-    public boolean deleteFile(Long fileId) {
-        return false;
+    public boolean deleteFile(MFile file) {
+        String filePath = file.getFilePath() + file.getNewFileName();
+        boolean result = FileUtil.del(filePath);
+        //如果有缩略图，删除缩略图
+        if (StrUtil.isNotBlank(file.getFileThFilename())) {
+            String fileThPath = file.getFilePath() + file.getFileThFilename();
+            FileUtil.del(fileThPath);
+        }
+        return result;
     }
 
 }

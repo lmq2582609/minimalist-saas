@@ -121,14 +121,17 @@ mica:
         enabled: true
         # 【全局】是否去除文本首尾空格
         trim-text: true
-        # 模式：clear 清理（默认）、escape 转义、validate 校验，
+        # mode有三个模式：clear清理（默认）、escape转义、validate校验，
         # validate校验模式，校验未通过会抛出异常，可使用全局异常捕获进行处理
+        # clear模式，会将不允许的数据清理掉
+        # escape模式，会将不允许的数据转义
+        # 出错抛出的异常：
         # json处理默认使用jackson，jackson校验未通过异常：HttpMessageNotReadableException
         # form表单校验未通过异常：MethodArgumentConversionNotSupportedException
-        mode: validate
-        # mode=clear专用 用于保留换行
+        mode: clear
+        # 是否保留换行
         pretty-print: false
-        # mode=clear专用 转义，默认关闭
+        # 是否转义
         enable-escape: false
         # 需要拦截的路由
         path-patterns: /**

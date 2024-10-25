@@ -83,8 +83,12 @@ const customRemoveFile = (fileItem) => {
     return new Promise((resolve, reject) => {
         Modal.confirm({
             title: '提示',
-            content: `是否确认删除文件：${fileItem.name}`,
+            content: '是否确认删除文件？',
             okLoading: removeFileLoading.value,
+            onCancel: () => {
+                removeFileLoading.value = false
+                return true
+            },
             onBeforeOk: async () => {
                 removeFileLoading.value = true
                 await deleteFileApi(fileItem.response?.fileId)

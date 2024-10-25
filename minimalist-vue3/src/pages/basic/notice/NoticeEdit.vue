@@ -12,7 +12,7 @@
                 </a-form-item>
                 <a-form-item class="w-[33%]" field="publishAuthorId" label="发布人" required>
                     <a-select v-model="form.publishAuthorId" placeholder="发布人" allow-clear allow-search>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.userList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.userList]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
                 <a-form-item class="w-[33%]" field="publishDeptId" label="发布部门" tooltip="表示发布此公告的部门，可为空">

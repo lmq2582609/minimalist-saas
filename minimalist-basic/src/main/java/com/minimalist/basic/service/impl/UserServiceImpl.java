@@ -103,9 +103,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
         //校验用户名唯一
-        userManager.checkUsernameUniqueness(userVO.getUsername(), null);
+        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
+            userManager.checkUsernameUniqueness(userVO.getUsername(), null)
+        );
         //校验邮箱唯一
-        userManager.checkUserEmailUniqueness(userVO.getEmail(), null);
+        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
+                userManager.checkUserEmailUniqueness(userVO.getEmail(), null)
+        );
         //校验租户的套餐是否满足条件
         tenantManager.checkTenantPackage(SafetyUtil.getOperationTenantId());
         //新增用户数据
@@ -147,9 +151,13 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserByUserId(UserVO userVO) {
         //校验用户名唯一
-        userManager.checkUsernameUniqueness(userVO.getUsername(), userVO.getUserId());
+        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
+                userManager.checkUsernameUniqueness(userVO.getUsername(), userVO.getUserId())
+        );
         //校验邮箱唯一
-        userManager.checkUserEmailUniqueness(userVO.getEmail(), userVO.getUserId());
+        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
+                userManager.checkUserEmailUniqueness(userVO.getEmail(), userVO.getUserId())
+        );
         //校验该租户套餐是否满足条件
         tenantManager.checkTenantPackage(SafetyUtil.getOperationTenantId());
         //查询用户信息

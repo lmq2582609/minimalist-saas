@@ -49,11 +49,11 @@ public class MinIOFileHandler implements FileHandler {
 
     /**
      * 删除文件
-     * @param fileId 文件ID
+     * @param file 文件信息
      * @return 是否删除成功
      */
     @Override
-    public boolean deleteFile(Long fileId) {
+    public boolean deleteFile(MFile file) {
         //没做，做了需要引jar包，可自行实现
         return false;
     }

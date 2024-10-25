@@ -29,7 +29,7 @@ public enum RespEnum {
     RESUBMIT_ERROR(503, "请求已提交，请稍后重试"),
 
     /** 参数存在XSS敏感字符 */
-    PARAM_XSS_ERROR(400, "xss params This is not allowed"),
+    PARAM_XSS_ERROR(400, "存在敏感数据，不能提交"),
 
     ;
 
