@@ -113,7 +113,6 @@ router.beforeEach(async (to, from, next) => {
     }
     //如果未登录，将跳转到登录页进行登录
     if (!token) {
-        Msg.error('请登录')
         return next({path: routerWhiteList[0]})
     }
     //设置页面动态标题
