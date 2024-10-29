@@ -9,18 +9,18 @@
 ## 项目简介
 
 极简多租户管理系统是一个多租户管理系统，基于SpringBoot3+Vue3的前后端分离的后台开发脚手架，具备一些常用的基础功能。
-
 ## 项目地址
 
-演示地址：部署中...
+演示地址：[https://www..jjian.com.cn](https://www.jjian.com.cn)
 
-文档地址：编写中...
+文档地址：[https://apebbs.cn/docs/minimalist-saas/1.0.0/index](https://apebbs.cn/docs/minimalist-saas/1.0.0/index)
 
-Gitee：https://gitee.com/marlife/minimalist-saas
+Gitee：[https://gitee.com/marlife/minimalist-saas](https://gitee.com/marlife/minimalist-saas)
 
-Github：https://github.com/lmq2582609/minimalist-saas
+Github：[https://github.com/lmq2582609/minimalist-saas](https://github.com/lmq2582609/minimalist-saas)
 
-管理员账号/密码：admin/111111
+管理员账号/密码： `admin`/`111111`  
+租户账号/密码：`dongdong`/`111111`  
 
 ## 技术选型
 ### 前端
@@ -52,7 +52,6 @@ Github：https://github.com/lmq2582609/minimalist-saas
 | Satoken                    | 1.39.0 | Java权限认证框架              |
 | Knife4j                    | 4.1.0  | Swagger2和OpenAPI3增强解决方案 |
 | Mica-xss                   | 3.3.2  | xss防护                   |
-| Transmittable-Thread-Local | 2.14.3 | ThreadLocal增强，跨线程传递     |
 ## 中间件
 
 | 名称    | 版本     | 说明       |

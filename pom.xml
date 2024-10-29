@@ -37,8 +37,6 @@
         <spring-file.version>2.2.1</spring-file.version>
         <!-- mica-xss -->
         <mica-xss.version>3.3.2</mica-xss.version>
-        <!-- TTL -->
-        <ttl.version>2.14.3</ttl.version>
         <!-- java -->
         <java.version>17</java.version>
         <!-- maven.compiler -->
