@@ -1,6 +1,6 @@
 <template>
     <div class="fixed top-[50px] right-0 h-[45px] flex items-center px-3 shadow"
-         :style="{left: sysStore.siderWidth + 'px'}" style="background-color: var(--color-bg-white);z-index: 100">
+         :style="{left: sysStore.siderWidth + 'px'}" style="background-color: var(--color-bg-1);z-index: 100">
         <a-tabs type="card-gutter" v-model:active-key="activeTab" :editable="true" @delete="deleteTab" auto-switch>
             <a-tab-pane v-for="(item, index) of tabList" :key="item.path" :title="item.title" :closable="item.path !== '/'"></a-tab-pane>
         </a-tabs>

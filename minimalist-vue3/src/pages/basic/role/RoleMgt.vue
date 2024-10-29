@@ -141,7 +141,7 @@ const datatable = reactive({
         {title: '角色编码', dataIndex: 'roleCode', align: 'center'},
         {title: '排序', dataIndex: 'roleSort', align: 'center'},
         {title: '角色状态', dataIndex: 'status', slotName: 'status', align: 'center'},
-        {title: '操作', slotName: 'operation', align: 'center', width: 160}
+        {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}
     ],
     //加载
     loading: false,

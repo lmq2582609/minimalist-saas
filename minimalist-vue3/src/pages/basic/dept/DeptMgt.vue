@@ -143,7 +143,7 @@ const datatable = reactive({
         {title: '电话', dataIndex: 'phone', align: 'center', ellipsis: true, tooltip: true},
         {title: '邮箱', dataIndex: 'email', align: 'center', ellipsis: true, tooltip: true},
         {title: '部门状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},
-        {title: '操作', slotName: 'operation', align: 'center', width: 200}
+        {title: '操作', slotName: 'operation', align: 'center', width: 200, fixed: 'right'}
     ],
     //加载
     loading: false,

@@ -135,7 +135,7 @@ const datatable = reactive({
         {title: '套餐名称', dataIndex: 'packageName', slotName: 'packageName', align: 'center', width: 200, ellipsis: true, tooltip: true},
         {title: '套餐状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},
         {title: '备注', dataIndex: 'remark', align: 'center', ellipsis: true, tooltip: true},
-        {title: '操作', slotName: 'operation', align: 'center', width: 160}
+        {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}
     ],
     //加载
     loading: false,

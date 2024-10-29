@@ -152,7 +152,7 @@ const datatable = reactive({
         {title: '是否默认使用', dataIndex: 'storageDefault', slotName: 'storageDefault', align: 'center'},
         {title: '说明', dataIndex: 'description', width: 200, align: 'center', ellipsis: true, tooltip: true},
         {title: '状态', dataIndex: 'status', slotName: 'status', align: 'center'},
-        {title: '操作', slotName: 'operation', align: 'center', width: 160}
+        {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}
     ],
     //加载
     loading: false,

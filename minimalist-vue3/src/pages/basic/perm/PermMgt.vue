@@ -63,7 +63,7 @@
 
             <!-- 数据展示区 -->
             <a-row class="w-full flex-1 mt-3 overflow-y-auto">
-                <a-table ref="tableRef" class="w-[100%]" :scroll="{y: '100%'}" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="permId" :pagination="false" table-layout-fixed>
+                <a-table ref="tableRef" class="w-[100%]" :scroll="{ minWidth: 600, y: '100%' }" :columns="datatable.columns" :data="datatable.records" :loading="datatable.loading" row-key="permId" :pagination="false" table-layout-fixed>
                     <!-- 权限名称 -->
                     <template #permName="{ record }">
                         <a-link @click="detailBtnClick(record.permId)" icon>{{ record.permName }}</a-link>
@@ -145,10 +145,10 @@ const datatable = reactive({
         {title: '权限类型', dataIndex: 'permType', slotName: 'permType', align: 'center', width: 100},
         {title: '排序', dataIndex: 'permSort', align: 'center', width: 80},
         {title: '权限编码', dataIndex: 'permCode', align: 'center', width: 200, ellipsis: true, tooltip: true},
-        {title: '路由地址', dataIndex: 'permPath', align: 'center', ellipsis: true, tooltip: true},
-        {title: '组件路径', dataIndex: 'component', align: 'center', ellipsis: true, tooltip: true},
+        {title: '路由地址', dataIndex: 'permPath', align: 'center', width: 200,ellipsis: true, tooltip: true},
+        {title: '组件路径', dataIndex: 'component', align: 'center', width: 200,ellipsis: true, tooltip: true},
         {title: '权限状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},
-        {title: '操作', slotName: 'operation', align: 'center', width: 200}
+        {title: '操作', slotName: 'operation', align: 'center', width: 200, fixed: 'right'}
     ],
     //加载
     loading: false,

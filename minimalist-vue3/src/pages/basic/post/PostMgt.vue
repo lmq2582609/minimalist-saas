@@ -141,7 +141,7 @@ const datatable = reactive({
         {title: '岗位编码', dataIndex: 'postCode', align: 'center'},
         {title: '排序', dataIndex: 'postSort', align: 'center'},
         {title: '岗位状态', dataIndex: 'status', slotName: 'status', align: 'center'},
-        {title: '操作', slotName: 'operation', align: 'center', width: 160}
+        {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}
     ],
     //加载
     loading: false,

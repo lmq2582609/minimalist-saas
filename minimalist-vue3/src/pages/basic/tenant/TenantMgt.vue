@@ -145,7 +145,7 @@ const datatable = reactive({
         {title: '账号额度', dataIndex: 'accountCount', align: 'center', width: 90},
         {title: '过期时间', dataIndex: 'expireTime', align: 'center', width: 180},
         {title: '租户状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},
-        {title: '操作', slotName: 'operation', align: 'center', width: 160}
+        {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}
     ],
     //加载
     loading: false,
