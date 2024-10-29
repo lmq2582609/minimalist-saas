@@ -11,7 +11,7 @@
 极简多租户管理系统是一个多租户管理系统，基于SpringBoot3+Vue3的前后端分离的后台开发脚手架，具备一些常用的基础功能。
 ## 项目地址
 
-演示地址：[https://www..jjian.com.cn](https://www.jjian.com.cn)
+演示地址：[https://www.jjian.com.cn](https://www.jjian.com.cn)
 
 文档地址：[https://apebbs.cn/docs/minimalist-saas/1.0.0/index](https://apebbs.cn/docs/minimalist-saas/1.0.0/index)
 
