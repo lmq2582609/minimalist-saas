@@ -8,6 +8,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 @Slf4j
@@ -54,7 +55,6 @@ public class SchemaEnumHandler {
      * @return 文字描述
      */
     protected String getColumnDescription(SchemaEnum schemaEnumAnnotation, String sourceDescription) {
-        if (StrUtil.isNotBlank(sourceDescription)) { sourceDescription = ""; }
         //枚举
         Class<? extends Enum> enumClass = schemaEnumAnnotation.implementation();
         //将枚举转为文字描述
@@ -64,7 +64,10 @@ public class SchemaEnumHandler {
             Object value = getEnumMethodValue(enumConstant, schemaEnumAnnotation.valueMethodName());
             sj.add(key + ": " + value);
         }
-        return sourceDescription + " -> " + sj;
+        return Optional.ofNullable(sourceDescription)
+                .map(s -> s + " -> ")
+                .orElse("")
+                + sj;
     }
 
 }
