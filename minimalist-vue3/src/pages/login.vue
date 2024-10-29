@@ -43,6 +43,8 @@
                     <a-button type="primary" :loading="loginLoading" class="w-[100%]" @click="loginSubmitClick()">登录</a-button>
                 </a-form-item>
             </a-form>
+            <p>管理员账号/密码：admin/111111</p>
+            <p class="mt-2"> 租户账号/密码：dongdong/111111</p>
         </a-col>
     </a-row>
 </template>
@@ -60,8 +62,8 @@ const {proxy} = getCurrentInstance()
 //登录表单
 const loginFormRef = ref(null)
 const loginForm = reactive({
-    username: null,
-    password: null,
+    username: 'admin',
+    password: '111111',
     captcha: null,
     captchaId: null
 })
