@@ -16,6 +16,7 @@ import com.minimalist.basic.entity.po.MStorage;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.minimalist.basic.utils.ValidateUtil;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 
+@Slf4j
 @Service
 public class LocalFileHandler implements FileHandler {
 
@@ -97,6 +99,7 @@ public class LocalFileHandler implements FileHandler {
         fileInfo.setStorageType(storage.getStorageType());
         try {
             //上传文件
+            log.info("上传文件，路径：{}", path);
             File file = FileUtil.touch(path);
             multipartFile.transferTo(file);
             if (StrUtil.isNotBlank(multipartFile.getContentType()) && multipartFile.getContentType().contains("image")) {
@@ -113,10 +116,9 @@ public class LocalFileHandler implements FileHandler {
             }
         } catch (IOException e) {
             FileUtil.del(path);
+            log.warn("上传文件，异常：", e);
             throw new BusinessException(FileEnum.ErrorMsg.FILE_UPLOAD_FAIL.getDesc());
         }
-
-
         return fileInfo;
     }
 

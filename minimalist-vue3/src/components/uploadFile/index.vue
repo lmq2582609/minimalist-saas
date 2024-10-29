@@ -90,11 +90,16 @@ const customRemoveFile = (fileItem) => {
                 return true
             },
             onBeforeOk: async () => {
-                removeFileLoading.value = true
-                await deleteFileApi(fileItem.response?.fileId)
-                proxy.$msg.success(proxy.operationType.delete.success)
-                resolve(true)
-                removeFileLoading.value = false
+                let fileId = fileItem.response?.fileId
+                if (!fileId) {
+                    resolve(true)
+                } else {
+                    removeFileLoading.value = true
+                    await deleteFileApi(fileItem.response?.fileId)
+                    proxy.$msg.success(proxy.operationType.delete.success)
+                    resolve(true)
+                    removeFileLoading.value = false
+                }
                 return true
             }
         });

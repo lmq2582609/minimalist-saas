@@ -13,7 +13,7 @@
 
 演示地址：[https://www.jjian.com.cn](https://www.jjian.com.cn)
 
-文档地址：[https://apebbs.cn/docs/minimalist-saas/1.0.0/index](https://apebbs.cn/docs/minimalist-saas/1.0.0/index)
+文档地址：[https://apebbs.cn/docs/minimalist-saas/1.0.0/introduction](https://apebbs.cn/docs/minimalist-saas/1.0.0/introduction)
 
 Gitee：[https://gitee.com/marlife/minimalist-saas](https://gitee.com/marlife/minimalist-saas)
 
