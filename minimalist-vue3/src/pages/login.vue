@@ -49,7 +49,7 @@
     </a-row>
 </template>
 <script setup>
-import { ref, reactive, getCurrentInstance } from 'vue'
+import {ref, reactive, getCurrentInstance, onMounted} from 'vue'
 import { getImageCaptchaApi, loginApi } from '~/api/user'
 import { setToken } from '~/utils/cookie'
 import { useRouter } from 'vue-router'
@@ -72,7 +72,7 @@ const loginLoading = ref(false)
 //登录表单验证规则
 const loginRules = {
     username: [{required: true, message: '用户名不能为空', trigger: 'submit'}],
-    password: [{required: true, message: '密码不能为空', trigger: 'submit'}],
+    password: [{required: true, message: '密码不能为空', trigger: 'submit'}]
 }
 //登录点击事件
 const loginSubmitClick = () => {
@@ -90,6 +90,9 @@ const loginSubmitClick = () => {
             //跳转页面到后台首页
             router.push('/')
         }).catch(() => {
+            //清空输入的验证码
+            loginForm.captcha = null
+            loginForm.captchaId = null
             //登录失败，重新刷新验证码
             getImageCaptcha()
         }).finally(() => {
@@ -116,8 +119,10 @@ const getImageCaptcha = () => {
     })
 }
 
-//获取图形验证码
-getImageCaptcha()
+onMounted(() => {
+    //获取图形验证码
+    getImageCaptcha()
+})
 </script>
 <style scoped>
 @keyframes floating {
