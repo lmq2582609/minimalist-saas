@@ -314,7 +314,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public boolean checkImageCaptcha(String captcha, String captchaId) {
-        String key = StrUtil.indexedFormat(RedisKeyConstant.CAPTCHA_CACHE_KEY, captchaId);
+        String key = StrUtil.indexedFormat(RedisKeyConstant.CAPTCHA_CACHE_KEY, captchaId.toLowerCase());
         String captchaCache = redisManager.getAndDelete(key);
         return captcha.toLowerCase().equals(captchaCache);
     }
@@ -330,8 +330,8 @@ public class UserServiceImpl implements UserService {
         boolean loginCaptchaEnable = Boolean.parseBoolean(config.getConfigValue());
         //校验验证码是否正确
         if (loginCaptchaEnable) {
-            Assert.isTrue(StringUtils.hasText(reqVO.getCaptcha()), () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_ID_EMPTY.getDesc()));
-            Assert.isTrue(StringUtils.hasText(reqVO.getCaptchaId()), () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_CONTENT_EMPTY.getDesc()));
+            Assert.isTrue(StrUtil.isNotBlank(reqVO.getCaptcha()), () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_CONTENT_EMPTY.getDesc()));
+            Assert.isTrue(StrUtil.isNotBlank(reqVO.getCaptchaId()), () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_ID_EMPTY.getDesc()));
             boolean checkImageCaptcha = checkImageCaptcha(reqVO.getCaptcha(), reqVO.getCaptchaId());
             Assert.isTrue(checkImageCaptcha, () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_INCORRECT.getDesc()));
         }
