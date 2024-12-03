@@ -68,7 +68,7 @@ public class RoleServiceImpl implements RoleService {
         long roleId = UnqIdUtil.uniqueId();
         mRole = BeanUtil.copyProperties(roleVO, MRole.class);
         mRole.setRoleId(roleId);
-        roleMapper.insert(mRole);
+        roleMapper.insert(mRole, true);
         //插入角色和权限关联数据
         List<MRolePerm> mRolePerms = permIdToRolePerm(roleVO.getPermissionsIds(), roleId);
         rolePermMapper.insertBatch(mRolePerms);

@@ -57,7 +57,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         MTenantPackage mTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);
         long tenantPackageId = UnqIdUtil.uniqueId();
         mTenantPackage.setPackageId(tenantPackageId);
-        tenantPackageMapper.insert(mTenantPackage);
+        tenantPackageMapper.insert(mTenantPackage, true);
         //插入套餐与权限的关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = buildTenantPackagePerm(tenantPackageVO.getPermissionsIds(), tenantPackageId);
         tenantPackagePermMapper.insertBatch(mTenantPackagePerms);
@@ -74,6 +74,8 @@ public class TenantPackageServiceImpl implements TenantPackageService {
         Assert.isTrue(tenantCount <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.USE_TENANT_PACKAGE.getDesc()));
         //删除租户套餐
         tenantPackageMapper.deleteTenantPackageByTenantPackageId(tenantPackageId);
+        //删除套餐与权限关联数据
+        tenantPackagePermMapper.deleteByQuery(QueryWrapper.create().eq(MTenantPackagePerm::getPackageId, tenantPackageId));
     }
 
     /**

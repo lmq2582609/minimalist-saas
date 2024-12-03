@@ -666,7 +666,7 @@ CREATE TABLE `m_tenant_package`  (
   `id` bigint(0) NOT NULL AUTO_INCREMENT,
   `package_id` bigint(0) NOT NULL COMMENT '套餐ID',
   `package_name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '套餐名称',
-  `status` tinyint(0) NOT NULL DEFAULT 1 COMMENT '状态 0禁用 1正常',
+  `status` tinyint(0) NULL DEFAULT 1 COMMENT '状态 0禁用 1正常',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
   `create_id` bigint(0) NULL DEFAULT NULL COMMENT '创建人ID',
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',

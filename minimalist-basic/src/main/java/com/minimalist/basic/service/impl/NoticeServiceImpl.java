@@ -64,7 +64,7 @@ public class NoticeServiceImpl implements NoticeService {
         //内容处理 -> 编码
         mNotice.setNoticeContent(TextUtil.encode(noticeVO.getNoticeContent()));
         //插入
-        int insertCount = noticeMapper.insert(mNotice);
+        int insertCount = noticeMapper.insert(mNotice, true);
         Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
         //公告相关文件处理
         fileStatusHandler(null, noticeVO, StatusEnum.STATUS_1.getCode());

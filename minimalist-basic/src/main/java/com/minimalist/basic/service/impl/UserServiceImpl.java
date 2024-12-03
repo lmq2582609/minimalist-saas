@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
             //设置默认密码 123456qwerty
             user.setPassword(userManager.passwordEncrypt("123456qwerty", salt));
         }
-        userMapper.insert(user);
+        userMapper.insert(user, true);
         //新增用户关联信息
         userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userId);
     }

@@ -83,7 +83,7 @@ public class PermServiceImpl implements PermService {
     public void addPerm(PermVO permVO) {
         MPerms mPerms = BeanUtil.copyProperties(permVO, MPerms.class);
         mPerms.setPermId(UnqIdUtil.uniqueId());
-        permsMapper.insert(mPerms);
+        permsMapper.insert(mPerms, true);
     }
 
     /**
