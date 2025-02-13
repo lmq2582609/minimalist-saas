@@ -121,11 +121,8 @@ public class ConfigServiceImpl implements ConfigService {
         if (ObjectUtil.isNull(configVO)) {
             MConfig mConfig = configMapper.selectConfigByConfigKey(configKey, StatusEnum.STATUS_1.getCode());
             configVO = BeanUtil.copyProperties(mConfig, ConfigVO.class);
-            //随机超时时间
-            int systemConfigCacheEx = RandomUtil.randomInt(0, 500) + RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX;
             //重新放入缓存
             redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
-            redisManager.set(redisKey, configVO, systemConfigCacheEx);
         }
         return configVO;
     }
@@ -140,8 +137,7 @@ public class ConfigServiceImpl implements ConfigService {
         for (MConfig config : configList) {
             ConfigVO configVO = BeanUtil.copyProperties(config, ConfigVO.class);
             String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
-            redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
-
+            //随机超时时间，放入缓存
             int systemConfigCacheEx = RandomUtil.randomInt(0, 500) + RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX;
             redisManager.set(redisKey, configVO, systemConfigCacheEx);
         }
