@@ -90,7 +90,7 @@ public class TenantServiceImpl implements TenantService {
         //插入租户数据
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
-        tenantMapper.insert(mTenant);
+        tenantMapper.insert(mTenant, true);
     }
 
     /**
@@ -199,7 +199,7 @@ public class TenantServiceImpl implements TenantService {
         role.setRemark("系统自动创建角色");
         role.setTenantId(tenantId);
         //插入角色
-        roleMapper.insert(role);
+        roleMapper.insert(role, true);
         //插入角色和权限关联数据
         List<MTenantPackagePerm> mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
         List<MRolePerm> rolePerms = mTenantPackagePerms.stream().map(tpp -> {
@@ -226,14 +226,14 @@ public class TenantServiceImpl implements TenantService {
         user.setSalt(salt);
         user.setPassword(userManager.passwordEncrypt(userInfo.getPassword(), salt));
         user.setTenantId(tenantId);
-        userMapper.insert(user);
+        userMapper.insert(user, true);
     }
 
     private void addTenantUserRole(Long userId, Long roleId) {
         MUserRole userRole = new MUserRole();
         userRole.setUserId(userId);
         userRole.setRoleId(roleId);
-        userRoleMapper.insert(userRole);
+        userRoleMapper.insert(userRole, true);
     }
 
 }

@@ -61,7 +61,7 @@ public class DeptServiceImpl implements DeptService {
             mDept.setAncestors(ancestors);
         }
         //新增
-        deptMapper.insert(mDept);
+        deptMapper.insert(mDept, true);
     }
 
     /**

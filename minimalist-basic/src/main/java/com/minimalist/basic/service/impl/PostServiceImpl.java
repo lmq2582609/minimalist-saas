@@ -41,7 +41,7 @@ public class PostServiceImpl implements PostService {
         long postId = UnqIdUtil.uniqueId();
         mPost = BeanUtil.copyProperties(postVO, MPost.class);
         mPost.setPostId(postId);
-        postMapper.insert(mPost);
+        postMapper.insert(mPost, true);
     }
 
     /**

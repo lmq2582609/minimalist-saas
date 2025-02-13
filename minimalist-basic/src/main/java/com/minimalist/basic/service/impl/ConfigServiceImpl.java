@@ -46,7 +46,7 @@ public class ConfigServiceImpl implements ConfigService {
         Assert.isNull(config, () -> new BusinessException(ConfigEnum.ErrorMsg.CONTAIN_CONFIG_KEY.getDesc()));
         MConfig insertConfig = BeanUtil.copyProperties(configVO, MConfig.class);
         insertConfig.setConfigId(UnqIdUtil.uniqueId());
-        configMapper.insert(insertConfig);
+        configMapper.insert(insertConfig, true);
         //添加后将配置放入缓存
         String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
         redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);

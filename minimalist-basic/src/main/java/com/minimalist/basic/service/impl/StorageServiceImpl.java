@@ -42,7 +42,7 @@ public class StorageServiceImpl implements StorageService {
         long storageId = UnqIdUtil.uniqueId();
         storage.setStorageId(storageId);
         storage.setStorageConfig(storageConfig);
-        storageMapper.insert(storage);
+        storageMapper.insert(storage, true);
         //如果选择了默认存储
         if (Boolean.TRUE.equals(storageVO.getStorageDefault())) {
             //将其他存储更新为非默认存储

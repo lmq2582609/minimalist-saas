@@ -49,7 +49,7 @@ public class FileServiceImpl implements FileService {
         FileHandler fileHandler = fileManager.getFileHandler(storage.getStorageType());
         //上传文件
         MFile mFile = fileHandler.uploadFile(fileUploadVO.getFile(), fileUploadVO.getFileSource(), storage);
-        fileMapper.insert(mFile);
+        fileMapper.insert(mFile, true);
         return BeanUtil.copyProperties(mFile, FileUploadRespVO.class);
     }
 
