@@ -30,4 +30,17 @@ public class TenantEnum {
         private final String desc;
     }
 
+    /** 租户数据隔离方式 */
+    @Getter
+    @AllArgsConstructor
+    public enum DataIsolation {
+        COLUMN("column", "字段隔离"),
+        DB("db", "数据库隔离");
+        private final String code;
+        private final String desc;
+    }
+
+    /** 主数据源名称 */
+    public static final String MASTER = "master";
+
 }
