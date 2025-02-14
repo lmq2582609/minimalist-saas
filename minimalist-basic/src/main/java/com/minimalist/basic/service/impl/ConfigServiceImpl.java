@@ -3,8 +3,7 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.RandomUtil;
-import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.minimalist.basic.entity.enums.ConfigEnum;
 import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
@@ -16,6 +15,7 @@ import com.minimalist.basic.entity.vo.config.ConfigQueryVO;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
 import com.minimalist.basic.mapper.MConfigMapper;
 import com.minimalist.basic.service.ConfigService;
+import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.RedisKeyConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.paginate.Page;
@@ -47,9 +47,8 @@ public class ConfigServiceImpl implements ConfigService {
         MConfig insertConfig = BeanUtil.copyProperties(configVO, MConfig.class);
         insertConfig.setConfigId(UnqIdUtil.uniqueId());
         configMapper.insert(insertConfig, true);
-        //添加后将配置放入缓存
-        String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
-        redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
+        //发布消息 - 新增
+        redisManager.publishMessage(RedisKeyConstant.SYSTEM_CONFIG_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(configVO));
     }
 
     /**
@@ -64,9 +63,8 @@ public class ConfigServiceImpl implements ConfigService {
                 () -> new BusinessException(ConfigEnum.ErrorMsg.CANNOT_DEL_SYSTEM_CONFIG.getDesc()));
         int deleteCount = configMapper.deleteConfigByConfigId(configId);
         Assert.isTrue(deleteCount == 1, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-        //从缓存中删除参数
-        String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, config.getConfigKey());
-        redisManager.delete(redisKey);
+        //发布消息 - 删除
+        redisManager.publishMessage(RedisKeyConstant.SYSTEM_CONFIG_TOPIC_KEY + "." + CommonConstant.DELETE, config.getConfigKey());
     }
 
     /**
@@ -82,9 +80,8 @@ public class ConfigServiceImpl implements ConfigService {
         }
         MConfig updateConfig = BeanUtil.copyProperties(configVO, MConfig.class);
         configMapper.updateConfigByConfigId(updateConfig);
-        //添加后将配置放入缓存
-        String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
-        redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
+        //发布消息 - 修改
+        redisManager.publishMessage(RedisKeyConstant.SYSTEM_CONFIG_TOPIC_KEY + "." + CommonConstant.UPDATE, JSONUtil.toJsonStr(configVO));
     }
 
     /**
@@ -116,13 +113,12 @@ public class ConfigServiceImpl implements ConfigService {
      */
     @Override
     public ConfigVO getConfigByConfigKey(String configKey) {
-        String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configKey);
-        ConfigVO configVO = redisManager.get(redisKey);
+        ConfigVO configVO = CommonConstant.systemConfigMap.get(configKey);
         if (ObjectUtil.isNull(configVO)) {
             MConfig mConfig = configMapper.selectConfigByConfigKey(configKey, StatusEnum.STATUS_1.getCode());
             configVO = BeanUtil.copyProperties(mConfig, ConfigVO.class);
             //重新放入缓存
-            redisManager.set(redisKey, configVO, RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX);
+            CommonConstant.systemConfigMap.put(configKey, configVO);
         }
         return configVO;
     }
@@ -136,10 +132,8 @@ public class ConfigServiceImpl implements ConfigService {
                 QueryWrapper.create().eq(MConfig::getStatus, StatusEnum.STATUS_1.getCode()));
         for (MConfig config : configList) {
             ConfigVO configVO = BeanUtil.copyProperties(config, ConfigVO.class);
-            String redisKey = StrUtil.indexedFormat(RedisKeyConstant.SYSTEM_CONFIG_KEY, configVO.getConfigKey());
-            //随机超时时间，放入缓存
-            int systemConfigCacheEx = RandomUtil.randomInt(0, 500) + RedisKeyConstant.SYSTEM_CONFIG_CACHE_EX;
-            redisManager.set(redisKey, configVO, systemConfigCacheEx);
+            //缓存系统配置到Map
+            CommonConstant.systemConfigMap.put(configVO.getConfigKey(), configVO);
         }
     }
 }

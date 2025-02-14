@@ -7,7 +7,6 @@ import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.concurrent.TimeUnit;
 
@@ -101,11 +100,14 @@ public class RedisManager {
         return BigDecimal.valueOf(Math.random()).multiply(new BigDecimal(20)).intValue();
     }
 
-    public void publishMessage(String topic) {
+    /**
+     * 发布消息
+     * @param topic 主题
+     * @param message 消息
+     */
+    public void publishMessage(String topic, String message) {
         RTopic rTopic = redissonClient.getTopic(topic);
-        //long publish = rTopic.publish();
-
-
+        rTopic.publish(message);
     }
 
 }

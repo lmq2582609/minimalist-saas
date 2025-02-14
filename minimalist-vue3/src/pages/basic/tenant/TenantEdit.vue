@@ -16,6 +16,11 @@
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />
                 </a-form-item>
+                <a-form-item class="w-[49%]" field="dataIsolation" label="数据隔离方式" required tooltip="多租户数据隔离方式">
+                    <a-select v-model="form.dataIsolation" placeholder="数据隔离方式" allow-clear>
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.tenantDataIsolation]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                    </a-select>
+                </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="租户状态" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="租户状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -24,6 +29,27 @@
                 <a-form-item class="w-[100%]" field="remark" label="备注">
                     <a-textarea v-model="form.remark" placeholder="备注" />
                 </a-form-item>
+
+
+                <!-- 数据源名称：选择隔离方式为db时，需要配置数据源信息 -->
+                <template v-if="form.dataIsolation === 'db'">
+                    <a-divider orientation="left">
+                        租户的数据源信息
+                    </a-divider>
+                    <a-form-item class="w-[49%]" field="datasourceName" label="数据源名称">
+                        <a-input v-model="form.tenantDatasource.datasourceName" placeholder="数据源名称" />
+                    </a-form-item>
+                    <a-form-item class="w-[49%]" field="datasourceUrl" label="数据源连接">
+                        <a-textarea v-model="form.tenantDatasource.datasourceUrl" placeholder="数据源连接" />
+                    </a-form-item>
+                    <a-form-item class="w-[49%]" field="username" label="数据源用户名">
+                        <a-input v-model="form.tenantDatasource.username" placeholder="数据源用户名" />
+                    </a-form-item>
+                    <a-form-item class="w-[49%]" field="password" label="数据源密码">
+                        <a-input-password v-model="form.tenantDatasource.password" placeholder="数据源密码" />
+                    </a-form-item>
+                </template>
+
 
                 <!-- 租户与用户绑定 -->
                 <a-divider orientation="left" v-if="props.params.operationType === proxy.operationType.add.type">
@@ -76,7 +102,7 @@ import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.tenantDataIsolation])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -90,6 +116,13 @@ const emits = defineEmits(['ok', 'cancel'])
 const spinLoading = ref(false)
 //表单ref
 const formRef = ref(null)
+//默认数据源信息
+const defaultTenantDatasource = {
+    datasourceName: null,
+    datasourceUrl: 'jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true',
+    username: null,
+    password: null
+}
 //表单
 const form = reactive({
     //租户ID
@@ -104,6 +137,10 @@ const form = reactive({
     accountCount: null,
     //过期时间
     expireTime: null,
+    //数据隔离方式
+    dataIsolation: null,
+    //数据源名称
+    datasource: null,
     //租户状态
     status: null,
     //备注
@@ -124,7 +161,9 @@ const form = reactive({
         email: null,
         //用户性别
         userSex: null
-    }
+    },
+    //数据源信息，隔离方式为db时填充数据
+    tenantDatasource: defaultTenantDatasource
 })
 //表单校验规则
 const rules = {
@@ -132,6 +171,7 @@ const rules = {
     packageId: [{required: true, message: '租户套餐不能为空', trigger: 'submit'}],
     accountCount: [{required: true, message: '账号额度不能为空', trigger: 'submit'}],
     expireTime: [{required: true, message: '过期时间不能为空', trigger: 'submit'}],
+    dataIsolation: [{required: true, message: '数据库隔离方式不能为空', trigger: 'submit'}]
 }
 //确定 -> 点击
 const okBtnClick = () => {
@@ -172,7 +212,16 @@ const loadTenantInfo = (tenantId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    form[key] = res[key]
+                    //回显数据源信息
+                    if (key === 'tenantDatasource') {
+                        if (res[key]) {
+                            form[key] = res[key]
+                        } else {
+                            form[key] = defaultTenantDatasource
+                        }
+                    } else {
+                        form[key] = res[key]
+                    }
                 }
             }
             form.packageId = form.packageId === '0' ? Number(form.packageId) : String(form.packageId)

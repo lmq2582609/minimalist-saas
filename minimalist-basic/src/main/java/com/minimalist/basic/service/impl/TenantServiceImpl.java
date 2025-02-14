@@ -5,9 +5,12 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
+import cn.hutool.json.JSONUtil;
+import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
+import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
 import com.minimalist.basic.entity.vo.tenant.TenantQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.entity.vo.user.UserVO;
@@ -19,6 +22,7 @@ import com.minimalist.basic.service.TenantService;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.CommonConstant;
+import com.minimalist.basic.utils.RedisKeyConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +65,9 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private MRolePermMapper rolePermMapper;
 
+    @Autowired
+    private RedisManager redisManager;
+
     /**
      * 添加租户
      * @param tenantVO 租户信息
@@ -86,6 +93,28 @@ public class TenantServiceImpl implements TenantService {
         //用户与角色关联关系
         addTenantUserRole(userId, roleId);
 
+        //隔离方式为数据库隔离，则插入租户数据源数据
+        if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
+            TenantDatasourceVO tenantDatasourceVO = tenantVO.getTenantDatasource();
+            //数据源名称
+            mTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
+            //插入多租户数据源
+            MTenantDatasource tenantDatasource = new MTenantDatasource();
+            tenantDatasource.setTenantId(tenantId);
+            tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
+            tenantDatasource.setDatasourceName(tenantDatasourceVO.getDatasourceName());
+            tenantDatasource.setDatasourceUrl(tenantDatasourceVO.getDatasourceUrl());
+            tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
+            tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
+            tenantDatasourceMapper.insert(tenantDatasource, true);
+            //发布消息 - 缓存数据源信息
+            redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantDatasource));
+        } else {
+            //字段隔离
+            mTenant.setDatasource(TenantEnum.MASTER);
+            mTenant.setDataIsolation(TenantEnum.DataIsolation.COLUMN.getCode());
+        }
+
         //插入租户数据
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
@@ -97,7 +126,13 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantId 租户ID
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void deleteTenantByTenantId(Long tenantId) {
+        //删除租户数据源信息
+        tenantDatasourceMapper.deleteTenantDatasourceByTenantId(tenantId);
+        //发布消息 - 删除缓存中的数据源信息
+        redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.DELETE, String.valueOf(tenantId));
+        //删除租户数据
         tenantMapper.deleteTenantByTenantId(tenantId);
     }
 
@@ -112,6 +147,35 @@ public class TenantServiceImpl implements TenantService {
         MTenant tenant = tenantMapper.selectTenantByTenantId(tenantVO.getTenantId());
         Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
         MTenant newTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
+
+        //删除租户数据源信息
+        tenantDatasourceMapper.deleteTenantDatasourceByTenantId(tenant.getTenantId());
+        //发布消息 - 删除缓存中的数据源信息
+        redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.DELETE, String.valueOf(tenant.getTenantId()));
+
+        //检查租户数据源是否需要更新
+        if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
+            //数据库隔离
+            TenantDatasourceVO tenantDatasourceVO = tenantVO.getTenantDatasource();
+            //数据源名称
+            newTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
+            //插入多租户数据源
+            MTenantDatasource tenantDatasource = new MTenantDatasource();
+            tenantDatasource.setTenantId(tenant.getTenantId());
+            tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
+            tenantDatasource.setDatasourceName(tenantDatasourceVO.getDatasourceName());
+            tenantDatasource.setDatasourceUrl(tenantDatasourceVO.getDatasourceUrl());
+            tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
+            tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
+            tenantDatasourceMapper.insert(tenantDatasource, true);
+            //发布消息 - 缓存数据源信息
+            redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantDatasource));
+        } else {
+            //字段隔离
+            newTenant.setDatasource(TenantEnum.MASTER);
+            newTenant.setDataIsolation(TenantEnum.DataIsolation.COLUMN.getCode());
+        }
+
         //更新租户
         tenantMapper.updateTenantByTenantId(newTenant);
         //如果租户套餐变更，则修改租户套餐
@@ -121,6 +185,7 @@ public class TenantServiceImpl implements TenantService {
             //修改租户权限
             tenantManager.updateTenantPermission(roleList, tenantVO.getPackageId());
         }
+
     }
 
     /**
@@ -163,6 +228,11 @@ public class TenantServiceImpl implements TenantService {
         tenantVO.setContactName(mUser.getUserRealName());
         tenantVO.setPhone(mUser.getPhone());
         tenantVO.setEmail(mUser.getEmail());
+        //查询数据源信息
+        if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
+            MTenantDatasource tenantDatasource = tenantDatasourceMapper.selectTenantDatasourceByTenantId(tenantId);
+            tenantVO.setTenantDatasource(BeanUtil.copyProperties(tenantDatasource, TenantDatasourceVO.class));
+        }
         return tenantVO;
     }
 

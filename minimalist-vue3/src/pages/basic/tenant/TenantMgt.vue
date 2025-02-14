@@ -67,6 +67,10 @@
                     <template #packageId="{ record }">
                         <dict-convert :dict-data="dicts[proxy.DICT.tenantPackageList]" :dict-key="record.packageId === '0' ? Number(record.packageId) : String(record.packageId)" />
                     </template>
+                    <!-- 数据隔离方式 -->
+                    <template #dataIsolation="{ record }">
+                        <dict-convert :dict-data="dicts[proxy.DICT.tenantDataIsolation]" :dict-key="record.dataIsolation" />
+                    </template>
                     <!-- 租户状态 -->
                     <template #status="{ record }">
                         <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="record.status" />
@@ -119,7 +123,7 @@ import TenantEdit from "~/pages/basic/tenant/TenantEdit.vue";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.tenantDataIsolation])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单
@@ -139,6 +143,8 @@ const datatable = reactive({
     columns: [
         {title: '租户名', dataIndex: 'tenantName', slotName: 'tenantName', align: 'center', ellipsis: true, tooltip: true},
         {title: '租户套餐', dataIndex: 'packageId', slotName: 'packageId', align: 'center'},
+        {title: '数据隔离方式', dataIndex: 'dataIsolation', slotName: 'dataIsolation', align: 'center'},
+        {title: '数据源名称', dataIndex: 'datasource', slotName: 'datasource', align: 'center'},
         {title: '联系人', dataIndex: 'contactName', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '联系人手机', dataIndex: 'phone', align: 'center', width: 125},
         {title: '联系人邮箱', dataIndex: 'email', align: 'center', ellipsis: true, tooltip: true},

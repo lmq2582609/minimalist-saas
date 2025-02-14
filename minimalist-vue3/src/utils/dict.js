@@ -18,6 +18,8 @@ export const DICT = {
     commonNumberStatus: 'common-number-status',
     //存储类型
     storageType: 'storage-type',
+    //多租户数据隔离方式
+    tenantDataIsolation: 'tenant-data-isolation',
 
     /**************** 额外字典 ***************/
     //租户套餐列表 -> 额外字典

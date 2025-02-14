@@ -1,6 +1,17 @@
 package com.minimalist.basic.utils;
 
+import com.minimalist.basic.entity.vo.config.ConfigVO;
+import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class CommonConstant {
+
+    /** 系统配置缓存 */
+    public static Map<String, ConfigVO> systemConfigMap = new ConcurrentHashMap<>();
+
+    /** 租户数据源缓存 */
+    public static Map<Long, TenantDatasourceVO> tenantDatasourceMap = new ConcurrentHashMap<>();
 
     /** 数字 0 */
     public static final int ZERO = 0;
@@ -8,6 +19,16 @@ public class CommonConstant {
     /** 数字 1 */
     public static final int ONE = 1;
 
+    /** 增 */
+    public static final String ADD = "add";
+
+    /** 删 */
+    public static final String DELETE = "delete";
+
+    /** 改 */
+    public static final String UPDATE = "update";
+
+    /** 租户ID标识 */
     public static final String TRACE_ID = "traceId";
 
     /** 多租户开关配置 key */

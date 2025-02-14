@@ -1,8 +1,8 @@
 package com.minimalist.basic.config.mybatis;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
-import com.minimalist.basic.config.tenant.TenantInit;
+import com.minimalist.basic.entity.vo.config.ConfigVO;
+import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.SafetyUtil;
 import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.tenant.TenantManager;
@@ -26,9 +26,14 @@ public class MyBatisFlexConfiguration {
         //获取租户ID，目前支持返回一个租户ID
         TenantManager.setTenantFactory(() -> {
             //校验系统多租户是否开启
-            if (!TenantInit.getTenantOnOff()) {
-                //未打开，忽略多租户
-                return null;
+            ConfigVO configVO = CommonConstant.systemConfigMap.get(CommonConstant.SYSTEM_CONFIG_TENANT);
+            if (ObjectUtil.isNotNull(configVO)) {
+                Boolean tenantOnOff = Boolean.valueOf(configVO.getConfigValue());
+                //忽略多租户
+                if (Boolean.TRUE.equals(tenantOnOff)) {
+                    //未打开，忽略多租户
+                    return null;
+                }
             }
             //如果是系统租户，并且cookie中携带其他租户ID参数，表示查询其他租户数据
             if (SafetyUtil.checkIsSystemTenant()) {

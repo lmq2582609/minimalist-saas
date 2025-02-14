@@ -1,11 +1,9 @@
 package com.minimalist.basic.entity.po;
 
-import com.minimalist.basic.config.mybatis.InsertFullColumnHandler;
-import com.minimalist.basic.config.mybatis.UpdateFullColumnHandler;
-import com.minimalist.basic.config.mybatis.bo.BaseEntity;
+import com.mybatisflex.annotation.Id;
+import com.mybatisflex.annotation.KeyType;
 import com.mybatisflex.annotation.Table;
 import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,12 +21,16 @@ import java.io.Serial;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-@Table(value = "m_tenant_datasource", onInsert = InsertFullColumnHandler.class, onUpdate = UpdateFullColumnHandler.class)
-public class MTenantDatasource extends BaseEntity implements Serializable {
+@EqualsAndHashCode
+@Table(value = "m_tenant_datasource")
+public class MTenantDatasource implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
+
+    /** ID自增 */
+    @Id(keyType = KeyType.Auto)
+    private Long id;
 
     /**
      * 数据源ID
@@ -59,12 +61,5 @@ public class MTenantDatasource extends BaseEntity implements Serializable {
      * 数据源密码
      */
     private String password;
-
-    /**
-     * 状态 0禁用 1正常
-     */
-    private Integer status;
-
-    private String remark;
 
 }

@@ -69,7 +69,6 @@ public class TenantVO implements Serializable {
     @Schema(name = "dataIsolation", description = "数据隔离方式", type = "string")
     private String dataIsolation;
 
-    @NotBlank(message = "所使用的数据源不能为空", groups = {Add.class, Update.class})
     @Schema(name = "datasource", description = "所使用的数据源，默认使用master主库", type = "string")
     private String datasource;
 

@@ -28,16 +28,6 @@ public class RedisKeyConstant {
     public static final String REPEAT_SUBMIT_KEY = "repeat_submit:{0}";
 
     /**
-     * 参数管理 redis key
-     */
-    public static final String SYSTEM_CONFIG_KEY = "system_config:{0}";
-
-    /**
-     * 参数缓存，有效期 30 天
-     */
-    public static final int SYSTEM_CONFIG_CACHE_EX = 30 * 24 * 60 * 60;
-
-    /**
      * 用户角色 redis key
      */
     public static final String USER_ROLE_CACHE_KEY = "user_role:{0}";
@@ -51,5 +41,15 @@ public class RedisKeyConstant {
      * 用户权限超时时间
      */
     public static final int USER_PERM_CACHE_EX = 7 * 24 * 60 * 60;
+
+    /**
+     * 系统配置 订阅/发布 主题
+     */
+    public static final String SYSTEM_CONFIG_TOPIC_KEY = "system_config_topic";
+
+    /**
+     * 租户数据源 订阅/发布 主题
+     */
+    public static final String TENANT_DATASOURCE_TOPIC_KEY = "tenant_datasource_topic";
 
 }

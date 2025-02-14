@@ -10,6 +10,10 @@
             <a-descriptions-item label="联系人邮箱">{{ form.email }}</a-descriptions-item>
             <a-descriptions-item label="账号额度">{{ form.accountCount }}</a-descriptions-item>
             <a-descriptions-item label="过期时间">{{ form.expireTime }}</a-descriptions-item>
+            <a-descriptions-item label="数据隔离方式">
+                <dict-convert :dict-data="dicts[proxy.DICT.tenantDataIsolation]" :dict-key="form.dataIsolation" />
+            </a-descriptions-item>
+            <a-descriptions-item label="数据源名称">{{ form.datasource }}</a-descriptions-item>
             <a-descriptions-item label="租户状态">
                 <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
@@ -24,7 +28,7 @@ import { getTenantByTenantIdApi } from "~/api/tenant.js";
 //全局实例
 const { proxy } = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.tenantDataIsolation])
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数
@@ -52,6 +56,10 @@ const form = reactive({
     accountCount: null,
     //过期时间
     expireTime: null,
+    // 数据隔离方式
+    dataIsolation: null,
+    //数据源名称
+    datasource: null,
     //租户状态
     status: null,
     //备注
