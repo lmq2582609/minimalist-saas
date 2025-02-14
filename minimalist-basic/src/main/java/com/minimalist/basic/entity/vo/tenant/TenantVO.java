@@ -4,6 +4,7 @@ import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.swagger.SchemaEnum;
@@ -63,6 +64,15 @@ public class TenantVO implements Serializable {
     @Schema(name = "accountCount", description = "可创建账号数量，表示这个租户下可以创建多少账号", type = "integer")
     private Integer accountCount;
 
+    @NotBlank(message = "数据隔离方式不能为空", groups = {Add.class, Update.class})
+    @SchemaEnum(implementation = TenantEnum.DataIsolation.class)
+    @Schema(name = "dataIsolation", description = "数据隔离方式", type = "string")
+    private String dataIsolation;
+
+    @NotBlank(message = "所使用的数据源不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "datasource", description = "所使用的数据源，默认使用master主库", type = "string")
+    private String datasource;
+
     @NotNull(message = "租户状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "租户状态", type = "integer")
@@ -71,7 +81,12 @@ public class TenantVO implements Serializable {
     @Schema(name = "remark", description = "备注", type = "string")
     private String remark;
 
-    @Schema(name = "user", description = "租户的用户信息，新增时填充", type = "string")
+    @NotNull(message = "租户的用户信息不能为空", groups = {Add.class})
+    @Schema(name = "user", description = "租户的用户信息，新增时填充", type = "object")
     private UserVO user;
+
+    @NotNull(message = "租户数据源不能为空", groups = {Add.class})
+    @Schema(name = "tenantDatasource", description = "租户数据源", type = "object")
+    private TenantDatasourceVO tenantDatasource;
 
 }

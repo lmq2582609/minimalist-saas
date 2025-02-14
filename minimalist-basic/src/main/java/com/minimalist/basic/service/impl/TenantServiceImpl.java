@@ -16,7 +16,6 @@ import com.minimalist.basic.manager.UserManager;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
 import com.minimalist.basic.service.TenantService;
-import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.utils.CommonConstant;
@@ -36,7 +35,7 @@ public class TenantServiceImpl implements TenantService {
     private MTenantMapper tenantMapper;
 
     @Autowired
-    private MTenantPackageMapper tenantPackageMapper;
+    private MTenantDatasourceMapper tenantDatasourceMapper;
 
     @Autowired
     private MUserMapper userMapper;

@@ -3,6 +3,7 @@ package com.minimalist.basic.config.redis;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.redisson.api.RLock;
+import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -98,6 +99,13 @@ public class RedisManager {
      */
     public int randomSeconds() {
         return BigDecimal.valueOf(Math.random()).multiply(new BigDecimal(20)).intValue();
+    }
+
+    public void publishMessage(String topic) {
+        RTopic rTopic = redissonClient.getTopic(topic);
+        //long publish = rTopic.publish();
+
+
     }
 
 }
