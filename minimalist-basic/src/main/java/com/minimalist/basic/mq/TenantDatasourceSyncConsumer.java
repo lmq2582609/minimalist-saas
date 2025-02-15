@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.minimalist.basic.entity.po.MTenantDatasource;
 import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
+import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.RedisKeyConstant;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,9 @@ public class TenantDatasourceSyncConsumer implements ApplicationRunner {
     @Autowired
     private RedissonClient redissonClient;
 
+    @Autowired
+    private TenantManager tenantManager;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         RPatternTopic topic = redissonClient.getPatternTopic(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + ".*");
@@ -38,10 +42,16 @@ public class TenantDatasourceSyncConsumer implements ApplicationRunner {
                 if (CommonConstant.ADD.equals(opt) || CommonConstant.UPDATE.equals(opt)) {
                     MTenantDatasource tenantDatasource = JSONUtil.toBean(msg, MTenantDatasource.class);
                     TenantDatasourceVO tenantDatasourceVO = BeanUtil.copyProperties(tenantDatasource, TenantDatasourceVO.class);
-                    CommonConstant.tenantDatasourceMap.put(tenantDatasource.getTenantId(), tenantDatasourceVO);
+                    //数据源名称 = 租户ID
+                    String tenantId = tenantDatasource.getTenantId().toString();
+                    CommonConstant.tenantDatasourceMap.put(tenantId, tenantDatasourceVO);
+                    //动态添加数据源
+                    tenantManager.dynamicAddDatasource(tenantId, tenantDatasourceVO);
                 }
                 if (CommonConstant.DELETE.equals(opt)) {
-                    CommonConstant.tenantDatasourceMap.remove(Long.valueOf(msg));
+                    CommonConstant.tenantDatasourceMap.remove(msg);
+                    //动态删除数据源
+                    tenantManager.dynamicDeleteDatasource(msg);
                 }
                 log.info("租户数据源信息同步处理，完毕！");
             } catch (Exception e) {

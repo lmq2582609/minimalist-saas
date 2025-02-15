@@ -3,8 +3,12 @@ package com.minimalist.basic.manager;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.LocalDateTimeUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
+import com.baomidou.dynamic.datasource.creator.DataSourceProperty;
+import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
 import com.minimalist.basic.entity.enums.*;
 import com.minimalist.basic.entity.po.*;
+import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
 import com.minimalist.basic.mapper.MRolePermMapper;
 import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
@@ -16,6 +20,8 @@ import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import javax.sql.DataSource;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,6 +43,12 @@ public class TenantManager {
 
     @Autowired
     private MTenantPackagePermMapper tenantPackagePermMapper;
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private DefaultDataSourceCreator dataSourceCreator;
 
     /**
      * 检查租户套餐
@@ -120,6 +132,31 @@ public class TenantManager {
                 }
             }
         }
+    }
+
+    /**
+     * 动态添加数据源
+     * @param tenantId 租户ID
+     * @param tenantDatasourceVO 数据源信息
+     */
+    public void dynamicAddDatasource(String tenantId, TenantDatasourceVO tenantDatasourceVO) {
+        DataSourceProperty dataSourceProperty = new DataSourceProperty();
+        dataSourceProperty.setUrl(tenantDatasourceVO.getDatasourceUrl());
+        dataSourceProperty.setUsername(tenantDatasourceVO.getUsername());
+        dataSourceProperty.setPassword(tenantDatasourceVO.getPassword());
+        DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
+        DataSource dataSource = dataSourceCreator.createDataSource(dataSourceProperty);
+        ds.addDataSource(tenantId, dataSource);
+    }
+
+    /**
+     * 动态删除数据源
+     * @param tenantId 租户ID
+     */
+    public void dynamicDeleteDatasource(String tenantId) {
+        //动态删除数据源
+        DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;
+        ds.removeDataSource(tenantId);
     }
 
 }

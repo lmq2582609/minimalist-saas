@@ -1,6 +1,7 @@
 package com.minimalist.basic.config.trace;
 
 import cn.hutool.core.util.IdUtil;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.utils.CommonConstant;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +27,8 @@ public class TraceIdInterceptor implements HandlerInterceptor {
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         MDC.clear();
+        //清空线程内数据源信息
+        DynamicDataSourceContextHolder.clear();
     }
 
 }

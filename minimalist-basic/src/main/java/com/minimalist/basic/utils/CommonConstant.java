@@ -11,7 +11,7 @@ public class CommonConstant {
     public static Map<String, ConfigVO> systemConfigMap = new ConcurrentHashMap<>();
 
     /** 租户数据源缓存 */
-    public static Map<Long, TenantDatasourceVO> tenantDatasourceMap = new ConcurrentHashMap<>();
+    public static Map<String, TenantDatasourceVO> tenantDatasourceMap = new ConcurrentHashMap<>();
 
     /** 数字 0 */
     public static final int ZERO = 0;

@@ -9,6 +9,7 @@ mybatis-flex:
         logic-delete-column: deleted
     # 别名包扫描路径
     type-aliases-package: com.minimalist.**.entity
+
 # springdoc-openapi 项目文档配置
 springdoc:
     title: 极简多租户开发平台
@@ -40,29 +41,30 @@ knife4j:
         swagger-model-name: 实体说明
 spring:
     datasource:
-        type: com.zaxxer.hikari.HikariDataSource
-        driver-class-name: com.mysql.cj.jdbc.Driver
-        username: root
-        password: 123456
-        url: jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true
-        hikari:
-            # 最小空闲连接数量
-            minimum-idle: 10
-            # 连接池最大连接数，默认是10
-            maximum-pool-size: 20
-            # 空闲连接存活最大时间，默认600000
-            idle-timeout: 30000
-            # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
-            max-lifetime: 60000
-            # 此属性控制从池返回的连接的默认自动提交行为,默认值：true
-            auto-commit: true
-            # 连接池名字
-            pool-name: Minimalist-HikariCP
-            # 数据库连接超时时间,默认30秒，即30000
-            connection-timeout: 30000
-            # 测试连接 leakDetectionThreshold
-            connection-test-query: "SELECT 1"
-            register-mbeans: true
+        dynamic:
+            primary: master
+            strict: false
+            hikari:
+                # 最小空闲连接数量
+                minimum-idle: 20
+                # 连接池最大连接数，默认是10
+                maximum-pool-size: 100
+                # 空闲连接存活最大时间，默认600000
+                idle-timeout: 30000
+                # 此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+                max-lifetime: 60000
+                # 数据库连接超时时间,默认30秒，即30000
+                connection-timeout: 30000
+                # 测试连接
+                connection-test-query: "SELECT 1"
+            datasource:
+                master:
+                    type: com.zaxxer.hikari.HikariDataSource
+                    driver-class-name: com.mysql.cj.jdbc.Driver
+                    username: root
+                    password: 123456
+                    url: jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true
+
     servlet:
         multipart:
             # 单个文件大小

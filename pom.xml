@@ -27,6 +27,8 @@
         <mybatis-flex.codegen.version>1.8.3</mybatis-flex.codegen.version>
         <!-- mybatis-flex使用的连接池 -->
         <mybatis-flex.hikariCP.version>4.0.3</mybatis-flex.hikariCP.version>
+        <!-- 多数据源 -->
+        <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
         <!-- hutool工具包 -->
         <hutool.version>5.8.32</hutool.version>
         <!-- sa-token -->
