@@ -35,10 +35,10 @@ public class SafetyUtil {
     }
 
     /**
-     * 获取当前登陆人的租户ID
-     * @return 租户ID
+     * 获取当前登陆人的租户数据源
+     * @return 数据源
      */
-    public static String getLoginUserTenantIdStr() {
+    public static String getLoginUserDatasource() {
         return Optional.ofNullable(StpUtil.getSession().getString(TenantIgnore.TENANT_ID))
                 .orElse("master");
     }
