@@ -35,6 +35,15 @@ public class SafetyUtil {
     }
 
     /**
+     * 获取当前登陆人的租户ID
+     * @return 租户ID
+     */
+    public static String getLoginUserTenantIdStr() {
+        return Optional.ofNullable(StpUtil.getSession().getString(TenantIgnore.TENANT_ID))
+                .orElse("master");
+    }
+
+    /**
      * 获取cookie中的租户ID
      * @return cookie中的租户ID
      */
