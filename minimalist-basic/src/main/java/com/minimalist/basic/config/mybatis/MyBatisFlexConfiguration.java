@@ -30,7 +30,7 @@ public class MyBatisFlexConfiguration {
             if (ObjectUtil.isNotNull(configVO)) {
                 Boolean tenantOnOff = Boolean.valueOf(configVO.getConfigValue());
                 //忽略多租户
-                if (Boolean.TRUE.equals(tenantOnOff)) {
+                if (Boolean.FALSE.equals(tenantOnOff)) {
                     //未打开，忽略多租户
                     return null;
                 }
