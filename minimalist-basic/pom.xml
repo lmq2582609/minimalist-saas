@@ -100,13 +100,6 @@
             <version>0.4.20</version>
         </dependency>
 
-        <!-- spring-boot-test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- mybatis-flex -->
         <dependency>
             <groupId>com.mybatis-flex</groupId>
