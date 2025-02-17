@@ -136,6 +136,13 @@
             <version>${dynamic-datasource.version}</version>
         </dependency>
 
+        <!-- 七牛云 -->
+        <dependency>
+            <groupId>com.qiniu</groupId>
+            <artifactId>qiniu-java-sdk</artifactId>
+            <version>${qiniu.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

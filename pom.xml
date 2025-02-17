@@ -29,6 +29,8 @@
         <mybatis-flex.hikariCP.version>4.0.3</mybatis-flex.hikariCP.version>
         <!-- 多数据源 -->
         <dynamic-datasource.version>4.3.1</dynamic-datasource.version>
+        <!-- 七牛云 -->
+        <qiniu.version>7.18.0</qiniu.version>
         <!-- hutool工具包 -->
         <hutool.version>5.8.32</hutool.version>
         <!-- sa-token -->

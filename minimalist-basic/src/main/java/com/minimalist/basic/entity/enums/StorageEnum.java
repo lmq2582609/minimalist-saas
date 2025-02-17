@@ -20,6 +20,7 @@ public class StorageEnum {
     public enum StorageType {
         LOCAL("local", "本地"),
         MINIO("minio", "MinIO"),
+        QINIU("qiniu", "七牛云"),
         ;
         private final String code;
         private final String desc;

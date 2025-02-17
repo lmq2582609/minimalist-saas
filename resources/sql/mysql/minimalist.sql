@@ -1,3 +1,19 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : 优客得
+ Source Server Type    : MySQL
+ Source Server Version : 80024
+ Source Host           : 117.50.179.102:12306
+ Source Schema         : minimalist
+
+ Target Server Type    : MySQL
+ Target Server Version : 80024
+ File Encoding         : 65001
+
+ Date: 17/02/2025 21:08:33
+*/
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -17,7 +33,7 @@ CREATE TABLE `m_config`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '参数配置表' ROW_FORMAT = Dynamic;
@@ -49,7 +65,7 @@ CREATE TABLE `m_dept`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '部门表' ROW_FORMAT = Dynamic;
@@ -97,10 +113,10 @@ CREATE TABLE `m_dict`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 133 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 135 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_dict
@@ -163,7 +179,7 @@ CREATE TABLE `m_file`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_file_id`(`file_id`) USING BTREE COMMENT '文件ID索引',
@@ -200,7 +216,7 @@ CREATE TABLE `m_notice`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '通知公告表' ROW_FORMAT = Dynamic;
@@ -233,7 +249,7 @@ CREATE TABLE `m_perms`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 89 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '权限表' ROW_FORMAT = Dynamic;
@@ -324,7 +340,7 @@ CREATE TABLE `m_post`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '岗位表' ROW_FORMAT = Dynamic;
@@ -360,10 +376,10 @@ CREATE TABLE `m_role`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 115 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 118 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_role
@@ -408,7 +424,7 @@ CREATE TABLE `m_role_perm`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `perm_id_idx`(`perm_id`) USING BTREE COMMENT '权限ID索引',
   INDEX `role_id_idx`(`role_id`) USING BTREE COMMENT '角色ID索引'
-) ENGINE = InnoDB AUTO_INCREMENT = 2035 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色与权限关联表 1角色-N权限' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2098 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '角色与权限关联表 1角色-N权限' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_role_perm
@@ -670,7 +686,7 @@ CREATE TABLE `m_storage`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '存储管理表' ROW_FORMAT = Dynamic;
@@ -678,8 +694,8 @@ CREATE TABLE `m_storage`  (
 -- ----------------------------
 -- Records of m_storage
 -- ----------------------------
-INSERT INTO `m_storage` VALUES (1, 1843939697907720192, '本地存储测试', 'local', b'1', '1', '{\"storagePath\":\"/application/minimalist-saas/\"}', 1, 0, NULL, 0, NULL, b'1', 0);
-INSERT INTO `m_storage` VALUES (2, 1844270972333924352, 'minio', 'minio', b'0', '2', '{\"accessKey\":\"5555\",\"secretKey\":\"5555\",\"endPoint\":\"5555\",\"bucketName\":\"5555\"}', 1, 0, NULL, 0, NULL, b'1', 0);
+INSERT INTO `m_storage` VALUES (1, 1843939697907720192, '本地存储测试', 'local', b'1', '1', '{\"storagePath\":\"/application/minimalist-saas/\"}', 1, 0, NULL, 0, NULL, b'0', 0);
+INSERT INTO `m_storage` VALUES (2, 1844270972333924352, 'minio', 'minio', b'0', '2', '{\"accessKey\":\"5555\",\"secretKey\":\"5555\",\"endPoint\":\"5555\",\"bucketName\":\"5555\"}', 1, 0, NULL, 0, NULL, b'0', 0);
 
 -- ----------------------------
 -- Table structure for m_tenant
@@ -701,10 +717,10 @@ CREATE TABLE `m_tenant`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT NULL COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_tenant
@@ -729,7 +745,7 @@ CREATE TABLE `m_tenant_datasource`  (
   `username` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据源用户名',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据源密码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户数据源表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户数据源表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for m_tenant_package
@@ -745,7 +761,7 @@ CREATE TABLE `m_tenant_package`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT NULL COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `unq_package_id`(`package_id`) USING BTREE
@@ -822,12 +838,12 @@ CREATE TABLE `m_user`  (
   `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
   `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
   `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
-  `deleted` bit(1) NULL DEFAULT b'1' COMMENT '逻辑删除  0未删除  1已删除',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `username_unq`(`username`) USING BTREE COMMENT '用户名唯一索引',
   INDEX `user_id_idx`(`user_id`) USING BTREE COMMENT '用户ID索引'
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_user
@@ -916,7 +932,7 @@ CREATE TABLE `m_user_role`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `role_id_idx`(`role_id`) USING BTREE COMMENT '角色ID索引',
   INDEX `user_id_idx`(`user_id`) USING BTREE COMMENT '用户ID索引'
-) ENGINE = InnoDB AUTO_INCREMENT = 28 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户与角色关联表 1用户-N角色' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 31 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户与角色关联表 1用户-N角色' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_user_role
