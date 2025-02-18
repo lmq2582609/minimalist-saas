@@ -11,7 +11,7 @@
  Target Server Version : 80024
  File Encoding         : 65001
 
- Date: 18/02/2025 20:30:39
+ Date: 18/02/2025 22:00:40
 */
 
 SET NAMES utf8mb4;
@@ -116,7 +116,7 @@ CREATE TABLE `m_dict`  (
   `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 135 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 137 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_dict
@@ -691,7 +691,7 @@ CREATE TABLE `m_storage`  (
   `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '存储管理表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '存储管理表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_storage
@@ -714,6 +714,7 @@ CREATE TABLE `m_tenant`  (
   `account_count` int(0) NOT NULL DEFAULT 0 COMMENT '可创建账号数量',
   `data_isolation` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'column' COMMENT '数据隔离方式  column字段隔离(默认) db数据库隔离',
   `datasource` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT 'master' COMMENT '数据源名称 master(默认使用主库) ',
+  `storage_id` bigint(0) NULL DEFAULT NULL COMMENT '存储ID 表示该租户使用哪个文件存储',
   `remark` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
   `status` tinyint(0) NULL DEFAULT 1 COMMENT '状态 0禁用 1正常',
   `create_id` bigint(0) NULL DEFAULT NULL COMMENT '创建人ID',
@@ -728,12 +729,12 @@ CREATE TABLE `m_tenant`  (
 -- ----------------------------
 -- Records of m_tenant
 -- ----------------------------
-INSERT INTO `m_tenant` VALUES (1, 0, 0, 0, '系统租户', '2030-12-31 23:59:59.000000', 20, 'column', 'master', NULL, 1, 0, '2025-02-14 21:54:35.000000', 0, '2025-02-14 21:54:58.000000', b'0', 0);
-INSERT INTO `m_tenant` VALUES (3, 1834763883194494976, 1834763884364705792, 1676850220841287680, '东东胡辣汤', '2035-09-30 09:15:21.000000', 2, 'column', 'master', NULL, 1, 0, '2025-02-14 21:54:38.000000', 0, '2025-02-14 21:55:01.000000', b'0', 0);
-INSERT INTO `m_tenant` VALUES (4, 1836055976968843264, 1836055978990497792, 1676850220841287680, '测试租户111', '2024-09-30 22:38:09.000000', 3, 'column', 'master', NULL, 1, 0, '2025-02-14 21:54:41.000000', 0, '2025-02-14 21:55:06.000000', b'0', 0);
-INSERT INTO `m_tenant` VALUES (5, 1836056110565814272, 1836056110997827584, 1676850220841287680, '测试租户222', '2024-09-30 22:54:04.000000', 2, 'column', 'master', NULL, 1, 0, '2025-02-14 21:54:43.000000', 0, '2025-02-14 21:55:08.000000', b'0', 0);
-INSERT INTO `m_tenant` VALUES (6, 1846431773459197952, 1846431773870239744, 1676850220841287680, '测试租户333', '2024-10-31 14:03:03.000000', 3, 'column', 'master', NULL, 1, 0, '2025-02-14 21:54:46.000000', 0, '2025-02-14 21:55:09.000000', b'0', 0);
-INSERT INTO `m_tenant` VALUES (9, 1890406866181099520, 1890406866181099521, 1676850220841287680, '测试租户44', '2025-02-28 22:22:49.000000', 2, 'column', 'master', NULL, 1, 0, '2025-02-14 22:24:53.000000', 0, '2025-02-14 23:31:29.000000', b'0', 2);
+INSERT INTO `m_tenant` VALUES (1, 0, 0, 0, '系统租户', '2030-12-31 23:59:59.000000', 20, 'column', 'master', NULL, NULL, 1, 0, '2025-02-14 21:54:35.000000', 0, '2025-02-14 21:54:58.000000', b'0', 0);
+INSERT INTO `m_tenant` VALUES (3, 1834763883194494976, 1834763884364705792, 1676850220841287680, '东东胡辣汤', '2035-09-30 09:15:21.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:38.000000', 0, '2025-02-18 21:56:23.000000', b'0', 2);
+INSERT INTO `m_tenant` VALUES (4, 1836055976968843264, 1836055978990497792, 1676850220841287680, '测试租户111', '2024-09-30 22:38:09.000000', 3, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:41.000000', 0, '2025-02-18 21:56:32.000000', b'0', 2);
+INSERT INTO `m_tenant` VALUES (5, 1836056110565814272, 1836056110997827584, 1676850220841287680, '测试租户222', '2024-09-30 22:54:04.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:43.000000', 0, '2025-02-18 21:56:39.000000', b'0', 2);
+INSERT INTO `m_tenant` VALUES (6, 1846431773459197952, 1846431773870239744, 1676850220841287680, '测试租户333', '2024-10-31 14:03:03.000000', 3, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:46.000000', 0, '2025-02-18 21:56:42.000000', b'0', 2);
+INSERT INTO `m_tenant` VALUES (9, 1890406866181099520, 1890406866181099521, 1676850220841287680, '测试租户44', '2025-02-28 22:22:49.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 22:24:53.000000', 0, '2025-02-18 21:56:46.000000', b'0', 4);
 
 -- ----------------------------
 -- Table structure for m_tenant_datasource
