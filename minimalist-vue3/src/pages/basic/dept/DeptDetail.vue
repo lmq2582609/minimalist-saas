@@ -60,9 +60,9 @@ const form = reactive({
     status: null,
 })
 //加载部门详细信息
-const loadDeptInfo = (roleId) => {
+const loadDeptInfo = (deptId) => {
     spinLoading.value = true
-    getDeptByDeptIdApi(roleId).then(res => {
+    getDeptByDeptIdApi(deptId).then(res => {
         //数据赋值
         if (res) {
             for (let key in res) {
