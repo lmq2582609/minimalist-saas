@@ -40,6 +40,9 @@
             <!-- minio -->
             <minio ref="storageConfigRef" :params="form.storageConfig" :optType="proxy.operationType.update.type" v-if="form.storageType === 'minio'" />
 
+            <!-- 七牛云 -->
+            <qi-niu ref="storageConfigRef" :params="form.storageConfig" :optType="proxy.operationType.update.type" v-if="form.storageType === 'qiniu'" />
+
         </a-form>
 
         <!-- 分割线 -->
@@ -59,6 +62,7 @@ import { ref, reactive, getCurrentInstance, watch } from 'vue'
 import {addStorageApi, updateStorageByStorageIdApi, getStorageByStorageIdApi} from "~/api/storage.js";
 import Local from "~/pages/basic/storage/Local.vue";
 import Minio from "~/pages/basic/storage/Minio.vue";
+import QiNiu from "~/pages/basic/storage/QiNiu.vue";
 
 //全局实例
 const {proxy} = getCurrentInstance()

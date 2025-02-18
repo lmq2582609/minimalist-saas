@@ -1,13 +1,10 @@
 package com.minimalist.basic.entity.vo.file;
 
-import com.minimalist.basic.entity.enums.FileEnum;
-import com.minimalist.basic.config.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
@@ -24,8 +21,7 @@ public class FileUploadBatchVO implements Serializable {
     private List<MultipartFile> files;
 
     @NotNull(message = "文件来源不能为空")
-    @SchemaEnum(implementation = FileEnum.FileSource.class)
-    @Schema(name = "fileSource", description = "文件来源", type = "int")
+    @Schema(name = "fileSource", description = "文件来源，字典：file-source-path", type = "int")
     private Integer fileSource;
 
     @Schema(name = "storageId", description = "存储ID，可为空。为空则取默认使用的存储", type = "int")
