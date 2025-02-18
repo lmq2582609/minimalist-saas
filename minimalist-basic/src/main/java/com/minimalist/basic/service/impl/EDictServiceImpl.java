@@ -1,12 +1,14 @@
 package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.dict.DictCacheVO;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.EDictService;
 import com.minimalist.basic.config.eDict.EDict;
 import com.minimalist.basic.config.eDict.EDictConstant;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -34,6 +36,9 @@ public class EDictServiceImpl implements EDictService {
 
     @Autowired
     private MTenantPackageMapper tenantPackageMapper;
+
+    @Autowired
+    private MStorageMapper storageMapper;
 
     /**
      * 获取部门字典数据
@@ -161,6 +166,31 @@ public class EDictServiceImpl implements EDictService {
                 dictKV.setDictType(EDictConstant.TENANT_LIST);
                 return dictKV;
             }).toList();
+            dictCacheVO.setDictList(dictKVList);
+        }
+        return dictCacheVO;
+    }
+
+    /**
+     * 获取存储方式数据（额外字典数据）
+     * @return 字典数据列表
+     */
+    @Override
+    @EDict(dictType = EDictConstant.STORAGE_LIST)
+    public DictCacheVO getStorageDictData() {
+        DictCacheVO dictCacheVO = new DictCacheVO();
+        dictCacheVO.setDictType(EDictConstant.STORAGE_LIST);
+        List<MStorage> mStorages = storageMapper.selectListByQuery(QueryWrapper.create()
+                .eq(MStorage::getStatus, StatusEnum.STATUS_1.getCode()));
+        if (CollectionUtil.isNotEmpty(mStorages)) {
+            List<DictCacheVO.DictKV> dictKVList = mStorages.stream()
+                    .map(storage -> {
+                        DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
+                        dictKV.setDictKey(storage.getStorageId().toString());
+                        dictKV.setDictValue(storage.getStorageName());
+                        dictKV.setDictType(EDictConstant.STORAGE_LIST);
+                        return dictKV;
+                    }).toList();
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;

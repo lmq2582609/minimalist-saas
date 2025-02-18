@@ -72,6 +72,11 @@ public class TenantVO implements Serializable {
     @Schema(name = "datasource", description = "所使用的数据源，默认使用master主库", type = "string")
     private String datasource;
 
+    @JsonSerialize(using = ToStringSerializer.class)
+    @NotNull(message = "存储ID不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "storageId", description = "存储ID 表示该租户使用哪个文件存储", type = "string")
+    private Long storageId;
+
     @NotNull(message = "租户状态不能为空", groups = {Update.class})
     @SchemaEnum(implementation = StatusEnum.class)
     @Schema(name = "status", description = "租户状态", type = "integer")

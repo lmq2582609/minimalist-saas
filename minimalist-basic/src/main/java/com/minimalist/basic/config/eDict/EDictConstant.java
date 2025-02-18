@@ -28,4 +28,7 @@ public class EDictConstant {
     /** 租户套餐字典type */
     public static final String TENANT_PACKAGE_LIST = "tenant-package-list";
 
+    /** 存储方式字典type */
+    public static final String STORAGE_LIST = "storage-list";
+
 }

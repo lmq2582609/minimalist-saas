@@ -43,4 +43,10 @@ public interface EDictService {
      */
     DictCacheVO getTenantDictData();
 
+    /**
+     * 获取存储方式数据（额外字典数据）
+     * @return 字典数据列表
+     */
+    DictCacheVO getStorageDictData();
+
 }

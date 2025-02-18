@@ -21,6 +21,11 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.tenantDataIsolation]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
+                <a-form-item class="w-[49%]" field="storageId" label="文件存储方式" required>
+                    <a-select v-model="form.storageId" placeholder="文件存储方式" allow-clear>
+                        <a-option v-for="(d, index) in dicts[proxy.DICT.storageList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
+                    </a-select>
+                </a-form-item>
                 <a-form-item class="w-[49%]" field="status" label="租户状态" v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="租户状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -49,7 +54,6 @@
                         <a-input-password v-model="form.tenantDatasource.password" placeholder="数据源密码" />
                     </a-form-item>
                 </template>
-
 
                 <!-- 租户与用户绑定 -->
                 <a-divider orientation="left" v-if="props.params.operationType === proxy.operationType.add.type">
@@ -102,7 +106,7 @@ import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.tenantDataIsolation])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.tenantDataIsolation, proxy.DICT.storageList])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -141,6 +145,8 @@ const form = reactive({
     dataIsolation: null,
     //数据源名称
     datasource: null,
+    //存储ID
+    storageId: null,
     //租户状态
     status: null,
     //备注
@@ -171,7 +177,8 @@ const rules = {
     packageId: [{required: true, message: '租户套餐不能为空', trigger: 'submit'}],
     accountCount: [{required: true, message: '账号额度不能为空', trigger: 'submit'}],
     expireTime: [{required: true, message: '过期时间不能为空', trigger: 'submit'}],
-    dataIsolation: [{required: true, message: '数据库隔离方式不能为空', trigger: 'submit'}]
+    dataIsolation: [{required: true, message: '数据库隔离方式不能为空', trigger: 'submit'}],
+    storageId: [{required: true, message: '租户文件存储方式不能为空', trigger: 'submit'}]
 }
 //确定 -> 点击
 const okBtnClick = () => {

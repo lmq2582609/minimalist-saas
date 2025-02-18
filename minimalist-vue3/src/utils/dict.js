@@ -33,7 +33,9 @@ export const DICT = {
     //岗位列表 -> 额外字典
     postList: 'dict-post-list',
     //租户列表 -> 额外字典
-    tenantList: 'dict-tenant-list'
+    tenantList: 'dict-tenant-list',
+    //存储列表 -> 额外字典
+    storageList: 'storage-list'
 }
 
 /**

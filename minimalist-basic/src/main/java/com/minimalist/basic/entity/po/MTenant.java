@@ -72,6 +72,11 @@ public class MTenant extends BaseEntity implements Serializable {
     private String datasource;
 
     /**
+     * 存储ID 表示该租户使用哪个文件存储
+     */
+    private Long storageId;
+
+    /**
      * 状态 0禁用 1正常
      */
     private Integer status;
