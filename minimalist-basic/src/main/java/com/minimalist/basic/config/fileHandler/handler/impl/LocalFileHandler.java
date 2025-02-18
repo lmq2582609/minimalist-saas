@@ -98,7 +98,6 @@ public class LocalFileHandler implements FileHandler {
         fileInfo.setFileSource(fileSource);
         fileInfo.setStorageType(storage.getStorageType());
         try {
-            //上传文件
             log.info("上传文件，路径：{}", path);
             File file = FileUtil.touch(path);
             multipartFile.transferTo(file);

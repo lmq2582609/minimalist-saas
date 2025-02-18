@@ -1,14 +1,56 @@
 package com.minimalist.basic.config.fileHandler.handler.impl;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
+import com.minimalist.basic.config.exception.BusinessException;
+import com.minimalist.basic.config.fileHandler.FileManager;
+import com.minimalist.basic.config.fileHandler.entity.MinIOFileEntity;
+import com.minimalist.basic.config.fileHandler.entity.QiNiuFileEntity;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
+import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.po.MStorage;
+import com.minimalist.basic.mapper.MFileMapper;
+import com.minimalist.basic.mapper.MStorageMapper;
+import com.minimalist.basic.utils.SafetyUtil;
+import com.minimalist.basic.utils.UnqIdUtil;
+import com.minimalist.basic.utils.ValidateUtil;
+import com.mybatisflex.core.query.QueryWrapper;
+import com.qiniu.common.QiniuException;
+import com.qiniu.http.Response;
+import com.qiniu.storage.BucketManager;
+import com.qiniu.storage.Configuration;
+import com.qiniu.storage.Region;
+import com.qiniu.storage.UploadManager;
+import com.qiniu.storage.model.DefaultPutRet;
+import com.qiniu.util.Auth;
+import com.qiniu.util.StringMap;
+import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+
+@Slf4j
 @Service
 public class QiNiuFileHandler implements FileHandler {
+
+    @Value("${server.servlet.context-path}")
+    private String contextPath;
+
+    @Autowired
+    private FileManager fileManager;
+
+    @Autowired
+    private MStorageMapper storageMapper;
 
     /**
      * 是否是对应的处理类
@@ -26,7 +68,9 @@ public class QiNiuFileHandler implements FileHandler {
      */
     @Override
     public String valid(String storageConfig) {
-        return null;
+        QiNiuFileEntity qiNiuFileEntity = JSONUtil.toBean(storageConfig, QiNiuFileEntity.class);
+        ValidateUtil.valid(qiNiuFileEntity);
+        return storageConfig;
     }
 
     /**
@@ -38,7 +82,66 @@ public class QiNiuFileHandler implements FileHandler {
      */
     @Override
     public MFile uploadFile(MultipartFile multipartFile, Integer fileSource, MStorage storage) {
-        return null;
+        //根据文件来源，获取相对路径
+        String fileSourcePath = fileManager.getPathByFileSource(fileSource);
+        //文件后缀
+        String fileSuffix = FileNameUtil.extName(multipartFile.getOriginalFilename());
+        //新文件名
+        String newFileName = IdUtil.objectId() + "." + fileSuffix;
+        //文件信息
+        QiNiuFileEntity qnConfig = JSONUtil.toBean(storage.getStorageConfig(), QiNiuFileEntity.class);
+        MFile fileInfo = new MFile();
+        fileInfo.setFileId(UnqIdUtil.uniqueId());
+        fileInfo.setFileName(multipartFile.getOriginalFilename());
+        fileInfo.setNewFileName(newFileName);
+        fileInfo.setFileSize(multipartFile.getSize());
+        fileInfo.setFileType(multipartFile.getContentType());
+        //基础路径 = 租户ID
+        String basePath = SafetyUtil.getLoginUserTenantIdThrowException(String.class);
+        fileInfo.setFileBasePath(basePath);
+        String fileKey = basePath + "/" + fileSourcePath + newFileName;
+        fileInfo.setFilePath(basePath + "/" + fileSourcePath);
+        fileInfo.setFileUrl(qnConfig.getEndPoint() + fileKey);
+        fileInfo.setFileSource(fileSource);
+        fileInfo.setStorageType(storage.getStorageType());
+        try {
+            Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
+            String upToken = auth.uploadToken(qnConfig.getBucketName());
+            Configuration cfg = new Configuration(Region.createWithRegionId(qnConfig.getRegionId()));
+            UploadManager uploadManager = new UploadManager(cfg);
+            StringMap params = new StringMap();
+            params.put("tenantId", basePath);
+            Response response = uploadManager.put(multipartFile.getInputStream(), fileKey, upToken, params, null);
+            if (!response.isOK()) {
+                log.error("上传文件失败：{}", JSONUtil.toJsonStr(response));
+                throw new BusinessException(FileEnum.ErrorMsg.FILE_UPLOAD_FAIL.getDesc());
+            }
+            //生成图片缩略图
+            if (StrUtil.isNotBlank(multipartFile.getContentType()) && multipartFile.getContentType().contains("image")) {
+                ByteArrayOutputStream thumbnailOutputStream = new ByteArrayOutputStream();
+                Thumbnails.of(multipartFile.getInputStream())
+                        .scale(0.4)
+                        .toOutputStream(thumbnailOutputStream);
+                byte[] fileByte = thumbnailOutputStream.toByteArray();
+                String thFileName = "thumbnail-" + newFileName;
+                String thumbnailsFileKey = basePath + "/" + fileSourcePath + thFileName;
+                Response thumbnailsResponse = uploadManager.put(fileByte, thumbnailsFileKey, upToken, params, null, false);
+                if (thumbnailsResponse.isOK()) {
+                    fileInfo.setFileThUrl(qnConfig.getEndPoint() + thumbnailsFileKey);
+                    fileInfo.setFileThFilename(thFileName);
+                    fileInfo.setFileThSize((long) fileByte.length);
+                } else {
+                    log.error("上传缩略图失败：{}", JSONUtil.toJsonStr(thumbnailsResponse));
+                    //删除刚上传的图片
+                    deleteFile(fileInfo);
+                    throw new BusinessException(FileEnum.ErrorMsg.FILE_THUMBNAILS_UPLOAD_FAIL.getDesc());
+                }
+            }
+        } catch (Exception e) {
+            log.error("上传文件，异常：", e);
+            throw new BusinessException(FileEnum.ErrorMsg.FILE_UPLOAD_FAIL.getDesc());
+        }
+        return fileInfo;
     }
 
     /**
@@ -48,6 +151,30 @@ public class QiNiuFileHandler implements FileHandler {
      */
     @Override
     public boolean deleteFile(MFile file) {
+        MStorage storage = storageMapper.selectOneByQuery(QueryWrapper.create().eq(MStorage::getStorageType, file.getStorageType()));
+        if (ObjectUtil.isNull(storage)) {
+            log.warn("删除文件，查询存储信息为空：{}", JSONUtil.toJsonStr(file));
+            throw new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc());
+        }
+        try {
+            QiNiuFileEntity qnConfig = JSONUtil.toBean(storage.getStorageConfig(), QiNiuFileEntity.class);
+            Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
+            Configuration cfg = new Configuration(Region.createWithRegionId(qnConfig.getRegionId()));
+            BucketManager bucketManager = new BucketManager(auth, cfg);
+            Response response = bucketManager.delete(qnConfig.getBucketName(), file.getFilePath() + file.getNewFileName());
+            if (!response.isOK()) {
+                log.warn("删除文件失败：{}", JSONUtil.toJsonStr(response));
+                return false;
+            }
+            //如果存在缩略图，删除
+            if (StrUtil.isNotBlank(file.getFileThFilename())) {
+                //删除缩略图
+                bucketManager.delete(qnConfig.getBucketName(), file.getFilePath() + file.getFileThFilename());
+            }
+            return true;
+        } catch (Exception e) {
+            log.error("删除文件失败：", e);
+        }
         return false;
     }
 

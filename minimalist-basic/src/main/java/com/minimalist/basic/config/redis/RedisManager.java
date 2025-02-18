@@ -71,7 +71,6 @@ public class RedisManager {
         try {
             return lock.tryLock(waitTime, leaseTime, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
-            e.printStackTrace();
             log.error("尝试获取分布式锁异常：", e);
         }
         return false;

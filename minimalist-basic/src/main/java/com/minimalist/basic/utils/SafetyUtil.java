@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
+import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.tenant.TenantIgnore;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,6 +34,25 @@ public class SafetyUtil {
         return Optional.ofNullable(StpUtil.getSession().getString(TenantIgnore.TENANT_ID))
                 .map(Long::valueOf)
                 .orElse(-1L);
+    }
+
+    /**
+     * 获取当前登录人租户ID，租户ID为空会抛出异常
+     * 可以返回字符串的租户ID或者Long类型的租户ID
+     * @return 租户ID
+     */
+    public static <T> T getLoginUserTenantIdThrowException(Class<T> clazz) {
+        String tenantId = StpUtil.getSession().getString(TenantIgnore.TENANT_ID);
+        if (StrUtil.isBlank(tenantId)) {
+            throw new BusinessException("获取租户ID为空，请检查");
+        }
+        if (clazz == String.class) {
+            return clazz.cast(tenantId);
+        }
+        if (clazz == Long.class || clazz == long.class) {
+            return clazz.cast(Long.parseLong(tenantId));
+        }
+        return null;
     }
 
     /**

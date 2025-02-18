@@ -5,7 +5,6 @@ import com.minimalist.basic.config.mybatis.UpdateFullColumnHandler;
 import com.minimalist.basic.config.mybatis.bo.BaseEntity;
 import com.mybatisflex.annotation.Table;
 import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,6 +56,9 @@ public class MStorage extends BaseEntity implements Serializable {
      */
     private String storageConfig;
 
+    /**
+     * 状态
+     */
     private Integer status;
 
 }
