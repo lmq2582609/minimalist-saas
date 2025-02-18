@@ -4,7 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
-import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.tenant.TenantIgnore;
 import jakarta.servlet.http.Cookie;
@@ -53,35 +52,6 @@ public class SafetyUtil {
             return clazz.cast(Long.parseLong(tenantId));
         }
         return null;
-    }
-
-    /**
-     * 切换租户数据源
-     * @param name 数据源名称。为空时切换到当前登录人租户数据源
-     * @param forceChange 是否强制切换。
-     *                    true：name不为空按照name切换，name为空按照租户切换
-     *                    false：name不为空按照name切换，name为空时若不是系统租户则切换，是系统租户则不切换
-     */
-    public static void changeTenantDatasource(String name, boolean forceChange) {
-        //如果指定了数据源名称，直接切换
-        if (StrUtil.isNotBlank(name)) {
-            DynamicDataSourceContextHolder.push(name);
-            return;
-        }
-        //从session中获取租户ID
-        String tenantId = StpUtil.getSession().getString(TenantIgnore.TENANT_ID);
-        //强制切换
-        if (forceChange && StrUtil.isNotBlank(tenantId)) {
-            DynamicDataSourceContextHolder.push(tenantId);
-            return;
-        }
-        //非强制切换
-        if (!forceChange) {
-            //不是系统租户时，切换数据源
-            if (StrUtil.isNotBlank(tenantId) && !checkIsSystemTenant()) {
-                DynamicDataSourceContextHolder.push(tenantId);
-            }
-        }
     }
 
     /**

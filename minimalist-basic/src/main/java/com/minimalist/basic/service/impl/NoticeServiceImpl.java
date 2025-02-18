@@ -203,15 +203,15 @@ public class NoticeServiceImpl implements NoticeService {
     private void fileStatusHandler(MNotice oldNotice, NoticeVO newNotice, Integer fileStatus) {
         //公告插入、删除的文件处理
         if (ObjectUtil.isNull(oldNotice)) {
-            //图片文件ID
-            List<Long> fileIdList = CollectionUtil.list(false);
             //处理公告封面图片和富文本中的图片
             if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
+                //图片文件ID
                 List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(newNotice.getNoticePicFileId());
-                fileIdList.addAll(noticePicFileIdList);
+                if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
+                    //将公告封面图片的状态置为已使用
+                    fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, fileStatus);
+                }
             }
-            //将公告封面图片的状态置为已使用
-            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), fileIdList, fileStatus);
             //处理富文本编辑器中的图片，富文本内容解码
             String decodeOldContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> imgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
@@ -220,15 +220,14 @@ public class NoticeServiceImpl implements NoticeService {
                 fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), imgUrlList, fileStatus);
             }
         } else {
-            //旧公告封面图片文件ID
-            List<Long> oldNoticePicFileIdList = CollectionUtil.list(false);
             //旧公告所使用的封面图
             if (StrUtil.isNotBlank(oldNotice.getNoticePicFileId())) {
                 List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(oldNotice.getNoticePicFileId());
-                oldNoticePicFileIdList.addAll(noticePicFileIdList);
+                if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
+                    //将旧公告封面图的状态置为未使用
+                    fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, StatusEnum.STATUS_0.getCode());
+                }
             }
-            //将旧公告封面图的状态置为未使用
-            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), oldNoticePicFileIdList, StatusEnum.STATUS_0.getCode());
             //旧公告富文本中的图片
             String decodeOldContent = TextUtil.decode(oldNotice.getNoticeContent());
             List<String> oldContentImgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
@@ -236,15 +235,14 @@ public class NoticeServiceImpl implements NoticeService {
             if (CollectionUtil.isNotEmpty(oldContentImgUrlList)) {
                 fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), oldContentImgUrlList, StatusEnum.STATUS_0.getCode());
             }
-
             //新公告封面图片文件ID
-            List<Long> newNoticePicIdList = CollectionUtil.list(false);
             if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
                 List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(newNotice.getNoticePicFileId());
-                newNoticePicIdList.addAll(noticePicFileIdList);
+                if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
+                    //将新公告封面图的状态置为已使用
+                    fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, StatusEnum.STATUS_1.getCode());
+                }
             }
-            //将新公告封面图的状态置为已使用
-            fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), newNoticePicIdList, StatusEnum.STATUS_1.getCode());
             //新公告富文本中的图片
             String decodeNewContent = TextUtil.decode(newNotice.getNoticeContent());
             List<String> newContentImgUrlList = TextUtil.getImgUrlByRichText(decodeNewContent);
