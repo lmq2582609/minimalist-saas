@@ -132,12 +132,12 @@ public class QiNiuFileHandler implements FileHandler {
                     fileInfo.setFileThSize((long) fileByte.length);
                 } else {
                     log.error("上传缩略图失败：{}", JSONUtil.toJsonStr(thumbnailsResponse));
-                    //删除刚上传的图片
-                    deleteFile(fileInfo, storage);
                     throw new BusinessException(FileEnum.ErrorMsg.FILE_THUMBNAILS_UPLOAD_FAIL.getDesc());
                 }
             }
         } catch (Exception e) {
+            //删除刚上传的图片
+            deleteFile(fileInfo, storage);
             log.error("上传文件，异常：", e);
             throw new BusinessException(FileEnum.ErrorMsg.FILE_UPLOAD_FAIL.getDesc());
         }
