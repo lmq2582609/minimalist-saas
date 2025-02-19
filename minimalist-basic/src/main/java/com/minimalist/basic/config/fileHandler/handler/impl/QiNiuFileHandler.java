@@ -5,6 +5,7 @@ import cn.hutool.core.io.file.FileNameUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
@@ -101,7 +102,7 @@ public class QiNiuFileHandler implements FileHandler {
         fileInfo.setFileBasePath(basePath);
         String fileKey = basePath + "/" + fileSourcePath + newFileName;
         fileInfo.setFilePath(basePath + "/" + fileSourcePath);
-        fileInfo.setFileUrl(qnConfig.getEndPoint() + fileKey);
+        fileInfo.setFileUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + fileKey));
         fileInfo.setFileSource(fileSource);
         fileInfo.setStorageId(storage.getStorageId());
         try {
