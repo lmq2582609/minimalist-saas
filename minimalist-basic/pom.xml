@@ -97,7 +97,14 @@
         <dependency>
             <groupId>net.coobird</groupId>
             <artifactId>thumbnailator</artifactId>
-            <version>0.4.20</version>
+            <version>${thumbnailator.version}</version>
+        </dependency>
+
+        <!-- webp-imageio 配合thumbnailator做缩略图处理，不引入回出现No suitable ImageReader found for source data. -->
+        <dependency>
+            <groupId>org.sejda.imageio</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>${webp-imageio.version}</version>
         </dependency>
 
         <!-- mybatis-flex -->

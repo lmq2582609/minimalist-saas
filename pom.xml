@@ -41,6 +41,10 @@
         <spring-file.version>2.2.1</spring-file.version>
         <!-- mica-xss -->
         <mica-xss.version>3.3.2</mica-xss.version>
+        <!-- 缩略图处理 -->
+        <thumbnailator.version>0.4.20</thumbnailator.version>
+        <!-- webp配合做缩略图处理 -->
+        <webp-imageio.version>0.1.6</webp-imageio.version>
         <!-- java -->
         <java.version>17</java.version>
         <!-- maven.compiler -->
