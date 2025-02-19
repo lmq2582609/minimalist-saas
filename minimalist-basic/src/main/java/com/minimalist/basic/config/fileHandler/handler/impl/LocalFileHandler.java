@@ -96,7 +96,7 @@ public class LocalFileHandler implements FileHandler {
         fileInfo.setFilePath(FileUtil.normalize(storagePath + "/" + fileSourcePath));
         fileInfo.setFileUrl(url + fileSourcePath + newFileName);
         fileInfo.setFileSource(fileSource);
-        fileInfo.setStorageType(storage.getStorageType());
+        fileInfo.setStorageId(storage.getStorageId());
         try {
             log.info("上传文件，路径：{}", path);
             File file = FileUtil.touch(path);
@@ -127,7 +127,7 @@ public class LocalFileHandler implements FileHandler {
      * @return 是否删除成功
      */
     @Override
-    public boolean deleteFile(MFile file) {
+    public boolean deleteFile(MFile file, MStorage storage) {
         String filePath = file.getFilePath() + file.getNewFileName();
         boolean result = FileUtil.del(filePath);
         //如果有缩略图，删除缩略图

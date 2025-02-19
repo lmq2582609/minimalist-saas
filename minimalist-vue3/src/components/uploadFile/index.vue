@@ -20,7 +20,7 @@ const props = defineProps({
         type: Number,
         default: 0
     },
-    //存储信息ID -> 标识用哪个存储，不穿则使用默认的存储
+    //存储信息ID -> 标识用哪个存储，不传可使用租户默认存储
     storageId: {
         type: String,
         default: null

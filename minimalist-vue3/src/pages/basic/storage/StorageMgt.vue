@@ -68,10 +68,6 @@
                     <template #storageName="{ record }">
                         <a-link @click="detailBtnClick(record.storageId)" icon>{{ record.storageName }}</a-link>
                     </template>
-                    <!-- 是否默认 -->
-                    <template #storageDefault="{ record }">
-                        <dict-convert :dict-data="dicts[proxy.DICT.yesNo]" :dict-key="record.storageDefault" />
-                    </template>
                     <!-- 存储类型 -->
                     <template #storageType="{ record }">
                         <dict-convert :dict-data="dicts[proxy.DICT.storageType]" :dict-key="record.storageType" />
@@ -127,7 +123,7 @@ import {deleteStorageByStorageIdApi, getPageStorageListApi} from "~/api/storage.
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.storageType, proxy.DICT.yesNo])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.storageType])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单
@@ -149,7 +145,6 @@ const datatable = reactive({
     columns: [
         {title: '存储名称', dataIndex: 'storageName', slotName: 'storageName', align: 'center'},
         {title: '存储类型', dataIndex: 'storageType', slotName: 'storageType', align: 'center'},
-        {title: '是否默认使用', dataIndex: 'storageDefault', slotName: 'storageDefault', align: 'center'},
         {title: '说明', dataIndex: 'description', width: 200, align: 'center', ellipsis: true, tooltip: true},
         {title: '状态', dataIndex: 'status', slotName: 'status', align: 'center'},
         {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}

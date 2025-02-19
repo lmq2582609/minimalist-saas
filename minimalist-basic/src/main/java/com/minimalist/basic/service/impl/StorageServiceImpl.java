@@ -1,11 +1,8 @@
 package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.lang.Assert;
-import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
-import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.entity.po.MStorage;
 import com.minimalist.basic.entity.vo.storage.StorageQueryVO;
@@ -17,7 +14,6 @@ import com.mybatisflex.core.paginate.Page;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Service
 public class StorageServiceImpl implements StorageService {
@@ -43,11 +39,6 @@ public class StorageServiceImpl implements StorageService {
         storage.setStorageId(storageId);
         storage.setStorageConfig(storageConfig);
         storageMapper.insert(storage, true);
-        //如果选择了默认存储
-        if (Boolean.TRUE.equals(storageVO.getStorageDefault())) {
-            //将其他存储更新为非默认存储
-            storageMapper.updateStorageToNoDefault(storageId);
-        }
     }
 
     /**
@@ -71,11 +62,6 @@ public class StorageServiceImpl implements StorageService {
         MStorage storage = BeanUtil.copyProperties(storageVO, MStorage.class);
         storage.setStorageConfig(storageConfig);
         storageMapper.updateStorageByStorageId(storage);
-        //如果选择了默认存储
-        if (Boolean.TRUE.equals(storageVO.getStorageDefault())) {
-            //将其他存储更新为非默认存储
-            storageMapper.updateStorageToNoDefault(storageVO.getStorageId());
-        }
     }
 
     /**

@@ -103,7 +103,7 @@ public class QiNiuFileHandler implements FileHandler {
         fileInfo.setFilePath(basePath + "/" + fileSourcePath);
         fileInfo.setFileUrl(qnConfig.getEndPoint() + fileKey);
         fileInfo.setFileSource(fileSource);
-        fileInfo.setStorageType(storage.getStorageType());
+        fileInfo.setStorageId(storage.getStorageId());
         try {
             Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
             String upToken = auth.uploadToken(qnConfig.getBucketName());
@@ -133,7 +133,7 @@ public class QiNiuFileHandler implements FileHandler {
                 } else {
                     log.error("上传缩略图失败：{}", JSONUtil.toJsonStr(thumbnailsResponse));
                     //删除刚上传的图片
-                    deleteFile(fileInfo);
+                    deleteFile(fileInfo, storage);
                     throw new BusinessException(FileEnum.ErrorMsg.FILE_THUMBNAILS_UPLOAD_FAIL.getDesc());
                 }
             }
@@ -150,12 +150,7 @@ public class QiNiuFileHandler implements FileHandler {
      * @return 是否删除成功
      */
     @Override
-    public boolean deleteFile(MFile file) {
-        MStorage storage = storageMapper.selectOneByQuery(QueryWrapper.create().eq(MStorage::getStorageType, file.getStorageType()));
-        if (ObjectUtil.isNull(storage)) {
-            log.warn("删除文件，查询存储信息为空：{}", JSONUtil.toJsonStr(file));
-            throw new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc());
-        }
+    public boolean deleteFile(MFile file, MStorage storage) {
         try {
             QiNiuFileEntity qnConfig = JSONUtil.toBean(storage.getStorageConfig(), QiNiuFileEntity.class);
             Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());

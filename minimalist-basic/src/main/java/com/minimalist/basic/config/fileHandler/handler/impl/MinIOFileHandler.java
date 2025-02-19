@@ -53,7 +53,7 @@ public class MinIOFileHandler implements FileHandler {
      * @return 是否删除成功
      */
     @Override
-    public boolean deleteFile(MFile file) {
+    public boolean deleteFile(MFile file, MStorage storage) {
         //没做，做了需要引jar包，可自行实现
         return false;
     }

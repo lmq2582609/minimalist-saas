@@ -107,8 +107,6 @@ public class TenantServiceImpl implements TenantService {
             tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
             tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
             tenantDatasourceMapper.insert(tenantDatasource, true);
-            //发布消息 - 缓存数据源信息
-            redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantDatasource));
         } else {
             //字段隔离
             mTenant.setDatasource(TenantEnum.MASTER);
@@ -119,6 +117,9 @@ public class TenantServiceImpl implements TenantService {
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
         tenantMapper.insert(mTenant, true);
+
+        //发布消息 - 缓存租户信息
+        redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantVO));
     }
 
     /**
@@ -130,8 +131,8 @@ public class TenantServiceImpl implements TenantService {
     public void deleteTenantByTenantId(Long tenantId) {
         //删除租户数据源信息
         tenantDatasourceMapper.deleteTenantDatasourceByTenantId(tenantId);
-        //发布消息 - 删除缓存中的数据源信息
-        redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.DELETE, String.valueOf(tenantId));
+        //发布消息 - 删除缓存中的租户信息
+        redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.DELETE, String.valueOf(tenantId));
         //删除租户数据
         tenantMapper.deleteTenantByTenantId(tenantId);
     }
@@ -150,8 +151,6 @@ public class TenantServiceImpl implements TenantService {
 
         //删除租户数据源信息
         tenantDatasourceMapper.deleteTenantDatasourceByTenantId(tenant.getTenantId());
-        //发布消息 - 删除缓存中的数据源信息
-        redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.DELETE, String.valueOf(tenant.getTenantId()));
 
         //检查租户数据源是否需要更新
         if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
@@ -168,8 +167,6 @@ public class TenantServiceImpl implements TenantService {
             tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
             tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
             tenantDatasourceMapper.insert(tenantDatasource, true);
-            //发布消息 - 缓存数据源信息
-            redisManager.publishMessage(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantDatasource));
         } else {
             //字段隔离
             newTenant.setDatasource(TenantEnum.MASTER);
@@ -186,6 +183,8 @@ public class TenantServiceImpl implements TenantService {
             tenantManager.updateTenantPermission(roleList, tenantVO.getPackageId());
         }
 
+        //发布消息 - 缓存租户信息
+        redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantVO));
     }
 
     /**

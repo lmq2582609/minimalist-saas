@@ -77,9 +77,9 @@ public class MFile extends BaseEntity implements Serializable {
     private Integer fileSource;
 
     /**
-     * 存储类型
+     * 存储ID
      */
-    private String storageType;
+    private Long storageId;
 
     /**
      * 文件缩略图url

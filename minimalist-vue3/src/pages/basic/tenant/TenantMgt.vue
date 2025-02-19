@@ -145,14 +145,14 @@ const searchForm = reactive({
 const datatable = reactive({
     //列配置
     columns: [
-        {title: '租户名', dataIndex: 'tenantName', slotName: 'tenantName', align: 'center', ellipsis: true, tooltip: true},
-        {title: '租户套餐', dataIndex: 'packageId', slotName: 'packageId', align: 'center'},
-        {title: '数据隔离方式', dataIndex: 'dataIsolation', slotName: 'dataIsolation', align: 'center'},
-        {title: '数据源名称', dataIndex: 'datasource', slotName: 'datasource', align: 'center'},
-        {title: '文件存储方式', dataIndex: 'storageId', slotName: 'storageId', align: 'center'},
+        {title: '租户名', dataIndex: 'tenantName', slotName: 'tenantName', align: 'center', width: 200, ellipsis: true, tooltip: true},
+        {title: '租户套餐', dataIndex: 'packageId', slotName: 'packageId', align: 'center', width: 150, ellipsis: true, tooltip: true},
+        {title: '数据隔离方式', dataIndex: 'dataIsolation', slotName: 'dataIsolation', align: 'center', width: 150},
+        {title: '数据源名称', dataIndex: 'datasource', slotName: 'datasource', align: 'center', width: 150},
+        {title: '文件存储方式', dataIndex: 'storageId', slotName: 'storageId', align: 'center', width: 150},
         {title: '联系人', dataIndex: 'contactName', align: 'center', width: 150, ellipsis: true, tooltip: true},
-        {title: '联系人手机', dataIndex: 'phone', align: 'center', width: 125},
-        {title: '联系人邮箱', dataIndex: 'email', align: 'center', ellipsis: true, tooltip: true},
+        {title: '联系人手机', dataIndex: 'phone', align: 'center', width: 125, ellipsis: true, tooltip: true},
+        {title: '联系人邮箱', dataIndex: 'email', align: 'center', width: 125, ellipsis: true, tooltip: true},
         {title: '账号额度', dataIndex: 'accountCount', align: 'center', width: 90},
         {title: '过期时间', dataIndex: 'expireTime', align: 'center', width: 180},
         {title: '租户状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100},

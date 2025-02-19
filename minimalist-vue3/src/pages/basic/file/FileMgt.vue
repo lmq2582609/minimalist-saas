@@ -85,9 +85,9 @@
                         <template #fileSource="{ record }">
                             <dict-convert :dict-data="dicts[proxy.DICT.fileSource]" :dict-key="record.fileSource" />
                         </template>
-                        <!-- 存储类型 -->
-                        <template #storageType="{ record }">
-                            <dict-convert :dict-data="dicts[proxy.DICT.storageType]" :dict-key="record.storageType" />
+                        <!-- 存储方式 -->
+                        <template #storageId="{ record }">
+                            <dict-convert :dict-data="dicts[proxy.DICT.storageList]" :dict-key="record.storageId" />
                         </template>
                         <!-- 文件状态 -->
                         <template #status="{ record }">
@@ -132,7 +132,7 @@ import { getPageFileListApi, deleteFileApi } from "~/api/file.js";
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.fileSource, proxy.DICT.storageType])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.fileSource, proxy.DICT.storageList])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单
@@ -155,7 +155,7 @@ const datatable = reactive({
         {title: '文件名称', dataIndex: 'fileName', align: 'center', width: 250, ellipsis: true, tooltip: true},
         {title: '文件大小', dataIndex: 'fileSize', align: 'center', width: 120, ellipsis: true, tooltip: true},
         {title: '文件来源', dataIndex: 'fileSource', slotName: 'fileSource', align: 'center', width: 120, ellipsis: true, tooltip: true},
-        {title: '存储类型', dataIndex: 'storageType', slotName: 'storageType', align: 'center', width: 120, ellipsis: true, tooltip: true},
+        {title: '存储方式', dataIndex: 'storageId', slotName: 'storageId', align: 'center', width: 120, ellipsis: true, tooltip: true},
         {title: '文件状态', dataIndex: 'status', slotName: 'status', align: 'center', width: 100, ellipsis: true, tooltip: true},
         {title: '备注', dataIndex: 'remark', align: 'center', width: 200, ellipsis: true, tooltip: true},
         {title: '操作', slotName: 'operation', align: 'center', width: 160, fixed: 'right'}

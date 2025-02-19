@@ -34,6 +34,6 @@ public interface FileHandler {
      * @param file 文件信息
      * @return 是否删除成功
      */
-    boolean deleteFile(MFile file);
+    boolean deleteFile(MFile file, MStorage storage);
 
 }

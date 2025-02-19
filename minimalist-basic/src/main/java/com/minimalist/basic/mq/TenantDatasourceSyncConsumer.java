@@ -1,10 +1,10 @@
 package com.minimalist.basic.mq;
 
-import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.minimalist.basic.entity.po.MTenantDatasource;
-import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
+import com.minimalist.basic.entity.enums.TenantEnum;
+import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.RedisKeyConstant;
@@ -33,23 +33,30 @@ public class TenantDatasourceSyncConsumer implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        RPatternTopic topic = redissonClient.getPatternTopic(RedisKeyConstant.TENANT_DATASOURCE_TOPIC_KEY + ".*");
+        RPatternTopic topic = redissonClient.getPatternTopic(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + ".*");
         topic.addListener(String.class, (pattern, channel, msg) -> {
             log.info("租户数据源信息同步处理，参数：{}", msg);
             try {
                 //区分新增、修改、删除
                 String opt = StrUtil.subAfter(channel, ".", true);
                 if (CommonConstant.ADD.equals(opt) || CommonConstant.UPDATE.equals(opt)) {
-                    MTenantDatasource tenantDatasource = JSONUtil.toBean(msg, MTenantDatasource.class);
-                    TenantDatasourceVO tenantDatasourceVO = BeanUtil.copyProperties(tenantDatasource, TenantDatasourceVO.class);
-                    //数据源名称 = 租户ID
-                    String tenantId = tenantDatasource.getTenantId().toString();
-                    CommonConstant.tenantDatasourceMap.put(tenantId, tenantDatasourceVO);
-                    //动态添加数据源
-                    tenantManager.dynamicAddDatasource(tenantId, tenantDatasourceVO);
+                    TenantVO tenantVO = JSONUtil.toBean(msg, TenantVO.class);
+                    CommonConstant.tenantMap.put(tenantVO.getTenantId(), tenantVO);
+                    //动态加载数据源
+                    if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())
+                        && ObjectUtil.isNotNull(tenantVO.getTenantDatasource())) {
+                        String tenantId = tenantVO.getTenantId().toString();
+                        //删除旧数据源
+                        tenantManager.dynamicDeleteDatasource(tenantId);
+                        //动态添加数据源
+                        tenantManager.dynamicAddDatasource(tenantId, tenantVO.getTenantDatasource());
+                    } else {
+                        //不需要数据库隔离，删除数据源
+                        tenantManager.dynamicDeleteDatasource(tenantVO.getTenantId().toString());
+                    }
                 }
                 if (CommonConstant.DELETE.equals(opt)) {
-                    CommonConstant.tenantDatasourceMap.remove(msg);
+                    CommonConstant.tenantMap.remove(Long.parseLong(msg));
                     //动态删除数据源
                     tenantManager.dynamicDeleteDatasource(msg);
                 }

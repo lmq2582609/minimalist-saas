@@ -1,6 +1,5 @@
 package com.minimalist.basic.mapper;
 
-import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.vo.storage.StorageQueryVO;
 import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.mybatisflex.core.BaseMapper;
@@ -52,27 +51,6 @@ public interface MStorageMapper extends BaseMapper<MStorage> {
                         .eq(MStorage::getStatus, queryVO.getStatus())
                         .like(MStorage::getStorageName, queryVO.getStorageName()),
                 StorageVO.class
-        );
-    }
-
-    /**
-     * 更新非默认存储
-     * @param storageId 更新时排掉的存储ID
-     */
-    default void updateStorageToNoDefault(Long storageId) {
-        MStorage updateStorage = new MStorage();
-        updateStorage.setStorageDefault(Boolean.FALSE);
-        updateByQuery(updateStorage, QueryWrapper.create().ne(MStorage::getStorageId, storageId));
-    }
-
-    /**
-     * 查询默认存储
-     * @return 存储信息
-     */
-    default MStorage selectStorageByDefault() {
-        return selectOneByQuery(QueryWrapper.create()
-                .eq(MStorage::getStorageDefault, Boolean.TRUE)
-                .eq(MStorage::getStatus, StatusEnum.STATUS_1.getCode())
         );
     }
 

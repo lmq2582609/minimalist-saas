@@ -4,19 +4,22 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
-import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
 import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
+import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.po.MStorage;
+import com.minimalist.basic.entity.po.MTenant;
 import com.minimalist.basic.entity.vo.file.*;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
+import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.service.FileService;
+import com.minimalist.basic.utils.SafetyUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -36,6 +39,9 @@ public class FileServiceImpl implements FileService {
 
     @Autowired
     private FileManager fileManager;
+
+    @Autowired
+    private MTenantMapper tenantMapper;
 
     /**
      * 单文件上传
@@ -83,9 +89,10 @@ public class FileServiceImpl implements FileService {
         //查询文件
         MFile mFile = fileMapper.selectFileByFileId(fileId);
         Assert.notNull(mFile, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
-        FileHandler fileHandler = fileManager.getFileHandler(mFile.getStorageType());
+        MStorage storage = getStorage(mFile.getStorageId());
+        FileHandler fileHandler = fileManager.getFileHandler(storage.getStorageType());
         //删除文件
-        fileHandler.deleteFile(mFile);
+        fileHandler.deleteFile(mFile, storage);
         //删除数据库文件记录
         LogicDeleteManager.execWithoutLogicDelete(()->
                 fileMapper.deleteByQuery(QueryWrapper.create().eq(MFile::getFileId, fileId))
@@ -114,8 +121,10 @@ public class FileServiceImpl implements FileService {
         if (ObjectUtil.isNotNull(storageId)) {
             return storageMapper.selectStorageByStorageId(storageId);
         }
-        //未指定存储，取默认
-        return storageMapper.selectStorageByDefault();
+        //未指定存储，根据租户ID获取
+        MTenant tenant = tenantMapper.selectTenantByTenantId(SafetyUtil.getLoginUserTenantId());
+        Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.QUERY_NULL_TENANT.getDesc()));
+        return storageMapper.selectStorageByStorageId(tenant.getStorageId());
     }
 
 }

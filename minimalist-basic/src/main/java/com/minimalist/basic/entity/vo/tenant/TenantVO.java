@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.minimalist.basic.entity.enums.TenantEnum;
+import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.swagger.SchemaEnum;
@@ -92,5 +93,8 @@ public class TenantVO implements Serializable {
     @NotNull(message = "租户数据源不能为空", groups = {Add.class})
     @Schema(name = "tenantDatasource", description = "租户数据源", type = "object")
     private TenantDatasourceVO tenantDatasource;
+
+    @Schema(name = "tenantDatasource", description = "租户文件存储", type = "object")
+    private StorageVO storage;
 
 }

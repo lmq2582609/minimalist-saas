@@ -4,13 +4,18 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.dict.DictCacheVO;
+import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.EDictService;
 import com.minimalist.basic.config.eDict.EDict;
 import com.minimalist.basic.config.eDict.EDictConstant;
+import com.minimalist.basic.utils.CommonConstant;
+import com.minimalist.basic.utils.SafetyUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -180,9 +185,10 @@ public class EDictServiceImpl implements EDictService {
     public DictCacheVO getStorageDictData() {
         DictCacheVO dictCacheVO = new DictCacheVO();
         dictCacheVO.setDictType(EDictConstant.STORAGE_LIST);
-        List<MStorage> mStorages = storageMapper.selectListByQuery(QueryWrapper.create()
-                .eq(MStorage::getStatus, StatusEnum.STATUS_1.getCode()));
-        if (CollectionUtil.isNotEmpty(mStorages)) {
+        //系统租户，查询全部存储
+        if (SafetyUtil.checkIsSystemTenant()) {
+            List<MStorage> mStorages = storageMapper.selectListByQuery(QueryWrapper.create()
+                    .eq(MStorage::getStatus, StatusEnum.STATUS_1.getCode()));
             List<DictCacheVO.DictKV> dictKVList = mStorages.stream()
                     .map(storage -> {
                         DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
@@ -191,6 +197,17 @@ public class EDictServiceImpl implements EDictService {
                         dictKV.setDictType(EDictConstant.STORAGE_LIST);
                         return dictKV;
                     }).toList();
+            dictCacheVO.setDictList(dictKVList);
+        } else {
+            //普通租户，查询租户自己的存储
+            TenantVO tenantVO = CommonConstant.tenantMap.get(SafetyUtil.getLoginUserTenantId());
+            MStorage storage = storageMapper.selectStorageByStorageId(tenantVO.getStorageId());
+            List<DictCacheVO.DictKV> dictKVList = CollectionUtil.list(false);
+            DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();
+            dictKV.setDictKey(storage.getStorageId().toString());
+            dictKV.setDictValue(storage.getStorageName());
+            dictKV.setDictType(EDictConstant.STORAGE_LIST);
+            dictKVList.add(dictKV);
             dictCacheVO.setDictList(dictKVList);
         }
         return dictCacheVO;

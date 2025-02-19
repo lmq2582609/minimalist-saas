@@ -48,8 +48,8 @@ public class RedisKeyConstant {
     public static final String SYSTEM_CONFIG_TOPIC_KEY = "system_config_topic";
 
     /**
-     * 租户数据源 订阅/发布 主题
+     * 租户信息 订阅/发布 主题
      */
-    public static final String TENANT_DATASOURCE_TOPIC_KEY = "tenant_datasource_topic";
+    public static final String TENANT_DATA_TOPIC_KEY = "tenant_data_topic";
 
 }

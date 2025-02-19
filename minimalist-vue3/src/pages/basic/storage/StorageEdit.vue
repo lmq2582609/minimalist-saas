@@ -5,15 +5,6 @@
                 <a-form-item class="w-[49%]" field="storageName" label="存储名称" required>
                     <a-input v-model="form.storageName" placeholder="存储名称" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="storageDefault" label="是否默认使用" required tooltip="只能有一个默认的存储。如果之前已有默认的存储，选择`是`会将之前的数据置为`否`，新增的本条数据置为`是`">
-                    <a-select v-model="form.storageDefault" placeholder="是否默认使用" allow-clear>
-                        <!-- 目前a-option还不支持使用布尔值，所以dictKey需要转成字符串 -->
-                        <!-- 所以，storageDefault回显时也要转成字符串 -->
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.yesNo]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
-            </a-row>
-            <a-row justify="space-between">
                 <a-form-item class="w-[49%]" field="status" label="存储状态" required v-if="props.params.operationType === proxy.operationType.update.type">
                     <a-select v-model="form.status" placeholder="存储状态" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -89,8 +80,6 @@ const form = reactive({
     storageName: null,
     //存储类型
     storageType: null,
-    //是否默认使用
-    storageDefault: null,
     //说明
     description: null,
     //存储配置
@@ -102,7 +91,6 @@ const form = reactive({
 const rules = {
     storageName: [{required: true, message: '存储名称不能为空', trigger: 'submit'}],
     storageType: [{required: true, message: '存储类型不能为空', trigger: 'submit'}],
-    storageDefault: [{required: true, message: '是否默认使用不能为空', trigger: 'submit'}],
 }
 //存储配置
 const storageConfigRef = ref()
@@ -149,12 +137,7 @@ const loadStorageInfo = (storageId) => {
         if (res) {
             for (let key in res) {
                 if (form.hasOwnProperty(key)) {
-                    //true和false的下拉框回显，需要转成string类型
-                    if (key === 'storageDefault') {
-                        form[key] = String(res[key])
-                    } else {
-                        form[key] = res[key]
-                    }
+                    form[key] = res[key]
                 }
             }
         }

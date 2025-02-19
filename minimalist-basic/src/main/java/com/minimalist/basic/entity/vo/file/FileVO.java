@@ -7,7 +7,6 @@ import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.swagger.SchemaEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -39,8 +38,9 @@ public class FileVO implements Serializable {
     @Schema(name = "fileSource", description = "文件来源", type = "int")
     private Integer fileSource;
 
-    @Schema(name = "storageType", description = "存储类型", type = "string")
-    private String storageType;
+    @JsonSerialize(using = ToStringSerializer.class)
+    @Schema(name = "storageId", description = "存储ID", type = "string")
+    private Long storageId;
 
     @Schema(name = "fileThUrl", description = "文件缩略图URL", type = "string")
     private String fileThUrl;

@@ -42,11 +42,6 @@ public class MStorage extends BaseEntity implements Serializable {
     private String storageType;
 
     /**
-     * 是否默认使用这个存储，0否 1是
-     */
-    private Boolean storageDefault;
-
-    /**
      * 说明
      */
     private String description;

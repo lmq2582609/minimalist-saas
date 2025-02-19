@@ -1,7 +1,7 @@
 package com.minimalist.basic.utils;
 
 import com.minimalist.basic.entity.vo.config.ConfigVO;
-import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
+import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -10,8 +10,8 @@ public class CommonConstant {
     /** 系统配置缓存 */
     public static Map<String, ConfigVO> systemConfigMap = new ConcurrentHashMap<>();
 
-    /** 租户数据源缓存 */
-    public static Map<String, TenantDatasourceVO> tenantDatasourceMap = new ConcurrentHashMap<>();
+    /** 租户缓存 */
+    public static Map<Long, TenantVO> tenantMap = new ConcurrentHashMap<>();
 
     /** 数字 0 */
     public static final int ZERO = 0;
