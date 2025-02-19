@@ -11,7 +11,7 @@
  Target Server Version : 80024
  File Encoding         : 65001
 
- Date: 18/02/2025 22:00:40
+ Date: 19/02/2025 19:53:40
 */
 
 SET NAMES utf8mb4;
@@ -170,8 +170,8 @@ CREATE TABLE `m_file`  (
   `file_path` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件相对路径',
   `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件url',
   `file_source` int(0) NULL DEFAULT NULL COMMENT '文件来源',
-  `storage_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '存储类型',
   `file_th_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件缩略图url',
+  `storage_id` bigint(0) NULL DEFAULT NULL COMMENT '存储ID',
   `file_th_filename` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '文件缩略图文件名',
   `file_th_size` bigint(0) NULL DEFAULT NULL COMMENT '缩略图文件大小',
   `remark` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '备注',
@@ -191,8 +191,8 @@ CREATE TABLE `m_file`  (
 -- ----------------------------
 -- Records of m_file
 -- ----------------------------
-INSERT INTO `m_file` VALUES (179, 1846015407035924480, 'QQ图片20230802151253.jpg', '670dd370211b4a9bd06242f1.jpg', 27675, 'image/jpeg', 'E:/', 'E:/notice/cover/', 'http://localhost:9090/minimalist/files/notice/cover/670dd370211b4a9bd06242f1.jpg', 1, 'local', 'http://localhost:9090/minimalist/files/notice/cover/thumbnail-670dd370211b4a9bd06242f1.jpg', 'thumbnail-670dd370211b4a9bd06242f1.jpg', 7515, NULL, 0, 0, 0, '2024-10-15 10:29:05.158802', 0, '2024-10-15 10:29:05.158802', b'0', 0);
-INSERT INTO `m_file` VALUES (202, 1851164126132932608, '微信图片_20241029151437.png', '67208e8fa3b49682ade3b6fe.png', 262189, 'image/png', '/application/minimalist-saas/', '/application/minimalist-saas/notice/cover/', 'http://jjian.com.cn:443/minimalist/files/notice/cover/67208e8fa3b49682ade3b6fe.png', 1, 'local', 'http://jjian.com.cn:443/minimalist/files/notice/cover/thumbnail-67208e8fa3b49682ade3b6fe.png', 'thumbnail-67208e8fa3b49682ade3b6fe.png', 63173, NULL, 0, 1, 0, '2024-10-29 15:28:15.000000', 0, '2024-10-29 15:28:42.000000', b'0', 2);
+INSERT INTO `m_file` VALUES (179, 1846015407035924480, 'QQ图片20230802151253.jpg', '670dd370211b4a9bd06242f1.jpg', 27675, 'image/jpeg', 'E:/', 'E:/notice/cover/', 'http://localhost:9090/minimalist/files/notice/cover/670dd370211b4a9bd06242f1.jpg', 1, 'http://localhost:9090/minimalist/files/notice/cover/thumbnail-670dd370211b4a9bd06242f1.jpg', NULL, 'thumbnail-670dd370211b4a9bd06242f1.jpg', 7515, NULL, 0, 0, 0, '2024-10-15 10:29:05.158802', 0, '2024-10-15 10:29:05.158802', b'0', 0);
+INSERT INTO `m_file` VALUES (202, 1851164126132932608, '微信图片_20241029151437.png', '67208e8fa3b49682ade3b6fe.png', 262189, 'image/png', '/application/minimalist-saas/', '/application/minimalist-saas/notice/cover/', 'http://jjian.com.cn:443/minimalist/files/notice/cover/67208e8fa3b49682ade3b6fe.png', 1, 'http://jjian.com.cn:443/minimalist/files/notice/cover/thumbnail-67208e8fa3b49682ade3b6fe.png', NULL, 'thumbnail-67208e8fa3b49682ade3b6fe.png', 63173, NULL, 0, 1, 0, '2024-10-29 15:28:15.000000', 0, '2024-10-29 15:28:42.000000', b'0', 2);
 
 -- ----------------------------
 -- Table structure for m_notice
@@ -680,7 +680,6 @@ CREATE TABLE `m_storage`  (
   `storage_id` bigint(0) NOT NULL,
   `storage_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '名称',
   `storage_type` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '存储类型，用于标识存储平台，如本地、阿里云oss、七牛云oss等',
-  `storage_default` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否默认使用这个存储，0否 1是',
   `description` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '说明',
   `storage_config` varchar(2048) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '存储配置，JSON数据',
   `status` tinyint(0) NULL DEFAULT 1 COMMENT '状态  0禁用 1正常',
@@ -696,9 +695,9 @@ CREATE TABLE `m_storage`  (
 -- ----------------------------
 -- Records of m_storage
 -- ----------------------------
-INSERT INTO `m_storage` VALUES (1, 1843939697907720192, '本地存储测试', 'local', b'1', '1', '{\"storagePath\":\"/application/minimalist-saas/\"}', 1, 0, NULL, 0, NULL, b'0', 0);
-INSERT INTO `m_storage` VALUES (2, 1844270972333924352, 'minio', 'minio', b'0', '2', '{\"accessKey\":\"5555\",\"secretKey\":\"5555\",\"endPoint\":\"5555\",\"bucketName\":\"5555\"}', 1, 0, NULL, 0, NULL, b'0', 0);
-INSERT INTO `m_storage` VALUES (4, 1891827317205766144, '七牛云2', 'qiniu', b'0', NULL, '{\"accessKey\":\"2222\",\"secretKey\":\"2222\",\"endPoint\":\"2222\",\"bucketName\":\"2222\",\"regionId\":\"2222\"}', 1, 0, '2025-02-18 20:29:15.000000', 0, '2025-02-18 20:29:56.000000', b'0', 2);
+INSERT INTO `m_storage` VALUES (1, 1843939697907720192, '本地存储测试', 'local', '1', '{\"storagePath\":\"/application/minimalist-saas/\"}', 1, 0, NULL, 0, NULL, b'0', 0);
+INSERT INTO `m_storage` VALUES (2, 1844270972333924352, 'minio', 'minio', '2', '{\"accessKey\":\"5555\",\"secretKey\":\"5555\",\"endPoint\":\"5555\",\"bucketName\":\"5555\"}', 1, 0, NULL, 0, NULL, b'0', 0);
+INSERT INTO `m_storage` VALUES (4, 1891827317205766144, '七牛云2', 'qiniu', NULL, '{\"accessKey\":\"2222\",\"secretKey\":\"2222\",\"endPoint\":\"2222\",\"bucketName\":\"2222\",\"regionId\":\"2222\"}', 1, 0, '2025-02-18 20:29:15.000000', 0, '2025-02-18 20:29:56.000000', b'0', 2);
 
 -- ----------------------------
 -- Table structure for m_tenant
@@ -734,7 +733,7 @@ INSERT INTO `m_tenant` VALUES (3, 1834763883194494976, 1834763884364705792, 1676
 INSERT INTO `m_tenant` VALUES (4, 1836055976968843264, 1836055978990497792, 1676850220841287680, '测试租户111', '2024-09-30 22:38:09.000000', 3, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:41.000000', 0, '2025-02-18 21:56:32.000000', b'0', 2);
 INSERT INTO `m_tenant` VALUES (5, 1836056110565814272, 1836056110997827584, 1676850220841287680, '测试租户222', '2024-09-30 22:54:04.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:43.000000', 0, '2025-02-18 21:56:39.000000', b'0', 2);
 INSERT INTO `m_tenant` VALUES (6, 1846431773459197952, 1846431773870239744, 1676850220841287680, '测试租户333', '2024-10-31 14:03:03.000000', 3, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:46.000000', 0, '2025-02-18 21:56:42.000000', b'0', 2);
-INSERT INTO `m_tenant` VALUES (9, 1890406866181099520, 1890406866181099521, 1676850220841287680, '测试租户44', '2025-02-28 22:22:49.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 22:24:53.000000', 0, '2025-02-18 21:56:46.000000', b'0', 4);
+INSERT INTO `m_tenant` VALUES (9, 1890406866181099520, 1890406866181099521, 1676850220841287680, '测试租户44', '2025-02-28 22:22:49.000000', 2, 'db', '112212', 1843939697907720192, NULL, 1, 0, '2025-02-14 22:24:53.000000', 0, '2025-02-19 11:01:00.000000', b'0', 6);
 
 -- ----------------------------
 -- Table structure for m_tenant_datasource
@@ -750,6 +749,11 @@ CREATE TABLE `m_tenant_datasource`  (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据源密码',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户数据源表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of m_tenant_datasource
+-- ----------------------------
+INSERT INTO `m_tenant_datasource` VALUES (4, 1892046699774840832, 1890406866181099520, '112212', 'jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true', '13123', '123123');
 
 -- ----------------------------
 -- Table structure for m_tenant_package
