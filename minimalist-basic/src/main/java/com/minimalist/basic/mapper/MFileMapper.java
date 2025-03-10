@@ -40,6 +40,7 @@ public interface MFileMapper extends BaseMapper<MFile> {
                         .eq(MFile::getStatus, queryVO.getStatus())
                         .eq(MFile::getFileSource, queryVO.getFileSource())
                         .like(MFile::getFileName, queryVO.getFileName())
+                        .like(MFile::getFileType, queryVO.getFileType())
                         .orderBy(MFile::getCreateTime, false));
     }
 

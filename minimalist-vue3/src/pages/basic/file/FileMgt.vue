@@ -50,7 +50,12 @@
 
                 <!-- 数据操作区 -->
                 <a-row class="w-full flex justify-between">
-                    <a-space></a-space>
+                    <a-space>
+                        <!-- 文件选择组件演示 - 可供其他页面调用 -->
+                        <a-button type="primary" size="small" @click="selectFileBtnClick()">
+                            <template #default>文件选择组件演示</template>
+                        </a-button>
+                    </a-space>
                     <a-space>
                         <!-- 刷新 -->
                         <a-button shape="circle" size="small" @click="getPageList(false)">
@@ -122,12 +127,51 @@
                 </a-row>
             </a-row>
         </div>
+
+        <!-- 文件选择组件演示 -->
+        <a-modal v-model:visible="modal.visible" fullscreen :esc-to-close="false" :mask-closable="false" draggable :footer="false">
+            <template #title>{{ modal.title }}</template>
+            <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
+        </a-modal>
+
     </a-card>
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance} from 'vue'
+import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
 import { getPageFileListApi, deleteFileApi } from "~/api/file.js";
+import FileSelect from "~/pages/basic/file/FileSelect.vue";
+import {fileType} from "~/utils/sys.js";
+
+/********************** 文件选择组件演示 **********************/
+const modal = reactive({
+    //是否显示
+    visible: false,
+    //模态框标题
+    title: '文件选择',
+    //传递参数
+    params: {},
+    //组件名称
+    component: null
+});
+//模态框 -> 确认
+const onOk = () => {
+    modal.visible = false
+    //显示选择的文件
+    alert('选择')
+}
+//模态框 -> 取消
+const onCancel = () => {
+    modal.visible = false
+}
+//点击选择
+const selectFileBtnClick = (() => {
+    modal.visible = true
+    modal.params = { fileType: fileType.image }
+    modal.component = shallowRef(FileSelect)
+})
+/********************** 文件选择组件演示结束 **********************/
+
 
 //全局实例
 const {proxy} = getCurrentInstance()

@@ -15,6 +15,11 @@ export const yesNo = {
     yes: {key: true, value: '是'},
     no: {key: false, value: '否'}
 }
+//文件类型
+export const fileType = {
+    image: {key: 'image', value: '图片'},
+    video: {key: 'video', value: '视频'}
+}
 //全局 - '文件来源' 枚举
 export const fileSource = {
     notice_cover_img: {key: 1, value: '系统公告封面图片'},
