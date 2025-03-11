@@ -176,7 +176,7 @@ const selectFileBtnClick = (() => {
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.fileSource, proxy.DICT.storageList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource, proxy.DICT.storageList])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单

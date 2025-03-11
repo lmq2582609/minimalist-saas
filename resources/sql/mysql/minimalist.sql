@@ -733,7 +733,7 @@ INSERT INTO `m_tenant` VALUES (3, 1834763883194494976, 1834763884364705792, 1676
 INSERT INTO `m_tenant` VALUES (4, 1836055976968843264, 1836055978990497792, 1676850220841287680, '测试租户111', '2024-09-30 22:38:09.000000', 3, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:41.000000', 0, '2025-02-18 21:56:32.000000', b'0', 2);
 INSERT INTO `m_tenant` VALUES (5, 1836056110565814272, 1836056110997827584, 1676850220841287680, '测试租户222', '2024-09-30 22:54:04.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:43.000000', 0, '2025-02-18 21:56:39.000000', b'0', 2);
 INSERT INTO `m_tenant` VALUES (6, 1846431773459197952, 1846431773870239744, 1676850220841287680, '测试租户333', '2024-10-31 14:03:03.000000', 3, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 21:54:46.000000', 0, '2025-02-18 21:56:42.000000', b'0', 2);
-INSERT INTO `m_tenant` VALUES (9, 1890406866181099520, 1890406866181099521, 1676850220841287680, '测试租户44', '2025-02-28 22:22:49.000000', 2, 'db', '112212', 1843939697907720192, NULL, 1, 0, '2025-02-14 22:24:53.000000', 0, '2025-02-19 11:01:00.000000', b'0', 6);
+INSERT INTO `m_tenant` VALUES (9, 1890406866181099520, 1890406866181099521, 1676850220841287680, '测试租户44', '2025-02-28 22:22:49.000000', 2, 'column', 'master', 1843939697907720192, NULL, 1, 0, '2025-02-14 22:24:53.000000', 0, '2025-02-19 11:01:00.000000', b'0', 6);
 
 -- ----------------------------
 -- Table structure for m_tenant_datasource
@@ -749,11 +749,6 @@ CREATE TABLE `m_tenant_datasource`  (
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据源密码',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户数据源表' ROW_FORMAT = Dynamic;
-
--- ----------------------------
--- Records of m_tenant_datasource
--- ----------------------------
-INSERT INTO `m_tenant_datasource` VALUES (4, 1892046699774840832, 1890406866181099520, '112212', 'jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true', '13123', '123123');
 
 -- ----------------------------
 -- Table structure for m_tenant_package
