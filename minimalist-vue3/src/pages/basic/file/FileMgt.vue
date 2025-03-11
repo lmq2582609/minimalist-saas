@@ -129,7 +129,7 @@
         </div>
 
         <!-- 文件选择组件演示 -->
-        <a-modal v-model:visible="modal.visible" fullscreen :esc-to-close="false" :mask-closable="false" draggable :footer="false">
+        <a-modal v-model:visible="modal.visible" width="60%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
@@ -167,7 +167,7 @@ const onCancel = () => {
 //点击选择
 const selectFileBtnClick = (() => {
     modal.visible = true
-    modal.params = { fileType: fileType.image }
+    modal.params = { fileType: fileType.image.key }
     modal.component = shallowRef(FileSelect)
 })
 /********************** 文件选择组件演示结束 **********************/

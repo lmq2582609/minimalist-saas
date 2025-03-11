@@ -11,7 +11,7 @@
  Target Server Version : 80024
  File Encoding         : 65001
 
- Date: 19/02/2025 19:53:40
+ Date: 11/03/2025 21:16:54
 */
 
 SET NAMES utf8mb4;
@@ -152,8 +152,9 @@ INSERT INTO `m_dict` VALUES (130, 1845016876603019264, 'file-source-path', '1', 
 INSERT INTO `m_dict` VALUES (131, 1845016876603019265, 'file-source-path', '2', 'notice/content/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 2, NULL, 1, 0, '2024-10-15 10:13:38.000000', 0, '2025-02-18 20:21:03.000000', b'0', 2);
 INSERT INTO `m_dict` VALUES (133, 1890393477224509440, 'tenant-data-isolation', 'column', '字段隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 1, 'green', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
 INSERT INTO `m_dict` VALUES (134, 1890393477329367040, 'tenant-data-isolation', 'db', '数据库隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 2, 'arcoblue', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
-INSERT INTO `m_dict` VALUES (135, 1891825254069571584, 'file-source-path', '100', 'product/brand/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 100, NULL, 1, 0, '2025-02-18 20:21:03.000000', 0, '2025-02-18 20:21:03.000000', b'0', 0);
 INSERT INTO `m_dict` VALUES (136, 1891825581577605120, 'storage-type', 'qiniu', '七牛云', '存储类型', '存储平台，如阿里云oss、腾讯云oss、七牛云oss等', 3, 'gold', 1, 0, '2025-02-18 20:22:21.000000', 0, '2025-02-18 20:29:34.000000', b'0', 2);
+INSERT INTO `m_dict` VALUES (137, 1899098996038688768, 'file-type', 'image', '图片', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
+INSERT INTO `m_dict` VALUES (138, 1899098996160323584, 'file-type', 'video', '视频', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
 
 -- ----------------------------
 -- Table structure for m_file
@@ -748,7 +749,7 @@ CREATE TABLE `m_tenant_datasource`  (
   `username` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据源用户名',
   `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '数据源密码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户数据源表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '租户数据源表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Table structure for m_tenant_package

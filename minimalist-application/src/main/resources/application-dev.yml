@@ -75,7 +75,7 @@ spring:
         # redis配置
         redis:
             # Redis数据库索引（默认为0）
-            database: 1
+            database: 3
             # Redis服务器地址
             host: 127.0.0.1
             # Redis服务器连接端口
@@ -112,7 +112,7 @@ spring:
 redisson:
     address: redis://${spring.data.redis.host}:${spring.data.redis.port}
     password: ${spring.data.redis.password}
-    database: 0
+    database: 3
     pingInterval: 10000
     connectionPoolSize: 100
     connectionMinimumIdleSize: 0
