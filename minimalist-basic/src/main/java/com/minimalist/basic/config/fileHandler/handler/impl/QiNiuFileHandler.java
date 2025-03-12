@@ -13,11 +13,13 @@ import com.minimalist.basic.config.fileHandler.entity.MinIOFileEntity;
 import com.minimalist.basic.config.fileHandler.entity.QiNiuFileEntity;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
 import com.minimalist.basic.entity.enums.FileEnum;
+import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.po.MStorage;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
+import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.SafetyUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.minimalist.basic.utils.ValidateUtil;
@@ -106,6 +108,11 @@ public class QiNiuFileHandler implements FileHandler {
         fileInfo.setFileUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + fileKey));
         fileInfo.setFileSource(fileSource);
         fileInfo.setStorageId(storage.getStorageId());
+        //如果未指定文件来源，将状态置为正常
+        //因为这是从文件选择组件中上传的文件，不置为正常，在选择文件时查询条件是正常的才能被查出来
+        if (fileSource < CommonConstant.ZERO) {
+            fileInfo.setStatus(StatusEnum.STATUS_1.getCode());
+        }
         try {
             Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
             String upToken = auth.uploadToken(qnConfig.getBucketName());

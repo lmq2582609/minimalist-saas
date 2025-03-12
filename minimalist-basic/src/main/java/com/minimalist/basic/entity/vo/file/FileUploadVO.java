@@ -18,9 +18,8 @@ public class FileUploadVO implements Serializable {
     @Schema(name = "file", description = "文件(单个文件)", type = "file")
     private MultipartFile file;
 
-    @NotNull(message = "文件来源不能为空")
     @Schema(name = "fileSource", description = "文件来源，字典：file-source-path", type = "int")
-    private Integer fileSource;
+    private Integer fileSource = -1;
 
     @Schema(name = "storageId", description = "存储ID，可为空。为空则取默认使用的存储", type = "int")
     private Long storageId;

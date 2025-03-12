@@ -155,10 +155,10 @@ const modal = reactive({
     component: null
 });
 //模态框 -> 确认
-const onOk = () => {
+const onOk = (selectedFiles) => {
     modal.visible = false
-    //显示选择的文件
-    alert('选择')
+    //TODO 拿到选择的文件-可自定实现逻辑
+    console.info(selectedFiles)
 }
 //模态框 -> 取消
 const onCancel = () => {

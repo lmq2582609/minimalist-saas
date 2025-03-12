@@ -20,20 +20,18 @@
             <!-- 文件数据 -->
             <a-row class="w-full flex flex-1 flex-col pl-3 overflow-x-auto overflow-y-hidden">
 
-                <a-row class="w-full justify-between mb-3">
-                    <a-button type="primary" @click="">
-                        <template #icon><icon-upload /></template>
-                        <template #default>上传</template>
-                    </a-button>
-                    <a-input-search v-model="searchForm.fileName" :style="{width:'180px'}" placeholder="请输入图片名称" search-button/>
-                </a-row>
+                <a-space class="w-full flex justify-between mb-3">
+                    <a-upload :action="uploadFileUrl" multiple with-credentials
+                              :custom-request="customUploadFile" :show-file-list="false" />
+                    <a-input-search v-model="searchForm.fileName" :style="{width:'180px'}" placeholder="请输入图片名称" search-button @search="getPageList"/>
+                </a-space>
 
                 <!-- 文件列表 -->
                 <div class="parent-container">
-                    <div class="image-container">
+                    <div class="image-container" v-if="datatable.records.length > 0">
                         <div class="image-item" v-for="file in datatable.records">
                             <div class="image-wrapper">
-                                <img src="../../../assets/login-pic.png" alt="" @click="selectFileBtnClick(file)">
+                                <img :src="file.fileUrl" alt="" @click="selectFileBtnClick(file)">
                                 <!-- 选中效果 -->
                                 <div class="flex items-center justify-center" v-if="checkSelect(file) >= 0"
                                      :class="checkSelect(file) >= 0 ? 'select-file-active' : ''"
@@ -41,9 +39,12 @@
                                     <icon-check class="text-7xl" style="color: var(--color-text-4)" />
                                 </div>
                             </div>
-                            <div class="image-title">这是一张非常长的图片名称需要被截断显示</div>
+                            <a-tooltip :content="file.fileName">
+                                <div class="image-title">{{file.fileName}}</div>
+                            </a-tooltip>
                         </div>
                     </div>
+                    <a-empty class="mt-5" v-else />
                 </div>
 
                 <!-- 分页 -->
@@ -70,7 +71,7 @@
 </template>
 <script setup>
 import {getCurrentInstance, reactive, ref, watch} from "vue";
-import {getPageFileListApi} from "~/api/file.js";
+import {getPageFileListApi, uploadFileApi} from "~/api/file.js";
 import {status} from "~/utils/sys.js";
 
 //全局实例
@@ -79,9 +80,15 @@ const {proxy} = getCurrentInstance()
 const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource])
 //接收父组件参数
 const props = defineProps({
-    params: {
-        type: Object,
-        default: () => {}
+    //可以选择几个文件
+    limit: {
+        type: Number,
+        default: () => 1
+    },
+    //文件类型
+    fileType: {
+        type: String,
+        default: () => null
     }
 })
 //加载中...
@@ -119,45 +126,36 @@ const fileSourceClick = (fileSource) => {
 const getPageList = () => {
     spinLoading.value = true
     getPageFileListApi(searchForm).then(res => {
-        //datatable.records = res.records
-
-        datatable.records = []
-        for (let i = 0; i < 20; i++) {
-            datatable.records.push({
-                fileId: i,
-            })
-        }
-
+        datatable.records = res.records
         datatable.total = res.total
     }).finally(() => {
         spinLoading.value = false
     })
 }
 
-
 //选中的文件
 const selectFile = ref([])
 //点击选中
 const selectFileBtnClick = (file) => {
     //检查可以选择几个文件 - 默认一个
-    let count = props.params?.limit || 1
-    //如果是选择 1 个，则将之前选择的剔除
-    if (count === 1) {
-        selectFile.value = [file]
+    let count = props.limit
+    //检查之前是否选中
+    let selectIndex = checkSelect(file)
+    //之前已选中，再次点击说明要取消掉
+    if (selectIndex >= 0) {
+        selectFile.value.splice(selectIndex, 1)
     } else {
-        //大于 1 个，可以多选
-        //检查之前是否选中
-        let selectIndex = checkSelect(file)
-        //之前已选中，再次点击说明要取消掉
-        if (selectIndex >= 0) {
-            selectFile.value.splice(selectIndex, 1)
+        //之前未选中，检查是否达到最大个数
+        if (selectFile.value.length < count) {
+            //未达到最大个数，直接选择
+            selectFile.value.push(file)
         } else {
-            //之前未选中，检查是否达到最大个数
-            if (selectFile.value.length < count) {
-                //未达到最大个数，直接选择
-                selectFile.value.push(file)
+            //达到最大个数，校验
+            if (count === 1) {
+                //最大个数=1，直接替换
+                selectFile.value = [file]
             } else {
-                //提示最多可以选择 count 个
+                //最大个数 > 1，提示最多可以选择 count 个
                 proxy.$msg.error(`最多可以选择${count}个文件`)
             }
         }
@@ -175,12 +173,53 @@ const checkSelect = (file) => {
     }
     return selectIndex
 }
+//父组件函数
+const emits = defineEmits(['ok', 'cancel'])
+//取消 -> 点击
+const cancelBtnClick = () => {
+    emits('cancel')
+}
+//确定 -> 点击
+const okBtnClick = () => {
+    emits("ok", selectFile.value)
+}
+
+//上传文件地址
+const uploadFileUrl = import.meta.env.VITE_UPLOAD_FILE_URL
+//自定义上传
+const customUploadFile = (option) => {
+    //上传进度监控
+    const onUploadProgress = (e) => {
+        option.onProgress(e.progress * 100)
+    }
+    //上传参数
+    const formData = new FormData();
+    formData.append("file", option.fileItem.file);
+    formData.append("fileSource", -1);
+    if (props.storageId) {
+        formData.append("storageId", props.storageId)
+    }
+    spinLoading.value = true
+    uploadFileApi(formData, onUploadProgress).then(res => {
+        //调用onSuccess方法将响应数据附加到fileItem中的response字段上
+        option.onSuccess(res)
+        proxy.$msg.success(proxy.operationType.upload.success)
+        //刷新文件列表
+        getPageList()
+    }).catch(e => {
+        //上传失败
+        option.onError(e)
+    }).finally(() => {
+        spinLoading.value = false
+    })
+}
+
 
 //监听参数变化
-watch(() => props.params, (newVal, oldVal) => {
+watch(() => props.fileType, (newVal, oldVal) => {
     //文件类型
-    if (props.params.fileType) {
-        searchForm.fileType = props.params.fileType
+    if (props.fileType) {
+        searchForm.fileType = props.fileType
     }
     //加载文件列表
     getPageList()
@@ -202,7 +241,6 @@ watch(() => props.params, (newVal, oldVal) => {
     overflow-y: auto; /* 纵向滚动条 */
     box-sizing: border-box;
 }
-
 /* 自定义滚动条样式 */
 .image-container::-webkit-scrollbar {
     width: 8px;
@@ -214,7 +252,6 @@ watch(() => props.params, (newVal, oldVal) => {
     background: #888;
     border-radius: 4px;
 }
-
 /* 图片项样式保持之前版本 */
 .image-item {
     display: flex;
@@ -223,18 +260,15 @@ watch(() => props.params, (newVal, oldVal) => {
     gap: 8px;
     padding-bottom: 10px; /* 防止底部被裁切 */
 }
-
 .image-wrapper {
     position: relative;
     width: 100%;
 }
-
 .image-wrapper::before {
     content: '';
     display: block;
     padding-top: 100%;
 }
-
 .image-container img {
     position: absolute;
     top: 0;
@@ -246,12 +280,10 @@ watch(() => props.params, (newVal, oldVal) => {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     transition: transform 0.3s ease;
 }
-
 /* 可选悬停动画 */
 .image-container img:hover {
     cursor: pointer;
 }
-
 .image-title {
     width: 100%;
     font-size: 14px;
@@ -262,7 +294,6 @@ watch(() => props.params, (newVal, oldVal) => {
     text-overflow: ellipsis;
     padding: 0 5px;
 }
-
 /* 响应式调整 */
 @media (max-width: 768px) {
     .image-container {
@@ -271,18 +302,10 @@ watch(() => props.params, (newVal, oldVal) => {
     .parent-container {
         height: 400px; /* 移动端调整高度 */
     }
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .image-container {
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    }
     .image-title {
         font-size: 12px;
     }
 }
-
 /* 点击选中文件 */
 .select-file-active {
     width: 100%;
@@ -294,7 +317,6 @@ watch(() => props.params, (newVal, oldVal) => {
     z-index: 99;
     top: 0;
 }
-
 /* 文件来源选中 */
 .file-select .file-source-active {
     background-color: var(--color-fill-1);color: rgb(var(--arcoblue-6))

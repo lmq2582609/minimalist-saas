@@ -11,7 +11,7 @@
  Target Server Version : 80024
  File Encoding         : 65001
 
- Date: 11/03/2025 21:16:54
+ Date: 12/03/2025 22:00:20
 */
 
 SET NAMES utf8mb4;
@@ -116,7 +116,7 @@ CREATE TABLE `m_dict`  (
   `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
   `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 137 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 139 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '字典表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of m_dict
@@ -148,13 +148,14 @@ INSERT INTO `m_dict` VALUES (126, 1843908761895776256, 'common-number-status', '
 INSERT INTO `m_dict` VALUES (127, 1843908761895776257, 'common-number-status', '1', '正常', '通用状态-数字', '0禁用 1正常', 2, 'green', 1, 0, '2024-10-11 14:45:26.000000', 0, '2024-10-10 16:59:41.770223', b'0', 0);
 INSERT INTO `m_dict` VALUES (128, 1843932948186218496, 'storage-type', 'local', '本地', '存储类型', '存储平台，如阿里云oss、腾讯云oss、七牛云oss等', 1, 'orange', 1, 0, '2024-10-09 14:45:18.000000', 0, '2025-02-18 20:29:33.000000', b'0', 4);
 INSERT INTO `m_dict` VALUES (129, 1843932948186218497, 'storage-type', 'minio', 'MinIO', '存储类型', '存储平台，如阿里云oss、腾讯云oss、七牛云oss等', 2, 'blue', 1, 0, '2024-10-09 14:45:18.000000', 0, '2025-02-18 20:29:33.000000', b'0', 4);
-INSERT INTO `m_dict` VALUES (130, 1845016876603019264, 'file-source-path', '1', 'notice/cover/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 1, NULL, 1, 0, '2024-10-15 10:13:34.000000', 0, '2025-02-18 20:21:03.000000', b'0', 2);
-INSERT INTO `m_dict` VALUES (131, 1845016876603019265, 'file-source-path', '2', 'notice/content/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 2, NULL, 1, 0, '2024-10-15 10:13:38.000000', 0, '2025-02-18 20:21:03.000000', b'0', 2);
+INSERT INTO `m_dict` VALUES (130, 1845016876603019264, 'file-source-path', '1', 'notice/cover/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 1, NULL, 1, 0, '2024-10-15 10:13:34.000000', 0, '2025-03-12 19:11:03.000000', b'0', 4);
+INSERT INTO `m_dict` VALUES (131, 1845016876603019265, 'file-source-path', '2', 'notice/content/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 2, NULL, 1, 0, '2024-10-15 10:13:38.000000', 0, '2025-03-12 19:11:03.000000', b'0', 4);
 INSERT INTO `m_dict` VALUES (133, 1890393477224509440, 'tenant-data-isolation', 'column', '字段隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 1, 'green', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
 INSERT INTO `m_dict` VALUES (134, 1890393477329367040, 'tenant-data-isolation', 'db', '数据库隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 2, 'arcoblue', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
 INSERT INTO `m_dict` VALUES (136, 1891825581577605120, 'storage-type', 'qiniu', '七牛云', '存储类型', '存储平台，如阿里云oss、腾讯云oss、七牛云oss等', 3, 'gold', 1, 0, '2025-02-18 20:22:21.000000', 0, '2025-02-18 20:29:34.000000', b'0', 2);
 INSERT INTO `m_dict` VALUES (137, 1899098996038688768, 'file-type', 'image', '图片', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
 INSERT INTO `m_dict` VALUES (138, 1899098996160323584, 'file-type', 'video', '视频', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
+INSERT INTO `m_dict` VALUES (139, 1899780153331810304, 'file-source-path', '-1', 'common/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 0, NULL, 1, 0, '2025-03-12 19:11:03.000000', 0, '2025-03-12 19:11:03.000000', b'0', 0);
 
 -- ----------------------------
 -- Table structure for m_file
@@ -192,8 +193,9 @@ CREATE TABLE `m_file`  (
 -- ----------------------------
 -- Records of m_file
 -- ----------------------------
-INSERT INTO `m_file` VALUES (179, 1846015407035924480, 'QQ图片20230802151253.jpg', '670dd370211b4a9bd06242f1.jpg', 27675, 'image/jpeg', 'E:/', 'E:/notice/cover/', 'http://localhost:9090/minimalist/files/notice/cover/670dd370211b4a9bd06242f1.jpg', 1, 'http://localhost:9090/minimalist/files/notice/cover/thumbnail-670dd370211b4a9bd06242f1.jpg', NULL, 'thumbnail-670dd370211b4a9bd06242f1.jpg', 7515, NULL, 0, 0, 0, '2024-10-15 10:29:05.158802', 0, '2024-10-15 10:29:05.158802', b'0', 0);
-INSERT INTO `m_file` VALUES (202, 1851164126132932608, '微信图片_20241029151437.png', '67208e8fa3b49682ade3b6fe.png', 262189, 'image/png', '/application/minimalist-saas/', '/application/minimalist-saas/notice/cover/', 'http://jjian.com.cn:443/minimalist/files/notice/cover/67208e8fa3b49682ade3b6fe.png', 1, 'http://jjian.com.cn:443/minimalist/files/notice/cover/thumbnail-67208e8fa3b49682ade3b6fe.png', NULL, 'thumbnail-67208e8fa3b49682ade3b6fe.png', 63173, NULL, 0, 1, 0, '2024-10-29 15:28:15.000000', 0, '2024-10-29 15:28:42.000000', b'0', 2);
+INSERT INTO `m_file` VALUES (204, 1899820597440864256, '微信图片_20241122215116.jpg', '67d1916e29479ffe018772d7.jpg', 28263, 'image/jpeg', 'D:/application/minimalist-saas/', 'D:/application/minimalist-saas/common/', 'http://localhost:9090/minimalist/files/common/67d1916e29479ffe018772d7.jpg', -1, 'http://localhost:9090/minimalist/files/common/thumbnail-67d1916e29479ffe018772d7.jpg', 1843939697907720192, 'thumbnail-67d1916e29479ffe018772d7.jpg', 5286, NULL, 0, 1, 0, '2025-03-12 21:51:41.000000', 0, '2025-03-12 21:51:41.000000', b'0', 0);
+INSERT INTO `m_file` VALUES (205, 1899821417918029824, '微信图片_20250301225402.png', '67d1923129479ffe018772d8.png', 303148, 'image/png', 'D:/application/minimalist-saas/', 'D:/application/minimalist-saas/common/', 'http://localhost:9090/minimalist/files/common/67d1923129479ffe018772d8.png', -1, 'http://localhost:9090/minimalist/files/common/thumbnail-67d1923129479ffe018772d8.png', 1843939697907720192, 'thumbnail-67d1923129479ffe018772d8.png', 58592, NULL, 0, 1, 0, '2025-03-12 21:54:57.000000', 0, '2025-03-12 21:54:57.000000', b'0', 0);
+INSERT INTO `m_file` VALUES (206, 1899821823532392448, '无标题.png', '67d1929229479ffe018772d9.png', 295216, 'image/png', 'D:/application/minimalist-saas/', 'D:/application/minimalist-saas/common/', 'http://localhost:9090/minimalist/files/common/67d1929229479ffe018772d9.png', -1, 'http://localhost:9090/minimalist/files/common/thumbnail-67d1929229479ffe018772d9.png', 1843939697907720192, 'thumbnail-67d1929229479ffe018772d9.png', 92429, NULL, 0, 1, 0, '2025-03-12 21:56:34.000000', 0, '2025-03-12 21:56:34.000000', b'0', 0);
 
 -- ----------------------------
 -- Table structure for m_notice
@@ -696,7 +698,7 @@ CREATE TABLE `m_storage`  (
 -- ----------------------------
 -- Records of m_storage
 -- ----------------------------
-INSERT INTO `m_storage` VALUES (1, 1843939697907720192, '本地存储测试', 'local', '1', '{\"storagePath\":\"/application/minimalist-saas/\"}', 1, 0, NULL, 0, NULL, b'0', 0);
+INSERT INTO `m_storage` VALUES (1, 1843939697907720192, '本地存储测试', 'local', '1', '{\"storagePath\":\"D:/application/minimalist-saas/\"}', 1, 0, NULL, 0, '2025-03-12 21:43:52.000000', b'0', 2);
 INSERT INTO `m_storage` VALUES (2, 1844270972333924352, 'minio', 'minio', '2', '{\"accessKey\":\"5555\",\"secretKey\":\"5555\",\"endPoint\":\"5555\",\"bucketName\":\"5555\"}', 1, 0, NULL, 0, NULL, b'0', 0);
 INSERT INTO `m_storage` VALUES (4, 1891827317205766144, '七牛云2', 'qiniu', NULL, '{\"accessKey\":\"2222\",\"secretKey\":\"2222\",\"endPoint\":\"2222\",\"bucketName\":\"2222\",\"regionId\":\"2222\"}', 1, 0, '2025-02-18 20:29:15.000000', 0, '2025-02-18 20:29:56.000000', b'0', 2);
 

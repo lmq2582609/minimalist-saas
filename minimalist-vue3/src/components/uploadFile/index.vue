@@ -18,7 +18,7 @@ const props = defineProps({
     //文件来源 -> 若上传文件，需传入此参数，用于标识文件的作用
     fileSource: {
         type: Number,
-        default: 0
+        default: -1
     },
     //存储信息ID -> 标识用哪个存储，不传可使用租户默认存储
     storageId: {
