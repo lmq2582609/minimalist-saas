@@ -50,15 +50,17 @@ CREATE TABLE `m_tenant_datasource`  (
 
 
 -- 新增七牛云存储数据
-INSERT INTO `m_storage` VALUES (4, 1891827317205766144, '七牛云2', 'qiniu', NULL, '{\"accessKey\":\"2222\",\"secretKey\":\"2222\",\"endPoint\":\"2222\",\"bucketName\":\"2222\",\"regionId\":\"2222\"}', 1, 0, '2025-02-18 20:29:15.000000', 0, '2025-02-18 20:29:56.000000', b'0', 2);
+INSERT INTO `minimalist`.`m_storage`(`storage_id`, `storage_name`, `storage_type`, `description`, `storage_config`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1891827317205766144, '七牛云2', 'qiniu', NULL, '{\"accessKey\":\"2222\",\"secretKey\":\"2222\",\"endPoint\":\"2222\",\"bucketName\":\"2222\",\"regionId\":\"2222\"}', 1, 0, '2025-02-18 20:29:15.000000', 0, '2025-02-18 20:29:56.000000', b'0', 2);
+
 
 
 -- 新增字典数据
-INSERT INTO `m_dict` VALUES (133, 1890393477224509440, 'tenant-data-isolation', 'column', '字段隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 1, 'green', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
-INSERT INTO `m_dict` VALUES (134, 1890393477329367040, 'tenant-data-isolation', 'db', '数据库隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 2, 'arcoblue', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
-INSERT INTO `m_dict` VALUES (136, 1891825581577605120, 'storage-type', 'qiniu', '七牛云', '存储类型', '存储平台，如阿里云oss、腾讯云oss、七牛云oss等', 3, 'gold', 1, 0, '2025-02-18 20:22:21.000000', 0, '2025-02-18 20:29:34.000000', b'0', 2);
-INSERT INTO `m_dict` VALUES (137, 1899098996038688768, 'file-type', 'image', '图片', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
-INSERT INTO `m_dict` VALUES (138, 1899098996160323584, 'file-type', 'video', '视频', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
-INSERT INTO `m_dict` VALUES (139, 1899780153331810304, 'file-source-path', '-1', 'common/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 0, NULL, 1, 0, '2025-03-12 19:11:03.000000', 0, '2025-03-12 19:11:03.000000', b'0', 0);
+INSERT INTO `minimalist`.`m_dict`(`dict_id`, `dict_type`, `dict_key`, `dict_value`, `dict_name`, `dict_desc`, `dict_order`, `dict_class`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1890393477224509440, 'tenant-data-isolation', 'column', '字段隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 1, 'green', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
+INSERT INTO `minimalist`.`m_dict`(`dict_id`, `dict_type`, `dict_key`, `dict_value`, `dict_name`, `dict_desc`, `dict_order`, `dict_class`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1890393477329367040, 'tenant-data-isolation', 'db', '数据库隔离', '租户数据隔离方式', '多租户隔离方式：字段隔离 或 数据库隔离', 2, 'arcoblue', 1, 0, '2025-02-14 21:31:41.000000', 0, '2025-02-14 21:31:41.000000', b'0', 0);
+INSERT INTO `minimalist`.`m_dict`(`dict_id`, `dict_type`, `dict_key`, `dict_value`, `dict_name`, `dict_desc`, `dict_order`, `dict_class`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1891825581577605120, 'storage-type', 'qiniu', '七牛云', '存储类型', '存储平台，如阿里云oss、腾讯云oss、七牛云oss等', 3, 'gold', 1, 0, '2025-02-18 20:22:21.000000', 0, '2025-02-18 20:29:34.000000', b'0', 2);
+INSERT INTO `minimalist`.`m_dict`(`dict_id`, `dict_type`, `dict_key`, `dict_value`, `dict_name`, `dict_desc`, `dict_order`, `dict_class`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1899098996038688768, 'file-type', 'image', '图片', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
+INSERT INTO `minimalist`.`m_dict`(`dict_id`, `dict_type`, `dict_key`, `dict_value`, `dict_name`, `dict_desc`, `dict_order`, `dict_class`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1899098996160323584, 'file-type', 'video', '视频', '文件类型', '文件类型，与file表中file_type字段对应', 0, NULL, 1, 0, '2025-03-10 22:04:18.000000', 0, '2025-03-10 22:04:18.000000', b'0', 0);
+INSERT INTO `minimalist`.`m_dict`(`dict_id`, `dict_type`, `dict_key`, `dict_value`, `dict_name`, `dict_desc`, `dict_order`, `dict_class`, `status`, `create_id`, `create_time`, `update_id`, `update_time`, `deleted`, `version`) VALUES (1899780153331810304, 'file-source-path', '-1', 'common/', '文件来源-存储位置', '文件来源对应的存储位置，配合\"文件来源\"一起使用', 0, NULL, 1, 0, '2025-03-12 19:11:03.000000', 0, '2025-03-12 19:11:03.000000', b'0', 0);
+
 
 
