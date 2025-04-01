@@ -1,7 +1,9 @@
 package com.minimalist.basic.entity.vo.file;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.minimalist.basic.config.convert.FileSizeDeserializer;
 import com.minimalist.basic.config.convert.FileSizeSerializer;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.config.swagger.SchemaEnum;
@@ -25,6 +27,7 @@ public class FileVO implements Serializable {
     private String fileName;
 
     @JsonSerialize(using = FileSizeSerializer.class)
+    @JsonDeserialize(using = FileSizeDeserializer.class)
     @Schema(name = "fileSize", description = "文件大小", type = "string")
     private Long fileSize;
 
