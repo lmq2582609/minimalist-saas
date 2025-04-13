@@ -18,4 +18,15 @@ public class FileEnum {
         private final String desc;
     }
 
+    /** 文件来源 */
+    @Getter
+    @AllArgsConstructor
+    public enum FileSource {
+        NOTICE_COVER_IMG(1, "系统公告封面图片"),
+        NOTICE_CONTENT_IMG(2, "系统公告内容图片"),
+        ;
+        private final Integer code;
+        private final String desc;
+    }
+
 }
