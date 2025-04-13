@@ -1,5 +1,6 @@
 package com.minimalist.basic.mapper;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.minimalist.basic.entity.vo.file.FileQueryVO;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MFile;
@@ -64,13 +65,20 @@ public interface MFileMapper extends BaseMapper<MFile> {
 
     /**
      * 根据文件ID修改文件状态
+     * @param userId 修改人ID
      * @param fileIdList 文件ID列表
      * @param fileStatus 文件状态
+     * @param fileSource 文件来源
      */
-    default void updateFileStatusByFileIds(Long userId, List<Long> fileIdList, Integer fileStatus) {
+    default void updateFileStatusByFileIds(Long userId, List<Long> fileIdList, Integer fileStatus, Integer fileSource) {
         MFile file = new MFile();
         file.setStatus(fileStatus);
-        file.setUpdateId(userId);
+        if (ObjectUtil.isNotNull(userId)) {
+            file.setUpdateId(userId);
+        }
+        if (ObjectUtil.isNotNull(fileSource)) {
+            file.setFileSource(fileSource);
+        }
         file.setUpdateTime(LocalDateTime.now());
         updateByQuery(file, QueryWrapper.create().in(MFile::getFileId, fileIdList));
     }
