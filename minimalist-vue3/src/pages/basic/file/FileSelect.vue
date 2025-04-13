@@ -22,8 +22,9 @@
 
                 <a-space class="w-full flex justify-between mb-3">
                     <a-upload :action="uploadFileUrl" multiple with-credentials
+                              :accept="accept"
                               :custom-request="customUploadFile" :show-file-list="false" />
-                    <a-input-search v-model="searchForm.fileName" :style="{width:'180px'}" placeholder="请输入图片名称" search-button @search="getPageList"/>
+                    <a-input-search v-model="searchForm.fileName" :style="{width:'180px'}" placeholder="请输入文件名称" search-button @search="getPageList"/>
                 </a-space>
 
                 <!-- 文件列表 -->
@@ -31,7 +32,16 @@
                     <div class="image-container" v-if="datatable.records.length > 0">
                         <div class="image-item" v-for="file in datatable.records">
                             <div class="image-wrapper">
-                                <img :src="file.fileUrl" alt="" @click="selectFileBtnClick(file)">
+                                <!-- 图片 -->
+                                <img :src="file.fileUrl" alt="" @click="selectFileBtnClick(file)" v-if="fileType.image.key === searchForm.fileType">
+                                <!-- 视频 -->
+                                <video controls muted @click.stop.prevent="selectFileBtnClick(file)" v-else-if="fileType.video.key === searchForm.fileType">
+                                    <source :src="file.fileUrl" :type="videoTypeHandler(file.fileUrl)" />
+                                    您的浏览器不支持视频播放
+                                </video>
+                                <!-- 其他文件 -->
+                                <img class="p-5" src="../../../assets/default-file-icon.png" alt="" @click="selectFileBtnClick(file)" v-else>
+
                                 <!-- 选中效果 -->
                                 <div class="flex items-center justify-center" v-if="checkSelect(file) >= 0"
                                      :class="checkSelect(file) >= 0 ? 'select-file-active' : ''"
@@ -72,12 +82,14 @@
 <script setup>
 import {getCurrentInstance, reactive, ref, watch} from "vue";
 import {getPageFileListApi, uploadFileApi} from "~/api/file.js";
-import {status} from "~/utils/sys.js";
+import {status, fileType, fileAccept} from "~/utils/sys.js";
 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
 const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.fileSource])
+//允许上传的文件类型
+const accept = ref('')
 //接收父组件参数
 const props = defineProps({
     //可以选择几个文件
@@ -214,12 +226,31 @@ const customUploadFile = (option) => {
     })
 }
 
+//视频类型处理
+const videoTypeHandler = (url) => {
+    let type = url.split('.').pop().toLowerCase()
+    return `video/${type}`
+}
 
 //监听参数变化
 watch(() => props.fileType, (newVal, oldVal) => {
     //文件类型
     if (props.fileType) {
         searchForm.fileType = props.fileType
+
+        //允许上传的文件类型
+        //图片文件
+        if (props.fileType === fileType.image.key) {
+            accept.value = fileAccept.img
+        }
+        //视频文件
+        else if (props.fileType === fileType.video.key) {
+            accept.value = fileAccept.video
+        }
+        //所有文件
+        else {
+            accept.value = ''
+        }
     }
     //加载文件列表
     getPageList()
@@ -269,7 +300,7 @@ watch(() => props.fileType, (newVal, oldVal) => {
     display: block;
     padding-top: 100%;
 }
-.image-container img {
+.image-container img,video {
     position: absolute;
     top: 0;
     left: 0;
@@ -282,6 +313,10 @@ watch(() => props.fileType, (newVal, oldVal) => {
 }
 /* 可选悬停动画 */
 .image-container img:hover {
+    cursor: pointer;
+}
+/* 可选悬停动画 */
+.image-container video:hover {
     cursor: pointer;
 }
 .image-title {

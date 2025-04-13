@@ -131,7 +131,7 @@
         <!-- 文件选择组件演示 -->
         <a-modal v-model:visible="modal.visible" width="60%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
-            <component :is="modal.component" :params="modal.params" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
+            <file-select :file-type="modal.fileType" :limit="modal.limit" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
 
     </a-card>
@@ -149,10 +149,10 @@ const modal = reactive({
     visible: false,
     //模态框标题
     title: '文件选择',
-    //传递参数
-    params: {},
-    //组件名称
-    component: null
+    //文件类型
+    fileType: '',
+    //可以选择几个文件
+    limit: 1,
 });
 //模态框 -> 确认
 const onOk = (selectedFiles) => {
@@ -167,8 +167,7 @@ const onCancel = () => {
 //点击选择
 const selectFileBtnClick = (() => {
     modal.visible = true
-    modal.params = { fileType: fileType.image.key }
-    modal.component = shallowRef(FileSelect)
+    modal.fileType = fileType.image.key
 })
 /********************** 文件选择组件演示结束 **********************/
 

@@ -29,6 +29,8 @@ export const fileSource = {
 export const fileAccept = {
     //图片允许的类型
     img: '.jpg,.jpeg,.png,.jfif,.bmp,.webp',
+    //视频允许的类型
+    video: '.mp4,.avi,.mov,.flv,.mpeg,.3gp,.rmvb,.ts',
 }
 //全局 - '上传文件列表样式' 枚举
 export const fileListType = {
