@@ -1,15 +1,13 @@
 package com.minimalist.basic.config.fileHandler.handler.impl;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
-import com.minimalist.basic.config.fileHandler.entity.MinIOFileEntity;
 import com.minimalist.basic.config.fileHandler.entity.QiNiuFileEntity;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
 import com.minimalist.basic.entity.enums.FileEnum;
@@ -30,28 +28,25 @@ import com.qiniu.storage.BucketManager;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
-import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
 import com.qiniu.util.StringMap;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
 public class QiNiuFileHandler implements FileHandler {
 
-    @Value("${server.servlet.context-path}")
-    private String contextPath;
-
     @Autowired
     private FileManager fileManager;
+
+    @Autowired
+    private MFileMapper fileMapper;
 
     @Autowired
     private MStorageMapper storageMapper;
@@ -178,6 +173,73 @@ public class QiNiuFileHandler implements FileHandler {
             return true;
         } catch (Exception e) {
             log.error("删除文件失败：", e);
+        }
+        return false;
+    }
+
+    /**
+     * 移动文件
+     * 在前端文件选择组件上传文件时不需要指定文件来源，默认会上传到common目录，
+     * 后端处理时可以将文件从common目录移动到对应业务的目录中
+     * @param fileId 文件ID
+     * @param fileSource 文件来源
+     * @param status 文件状态
+     * @param userId 操作人ID
+     * @return 是否移动成功
+     */
+    public boolean moveFile(Long fileId, Integer fileSource, Integer status, Long userId) {
+        MFile file = fileMapper.selectFileByFileId(fileId);
+        Assert.notNull(file, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
+        MStorage storage = storageMapper.selectStorageByStorageId(file.getStorageId());
+        Assert.notNull(storage, () -> new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc()));
+        try {
+            QiNiuFileEntity qnConfig = JSONUtil.toBean(storage.getStorageConfig(), QiNiuFileEntity.class);
+            Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
+            Configuration cfg = new Configuration(Region.createWithRegionId(qnConfig.getRegionId()));
+            BucketManager bucketManager = new BucketManager(auth, cfg);
+            //源文件名
+            String fromKey = file.getFilePath() + "/" + file.getNewFileName();
+            //基础路径 = 租户ID
+            String basePath = SafetyUtil.getLoginUserTenantIdThrowException(String.class);
+            //根据文件来源，获取相对路径
+            String fileSourcePath = fileManager.getPathByFileSource(fileSource);
+            //目标文件名
+            String toKey = basePath + "/" + fileSourcePath + file.getNewFileName();
+            //移动文件
+            Response response = bucketManager.move(qnConfig.getBucketName(), fromKey, qnConfig.getBucketName(), toKey);
+            if (!response.isOK()) {
+                log.warn("移动文件失败：{}", JSONUtil.toJsonStr(response));
+                return false;
+            }
+            //修改文件信息
+            file.setFileSource(fileSource);
+            file.setFilePath(basePath + "/" + fileSourcePath);
+            file.setFileUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + toKey));
+            file.setStatus(status);
+            file.setUpdateId(userId);
+            file.setUpdateTime(LocalDateTime.now());
+            //如果有缩略图，需要将缩略图移动
+            if (StrUtil.isNotBlank(file.getFileThFilename())) {
+                //源文件名
+                String fromKeyTh = file.getFilePath() + "/" + file.getFileThFilename();
+                //目标文件名
+                String toKeyTh = basePath + "/" + fileSourcePath + file.getFileThFilename();
+                //移动文件
+                Response responseTh = bucketManager.move(qnConfig.getBucketName(), fromKeyTh, qnConfig.getBucketName(), toKeyTh);
+                //修改缩略图url
+                file.setFileThUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + toKeyTh));
+                if (!responseTh.isOK()) {
+                    log.warn("移动文件失败：{}", JSONUtil.toJsonStr(responseTh));
+                    return false;
+                }
+            }
+            //更新文件信息
+            fileMapper.updateByQuery(file, QueryWrapper.create().eq(MFile::getFileId, fileId));
+        } catch (QiniuException ex) {
+            log.error("移动文件失败，错误码：{}，错误信息：{}", ex.code(), ex.response.toString());
+            log.error("移动文件失败：", ex);
+        } catch (Exception e) {
+            log.error("移动文件失败：", e);
         }
         return false;
     }

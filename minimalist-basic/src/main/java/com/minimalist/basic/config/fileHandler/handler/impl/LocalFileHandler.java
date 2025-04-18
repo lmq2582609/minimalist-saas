@@ -2,6 +2,7 @@ package com.minimalist.basic.config.fileHandler.handler.impl;
 
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.io.file.FileNameUtil;
+import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -14,9 +15,12 @@ import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.enums.StorageEnum;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.po.MStorage;
+import com.minimalist.basic.mapper.MFileMapper;
+import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.minimalist.basic.utils.ValidateUtil;
+import com.mybatisflex.core.query.QueryWrapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -26,9 +30,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -39,6 +45,12 @@ public class LocalFileHandler implements FileHandler {
 
     @Autowired
     private FileManager fileManager;
+
+    @Autowired
+    private MFileMapper fileMapper;
+
+    @Autowired
+    private MStorageMapper storageMapper;
 
     /**
      * 是否是对应的处理类
@@ -143,6 +155,62 @@ public class LocalFileHandler implements FileHandler {
             FileUtil.del(fileThPath);
         }
         return result;
+    }
+
+    /**
+     * 移动文件
+     * 在前端文件选择组件上传文件时不需要指定文件来源，默认会上传到common目录，
+     * 后端处理时可以将文件从common目录移动到对应业务的目录中
+     * @param fileId     文件ID
+     * @param fileSource 文件来源
+     * @param status     文件状态
+     * @param userId     操作人ID
+     * @return 是否移动成功
+     */
+    @Override
+    public boolean moveFile(Long fileId, Integer fileSource, Integer status, Long userId) {
+        MFile file = fileMapper.selectFileByFileId(fileId);
+        Assert.notNull(file, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
+        MStorage storage = storageMapper.selectStorageByStorageId(file.getStorageId());
+        Assert.notNull(storage, () -> new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc()));
+        //根据文件来源，获取相对路径
+        String fileSourcePath = fileManager.getPathByFileSource(fileSource);
+        //本地存储路径
+        LocalFileEntity localFileEntity = JSONUtil.toBean(storage.getStorageConfig(), LocalFileEntity.class);
+        String storagePath = localFileEntity.getStoragePath();
+        //request请求信息
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String url = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + contextPath + "/files/";
+        //源文件路径
+        Path sourcePath = Paths.get(FileUtil.normalize(storagePath + "/" + file.getFilePath() + "/" + file.getNewFileName()));
+        //目标文件路径
+        Path targetPath = Paths.get(FileUtil.normalize(storagePath + "/" + fileSourcePath + "/" + file.getNewFileName()));
+        try {
+            FileUtil.move(sourcePath, targetPath, true);
+            //修改文件信息
+            file.setFileSource(fileSource);
+            file.setFilePath(FileUtil.normalize(storagePath + "/" + fileSourcePath));
+            file.setFileUrl(url + fileSourcePath + file.getNewFileName());
+            file.setStatus(status);
+            file.setUpdateId(userId);
+            file.setUpdateTime(LocalDateTime.now());
+            //如果有缩略图，需要将缩略图移动
+            if (StrUtil.isNotBlank(file.getFileThFilename())) {
+                //源文件路径
+                Path sourcePathTh = Paths.get(FileUtil.normalize(storagePath + "/" + file.getFilePath() + "/" + file.getNewFileName()));
+                //目标文件路径
+                Path targetPathTh = Paths.get(FileUtil.normalize(storagePath + "/" + fileSourcePath + "/" + file.getNewFileName()));
+                //移动缩略图
+                FileUtil.move(sourcePathTh, targetPathTh, true);
+                file.setFileThUrl(url + fileSourcePath + file.getFileThFilename());
+            }
+            //更新文件信息
+            fileMapper.updateByQuery(file, QueryWrapper.create().eq(MFile::getFileId, fileId));
+        } catch (Exception e) {
+            log.warn("移动文件，异常：", e);
+            throw new BusinessException(FileEnum.ErrorMsg.FILE_MOVE_FAIL.getDesc());
+        }
+        return false;
     }
 
 }

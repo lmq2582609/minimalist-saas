@@ -14,6 +14,7 @@ public class FileEnum {
         FILE_UPLOAD_FAIL("文件上传失败，请重试"),
         FILE_THUMBNAILS_UPLOAD_FAIL("文件缩略图上传失败，请重试"),
         FILE_DOWNLOAD_FAIL("文件下载失败，请重试"),
+        FILE_MOVE_FAIL("文件移动失败，请重试"),
         ;
         private final String desc;
     }

@@ -58,4 +58,20 @@ public class MinIOFileHandler implements FileHandler {
         return false;
     }
 
+    /**
+     * 移动文件
+     * 在前端文件选择组件上传文件时不需要指定文件来源，默认会上传到common目录，
+     * 后端处理时可以将文件从common目录移动到对应业务的目录中
+     * @param fileId     文件ID
+     * @param fileSource 文件来源
+     * @param status     文件状态
+     * @param userId     操作人ID
+     * @return 是否移动成功
+     */
+    @Override
+    public boolean moveFile(Long fileId, Integer fileSource, Integer status, Long userId) {
+        //没做，做了需要引jar包，可自行实现
+        return false;
+    }
+
 }
