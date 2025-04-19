@@ -18,6 +18,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -48,8 +49,8 @@ public class NoticeVO implements Serializable {
     @Schema(name = "noticePicFileId", description = "公告封面图文件ID，多张 , 分割", type = "string")
     private String noticePicFileId;
 
-    @Schema(name = "noticePicFile", description = "公告封面图文件信息，返回数据时填充该数据", type = "array")
-    private List<FileVO> noticePicFile;
+    @Schema(name = "noticePicFile", description = "公告封面图文件信息，新增和修改时直接传入文件信息", type = "array")
+    private List<FileVO> noticePicFile = new ArrayList<>();
 
     @Schema(name = "noticeTop", description = "是否置顶", type = "string")
     private Boolean noticeTop;

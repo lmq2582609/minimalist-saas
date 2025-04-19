@@ -28,3 +28,74 @@ body {
 .fade-enter-active {
     transition-delay: 0.4s;
 }
+
+/* 配合文件选择组件 - 图片 */
+.image-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 8px; /* 图片间距 */
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+.image-item,
+.upload-item {
+    aspect-ratio: 1; /* 保持1:1比例 */
+    position: relative;
+}
+.image-content {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+}
+.action-buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    opacity: 0;
+    background: rgba(0, 0, 0, .5);
+    transition: opacity .1s cubic-bezier(0,0,1,1);
+}
+.action-buttons:hover {
+    opacity: 1;
+}
+.icon-btn {
+    border: none;
+    padding: 3px 6px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    color: #ffffff;
+    font-size: 1.5em;
+}
+.upload-btn {
+    width: 100%;
+    height: 100%;
+    border: 2px dashed var(--color-border-3);
+    background: var(--color-border-2);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+.upload-btn:hover {
+    border-color: rgb(var(--arcoblue-6));
+}
+.upload-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    color: var(--color-text-3);
+}
+.upload-icon {
+    font-size: 1.5em;
+    margin-bottom: 4px;
+}

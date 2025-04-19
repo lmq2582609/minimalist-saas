@@ -1,5 +1,6 @@
 package com.minimalist.basic.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
@@ -26,6 +27,8 @@ import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -92,11 +95,43 @@ public class FileServiceImpl implements FileService {
         MStorage storage = getStorage(mFile.getStorageId());
         FileHandler fileHandler = fileManager.getFileHandler(storage.getStorageType());
         //删除文件
-        fileHandler.deleteFile(mFile, storage);
+        boolean deleteFile = fileHandler.deleteFile(mFile, storage);
+        if (!deleteFile) {
+            throw new BusinessException(FileEnum.ErrorMsg.FILE_DELETE_FAIL.getDesc());
+        }
         //删除数据库文件记录
         LogicDeleteManager.execWithoutLogicDelete(()->
                 fileMapper.deleteByQuery(QueryWrapper.create().eq(MFile::getFileId, fileId))
         );
+    }
+
+    /**
+     * 移动文件
+     * 在前端文件选择组件上传文件时不需要指定文件来源，默认会上传到common目录，
+     * 后端处理时可以将文件从common目录移动到对应业务的目录中
+     * @param fileId     文件ID
+     * @param fileSource 文件来源
+     * @param status     文件状态
+     * @return 是否移动成功
+     */
+    @Override
+    public MFile moveFile(Long fileId, Integer fileSource, Integer status) {
+        //查询文件
+        MFile file = fileMapper.selectFileByFileId(fileId);
+        Assert.notNull(file, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
+        MStorage storage = getStorage(file.getStorageId());
+        //设置文件来源 - 在文件选择中上传没有文件来源，所以这里要设置
+        file.setFileSource(fileSource);
+        //修改文件信息
+        file.setStatus(status);
+        file.setUpdateId(StpUtil.getLoginIdAsLong());
+        file.setUpdateTime(LocalDateTime.now());
+        //移动文件
+        FileHandler fileHandler = fileManager.getFileHandler(storage.getStorageType());
+        fileHandler.moveFile(file, storage);
+        //更新文件信息
+        fileMapper.updateByQuery(file, QueryWrapper.create().eq(MFile::getFileId, fileId));
+        return file;
     }
 
     /**

@@ -116,7 +116,7 @@ const tinymceInit = {
     //富文本插件
     plugins: "link lists image media importcss code table wordcount preview searchreplace fullscreen codesample charmap",
     //工具栏
-    toolbar: "undo redo outdent indent removeformat | bold italic underline strikethrough charmap | fontsizeselect | forecolor backcolor | alignment bullist numlist link blockquote codesample table | image media file | searchreplace fullscreen preview",
+    toolbar: "undo redo outdent indent removeformat | bold italic underline strikethrough charmap | fontsizeselect | forecolor backcolor | alignment bullist numlist blockquote codesample table | link image media file | searchreplace fullscreen preview",
     //是否禁用"Powered by TinyMCE"
     branding: false,
     //顶部菜单栏是否显示

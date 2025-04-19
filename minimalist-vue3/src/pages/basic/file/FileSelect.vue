@@ -114,7 +114,7 @@ const searchForm = reactive({
     //文件名称
     fileName: null,
     //文件状态 = 正常
-    status: status.status_1.key,
+    status: null,
     //页码
     pageNum: 1,
     //条数

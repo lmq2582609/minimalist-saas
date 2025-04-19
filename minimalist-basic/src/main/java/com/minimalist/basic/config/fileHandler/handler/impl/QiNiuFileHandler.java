@@ -179,19 +179,11 @@ public class QiNiuFileHandler implements FileHandler {
 
     /**
      * 移动文件
-     * 在前端文件选择组件上传文件时不需要指定文件来源，默认会上传到common目录，
-     * 后端处理时可以将文件从common目录移动到对应业务的目录中
-     * @param fileId 文件ID
-     * @param fileSource 文件来源
-     * @param status 文件状态
-     * @param userId 操作人ID
-     * @return 是否移动成功
+     * @param file 文件信息
+     * @param storage 存储信息
+     * @return 是否成功
      */
-    public boolean moveFile(Long fileId, Integer fileSource, Integer status, Long userId) {
-        MFile file = fileMapper.selectFileByFileId(fileId);
-        Assert.notNull(file, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
-        MStorage storage = storageMapper.selectStorageByStorageId(file.getStorageId());
-        Assert.notNull(storage, () -> new BusinessException(StorageEnum.ErrorMsg.NONENTITY_STORAGE.getDesc()));
+    public boolean moveFile(MFile file, MStorage storage) {
         try {
             QiNiuFileEntity qnConfig = JSONUtil.toBean(storage.getStorageConfig(), QiNiuFileEntity.class);
             Auth auth = Auth.create(qnConfig.getAccessKey(), qnConfig.getSecretKey());
@@ -202,7 +194,7 @@ public class QiNiuFileHandler implements FileHandler {
             //基础路径 = 租户ID
             String basePath = SafetyUtil.getLoginUserTenantIdThrowException(String.class);
             //根据文件来源，获取相对路径
-            String fileSourcePath = fileManager.getPathByFileSource(fileSource);
+            String fileSourcePath = fileManager.getPathByFileSource(file.getFileSource());
             //目标文件名
             String toKey = basePath + "/" + fileSourcePath + file.getNewFileName();
             //移动文件
@@ -212,12 +204,8 @@ public class QiNiuFileHandler implements FileHandler {
                 return false;
             }
             //修改文件信息
-            file.setFileSource(fileSource);
             file.setFilePath(basePath + "/" + fileSourcePath);
             file.setFileUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + toKey));
-            file.setStatus(status);
-            file.setUpdateId(userId);
-            file.setUpdateTime(LocalDateTime.now());
             //如果有缩略图，需要将缩略图移动
             if (StrUtil.isNotBlank(file.getFileThFilename())) {
                 //源文件名
@@ -233,8 +221,7 @@ public class QiNiuFileHandler implements FileHandler {
                     return false;
                 }
             }
-            //更新文件信息
-            fileMapper.updateByQuery(file, QueryWrapper.create().eq(MFile::getFileId, fileId));
+            return true;
         } catch (QiniuException ex) {
             log.error("移动文件失败，错误码：{}，错误信息：{}", ex.code(), ex.response.toString());
             log.error("移动文件失败：", ex);

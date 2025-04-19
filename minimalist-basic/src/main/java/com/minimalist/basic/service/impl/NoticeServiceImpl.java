@@ -6,7 +6,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.minimalist.basic.entity.enums.RespEnum;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
+import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.enums.NoticeEnum;
 import com.minimalist.basic.entity.po.MFile;
@@ -16,6 +17,7 @@ import com.minimalist.basic.entity.vo.notice.NoticeQueryVO;
 import com.minimalist.basic.entity.vo.notice.NoticeVO;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MNoticeMapper;
+import com.minimalist.basic.service.FileService;
 import com.minimalist.basic.service.NoticeService;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
@@ -23,16 +25,16 @@ import com.minimalist.basic.config.mybatis.bo.PageReq;
 import com.minimalist.basic.utils.TextUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class NoticeServiceImpl implements NoticeService {
 
@@ -42,12 +44,15 @@ public class NoticeServiceImpl implements NoticeService {
     @Autowired
     private MFileMapper fileMapper;
 
+    @Autowired
+    private FileService fileService;
+
     /**
      * 添加公告
      * @param noticeVO 公告信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional(rollbackFor = Exception.class)
     public void addNotice(NoticeVO noticeVO) {
         MNotice mNotice = BeanUtil.copyProperties(noticeVO, MNotice.class);
         //公告ID
@@ -61,13 +66,12 @@ public class NoticeServiceImpl implements NoticeService {
             //不延期 -> 发布时间置为当前时间
             mNotice.setPublishTime(LocalDateTime.now());
         }
+        //公告相关文件处理
+        String fileIds = addNoticeFileHandler(noticeVO);
+        mNotice.setNoticePicFileId(fileIds);
         //内容处理 -> 编码
         mNotice.setNoticeContent(TextUtil.encode(noticeVO.getNoticeContent()));
-        //插入
-        int insertCount = noticeMapper.insert(mNotice, true);
-        Assert.isTrue(insertCount > 0, () -> new BusinessException(RespEnum.FAILED.getDesc()));
-        //公告相关文件处理
-        fileStatusHandler(null, noticeVO, StatusEnum.STATUS_1.getCode());
+        noticeMapper.insert(mNotice, true);
     }
 
     /**
@@ -75,13 +79,13 @@ public class NoticeServiceImpl implements NoticeService {
      * @param noticeId 公告ID
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional(rollbackFor = Exception.class)
     public void deleteNoticeByNoticeId(Long noticeId) {
         //查询公告
         MNotice mNotice = noticeMapper.selectNoticeByNoticeId(noticeId);
         Assert.notNull(mNotice, () -> new BusinessException(NoticeEnum.ErrorMsg.NONENTITY_NOTICE.getDesc()));
         //公告相关文件处理
-        fileStatusHandler(null, BeanUtil.copyProperties(mNotice, NoticeVO.class), StatusEnum.STATUS_0.getCode());
+        deleteNoticeFileHandler(mNotice);
         //删除公告
         noticeMapper.deleteNoticeByNoticeId(noticeId);
     }
@@ -91,7 +95,7 @@ public class NoticeServiceImpl implements NoticeService {
      * @param noticeVO 公告信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional(rollbackFor = Exception.class)
     public void updateNoticeByNoticeId(NoticeVO noticeVO) {
         //查询公告
         MNotice mNotice = noticeMapper.selectNoticeByNoticeId(noticeVO.getNoticeId());
@@ -104,12 +108,13 @@ public class NoticeServiceImpl implements NoticeService {
         } else {
             //不延期 -> 不处理，不修改发布时间
         }
+        //公告相关文件处理
+        String fileIds = updateNoticeFileHandler(mNotice, noticeVO);
+        newNotice.setNoticePicFileId(fileIds);
         //内容处理 -> 编码
         newNotice.setNoticeContent(TextUtil.encode(noticeVO.getNoticeContent()));
         //修改
         noticeMapper.updateNoticeByNoticeId(newNotice);
-        //公告相关文件处理
-        fileStatusHandler(mNotice, BeanUtil.copyProperties(newNotice, NoticeVO.class), null);
     }
 
     /**
@@ -195,62 +200,106 @@ public class NoticeServiceImpl implements NoticeService {
     }
 
     /**
-     * 修改公告相关的文件信息
-     * @param oldNotice 公告信息(旧)
-     * @param newNotice 公告信息(新)
-     * @param fileStatus 文件状态
+     * 新增公告时文件的处理
+     * @param newNotice 新增的公告信息
+     * @return 封面图文件ID
      */
-    private void fileStatusHandler(MNotice oldNotice, NoticeVO newNotice, Integer fileStatus) {
-        //公告插入、删除的文件处理
-        if (ObjectUtil.isNull(oldNotice)) {
-            //处理公告封面图片和富文本中的图片
-            if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
-                //图片文件ID
-                List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(newNotice.getNoticePicFileId());
-                if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
-                    //将公告封面图片的状态置为已使用
-                    fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, fileStatus, null);
+    private String addNoticeFileHandler(NoticeVO newNotice) {
+        //处理富文本中的图片 - 从富文本内容中提取文件名
+        Set<String> fileUrls = TextUtil.extractFileUrl(newNotice.getNoticeContent());
+        for (String fileUrl : fileUrls) {
+            //从url中提取文件名
+            String cleanUrl = StrUtil.subBefore(fileUrl, "?", true);
+            String fileName = StrUtil.subAfter(cleanUrl, "/", true);
+            //根据文件名查询文件
+            MFile file = fileMapper.selectOneByQuery(QueryWrapper.create().eq(MFile::getNewFileName, fileName));
+            //未查询到文件，跳过
+            if (ObjectUtil.isNull(file)) {
+                log.warn("公告文件处理，从富文本内容中提取文件名，未查询到文件，文件名：{}", fileName);
+                continue;
+            }
+            //已指定文件来源-将状态修改为启用
+            if (ObjectUtil.isNotNull(file.getFileSource()) && file.getFileSource() != -1) {
+                MFile mFile = new MFile();
+                mFile.setFileId(file.getFileId());
+                mFile.setStatus(StatusEnum.STATUS_1.getCode());
+                fileMapper.updateByQuery(mFile, QueryWrapper.create().eq(MFile::getFileId, file.getFileId()));
+                continue;
+            }
+            //移动文件到对应的目录 - 并将文件状态置为已使用
+            MFile newFile = fileService.moveFile(file.getFileId(), FileEnum.FileSource.NOTICE_CONTENT_IMG.getCode(), StatusEnum.STATUS_1.getCode());
+            //将新的url替换富文本内容中的旧url
+            String replace = StrUtil.replace(newNotice.getNoticeContent(), fileUrl, newFile.getFileUrl());
+            newNotice.setNoticeContent(replace);
+        }
+        StringJoiner fileIds = new StringJoiner(",");
+        //处理公告封面图片
+        if (CollectionUtil.isNotEmpty(newNotice.getNoticePicFile())) {
+            for (FileVO fileVO : newNotice.getNoticePicFile()) {
+                //已指定文件来源-将状态修改为启用
+                if (ObjectUtil.isNotNull(fileVO.getFileSource()) && fileVO.getFileSource() != -1) {
+                    MFile mFile = new MFile();
+                    mFile.setFileId(fileVO.getFileId());
+                    mFile.setStatus(StatusEnum.STATUS_1.getCode());
+                    fileMapper.updateByQuery(mFile, QueryWrapper.create().eq(MFile::getFileId, fileVO.getFileId()));
+                    //文件ID，逗号分隔
+                    fileIds.add(fileVO.getFileId().toString());
+                    continue;
                 }
+                //移动文件到对应的目录 - 并将文件状态置为已使用
+                MFile newFile = fileService.moveFile(fileVO.getFileId(), FileEnum.FileSource.NOTICE_COVER_IMG.getCode(), StatusEnum.STATUS_1.getCode());
+                //文件ID，逗号分隔
+                fileIds.add(fileVO.getFileId().toString());
             }
-            //处理富文本编辑器中的图片，富文本内容解码
-            String decodeOldContent = TextUtil.decode(newNotice.getNoticeContent());
-            List<String> imgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
-            if (CollectionUtil.isNotEmpty(imgUrlList)) {
-                //将富文本中的图片的状态置为已使用
-                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), imgUrlList, fileStatus);
-            }
-        } else {
-            //旧公告所使用的封面图
-            if (StrUtil.isNotBlank(oldNotice.getNoticePicFileId())) {
-                List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(oldNotice.getNoticePicFileId());
-                if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
-                    //将旧公告封面图的状态置为未使用
-                    fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, StatusEnum.STATUS_0.getCode(), null);
-                }
-            }
-            //旧公告富文本中的图片
-            String decodeOldContent = TextUtil.decode(oldNotice.getNoticeContent());
-            List<String> oldContentImgUrlList = TextUtil.getImgUrlByRichText(decodeOldContent);
-            //将旧公告富文本中的图片状态置为未使用
-            if (CollectionUtil.isNotEmpty(oldContentImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), oldContentImgUrlList, StatusEnum.STATUS_0.getCode());
-            }
-            //新公告封面图片文件ID
-            if (StrUtil.isNotBlank(newNotice.getNoticePicFileId())) {
-                List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(newNotice.getNoticePicFileId());
-                if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
-                    //将新公告封面图的状态置为已使用
-                    fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, StatusEnum.STATUS_1.getCode(), null);
-                }
-            }
-            //新公告富文本中的图片
-            String decodeNewContent = TextUtil.decode(newNotice.getNoticeContent());
-            List<String> newContentImgUrlList = TextUtil.getImgUrlByRichText(decodeNewContent);
-            //将新公告富文本中的图片状态置为已使用
-            if (CollectionUtil.isNotEmpty(newContentImgUrlList)) {
-                fileMapper.updateStatusByFileUrl(StpUtil.getLoginIdAsLong(), newContentImgUrlList, StatusEnum.STATUS_1.getCode());
+            //图片文件ID，逗号分隔
+            newNotice.setNoticePicFileId(fileIds.toString());
+        }
+        return fileIds.toString();
+    }
+
+    /**
+     * 删除公告时文件的处理
+     * @param notice 删除的公告信息
+     */
+    private void deleteNoticeFileHandler(MNotice notice) {
+        //将公告封面图的状态置为未使用
+        if (StrUtil.isNotBlank(notice.getNoticePicFileId())) {
+            List<Long> noticePicFileIdList = TextUtil.splitAndListStrToListLong(notice.getNoticePicFileId());
+            if (CollectionUtil.isNotEmpty(noticePicFileIdList)) {
+                fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), noticePicFileIdList, StatusEnum.STATUS_0.getCode(), null);
             }
         }
+        //处理富文本中的图片 - 从富文本内容中提取文件名
+        Set<String> fileUrls = TextUtil.extractFileUrl(notice.getNoticeContent());
+        //文件ID列表
+        List<Long> fileIds = CollectionUtil.list(false);
+        for (String fileUrl : fileUrls) {
+            //从url中提取文件名
+            String cleanUrl = StrUtil.subBefore(fileUrl, "?", true);
+            String fileName = StrUtil.subAfter(cleanUrl, "/", true);
+            //根据文件名查询文件
+            MFile file = fileMapper.selectOneByQuery(QueryWrapper.create().eq(MFile::getNewFileName, fileName));
+            //未查询到文件，跳过
+            if (ObjectUtil.isNull(file)) {
+                log.warn("公告文件处理，从富文本内容中提取文件名，未查询到文件，文件名：{}", fileName);
+                continue;
+            }
+            fileIds.add(file.getFileId());
+        }
+        //将公告内容中的文件状态置为未使用
+        fileMapper.updateFileStatusByFileIds(StpUtil.getLoginIdAsLong(), fileIds, StatusEnum.STATUS_0.getCode(), null);
+    }
+
+    /**
+     * 修改公告时文件的处理
+     * @param oldNotice 修改前的公告信息
+     * @param newNotice 修改后的公告信息
+     */
+    private String updateNoticeFileHandler(MNotice oldNotice, NoticeVO newNotice) {
+        //删除原公告相关的文件
+        deleteNoticeFileHandler(oldNotice);
+        //新增新公告相关的文件
+        return addNoticeFileHandler(newNotice);
     }
 
 }

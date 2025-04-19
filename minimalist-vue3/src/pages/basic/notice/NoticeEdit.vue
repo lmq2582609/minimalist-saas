@@ -43,8 +43,45 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.commonNumberStatus]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[100%]" field="noticePicFileId" label="公告封面图">
-                    <upload-file :file-list="noticePicList" :file-source="fileSource.notice_cover_img.key" :accept="fileAccept.img" :multiple="true" :list-type="fileListType.pictureCard" :limit="5" ref="uploadRef" />
+                <a-form-item class="w-[100%]" field="noticePicFile" label="公告封面图">
+                    <!-- 图片列表容器 -->
+                    <div class="image-grid">
+                        <!-- 图片项 -->
+                        <div v-for="(img, index) in form.noticePicFile" :key="index" class="image-item" v-if="form.noticePicFile.length > 0">
+                            <!-- 图片 -->
+                            <img :src="img.fileThUrl" :alt="img.fileName" class="image-content"  />
+
+                            <div class="action-buttons">
+                                <a-space>
+                                    <!-- 预览 -->
+                                    <div class="icon-btn" @click="img.visible = true">
+                                        <span><icon-zoom-in /></span>
+                                        <a-image-preview :src="img.fileUrl" v-model:visible="img.visible" />
+                                    </div>
+                                    <!-- 删除 -->
+                                    <a-popconfirm content="确认要删除吗?" @ok="deleteNoticePic(index)">
+                                        <div class="icon-btn">
+                                            <span><icon-delete /></span>
+                                        </div>
+                                    </a-popconfirm>
+                                </a-space>
+                            </div>
+                        </div>
+
+                        <!-- 上传按钮 -->
+                        <div class="upload-item" @click="noticePicSelectVisible = true" v-if="form.noticePicFile.length < 3">
+                            <div class="upload-btn">
+                                <div class="upload-content">
+                                    <icon-plus class="upload-icon" />
+                                    <span>上传</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 封面图选择 -->
+                    <a-modal v-model:visible="noticePicSelectVisible" width="60%" title="选择封面图" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
+                        <file-select @ok="noticePicSelectOk" @cancel="noticePicSelectCancel" :file-type="fileType.image.key" :limit="10" v-if="noticePicSelectVisible" />
+                    </a-modal>
                 </a-form-item>
                 <a-form-item class="w-[100%]" field="noticeContent" label="公告内容" required>
                     <tinymce-editor :editorHeight="450" :file-source="fileSource.notice_content_img.key" ref="editorRef" />
@@ -69,8 +106,8 @@ import { ref, reactive, getCurrentInstance, watch } from 'vue'
 import { addNoticeApi, updateNoticeByNoticeIdApi, getNoticeByNoticeIdApi } from "~/api/notice.js";
 import { getDeptListApi } from "~/api/dept.js";
 import TinymceEditor from '~/components/tinymceEditor/index.vue'
-import UploadFile from '~/components/uploadFile/index.vue'
-import { fileSource, fileAccept, fileListType } from "~/utils/sys.js";
+import {fileSource, fileType} from "~/utils/sys.js";
+import FileSelect from "~/pages/basic/file/FileSelect.vue";
 
 //全局实例
 const {proxy} = getCurrentInstance()
@@ -99,8 +136,8 @@ const form = reactive({
     noticeType: null,
     //系统公告内容
     noticeContent: null,
-    //公告封面图
-    noticePicFileId: null,
+    //公告封面图文件
+    noticePicFile: [],
     //是否置顶 -> 默认否
     noticeTop: proxy.yesNo.no.key,
     //延期发布时间
@@ -126,14 +163,55 @@ const rules = {
     publishAuthorId: [{required: true, message: '发布人不能为空', trigger: 'submit'}],
     status: [{required: true, message: '系统公告状态不能为空', trigger: 'submit'}]
 }
+
+
+/************************ 封面图开始 ***************************/
+//封面图选择
+const noticePicSelectVisible = ref(false)
+//封面图选择 - 确定
+const noticePicSelectOk = (selectedFiles) => {
+    //未选择 - 跳过
+    if (!selectedFiles || selectedFiles.length <= 0) {
+        return;
+    }
+    //检查不能超过3张
+    if (form.noticePicFile.length + selectedFiles.length > 3) {
+        proxy.$msg.error('封面图最多选择3张，请检查')
+        return;
+    }
+
+    //满足条件，将选择的图片与之前选择的图片合并
+    const existingIds = new Set(form.noticePicFile.map(item => item.fileId))
+    //合并非重复项
+    selectedFiles.forEach(item => {
+        if (!existingIds.has(item.fileId)) {
+            form.noticePicFile.push(item)
+            //更新集合以避免后续重复
+            existingIds.add(item.fileId)
+        }
+    })
+
+    //隐藏模态框
+    noticePicSelectVisible.value = false
+}
+//封面图选择 - 取消
+const noticePicSelectCancel = () => {
+    noticePicSelectVisible.value = false
+}
+//封面图选择 - 删除
+const deleteNoticePic = (index) => {
+    //从已选列表中剔除
+    form.noticePicFile.splice(index, 1)
+}
+/************************ 封面图结束 ***************************/
+
+
 //编辑器ref
 const editorRef = ref(null)
 //封面上传uploadRef
 const uploadRef = ref(null)
 //确定 -> 点击
 const okBtnClick = () => {
-    //公告封面图
-    form.noticePicFileId = uploadRef.value.getUploadFileId()
     //获取富文本数据
     form.noticeContent = editorRef.value.getEditorContent()
     //表单验证
@@ -165,12 +243,11 @@ const okBtnClick = () => {
 const cancelBtnClick = () => {
     emits('cancel')
 }
-//封面图列表
-const noticePicList = ref([])
 //加载公告详细信息
 const loadNoticeInfo = (noticeId) => {
     spinLoading.value = true
     getNoticeByNoticeIdApi(noticeId).then(res => {
+        console.info('res ', res)
         //数据赋值
         if (res) {
             for (let key in res) {
@@ -180,17 +257,6 @@ const loadNoticeInfo = (noticeId) => {
             }
             //富文本内容
             editorRef.value.setEditorContent(res.noticeContent)
-            //封面图回显
-            if (res.noticePicFile && res.noticePicFile.length > 0) {
-                let noticePicFile = res.noticePicFile
-                for (let i = 0; i < noticePicFile.length; i++) {
-                    let file = noticePicFile[i]
-                    noticePicList.value.push({
-                        url: file.fileUrl,
-                        response: file
-                    })
-                }
-            }
         }
     }).finally(() => {
         spinLoading.value = false

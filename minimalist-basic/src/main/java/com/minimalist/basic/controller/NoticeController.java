@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.NotNull;
+import net.dreamlu.mica.xss.core.XssCleanIgnore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +27,7 @@ public class NoticeController {
     @Autowired
     private NoticeService noticeService;
 
+    @XssCleanIgnore
     @PostMapping("/addNotice")
     @SaCheckPermission("basic:notice:add")
     @Operation(summary = "添加公告")
@@ -44,6 +46,7 @@ public class NoticeController {
         return ResponseEntity.ok().build();
     }
 
+    @XssCleanIgnore
     @PutMapping("/updateNoticeByNoticeId")
     @SaCheckPermission("basic:notice:update")
     @Operation(summary = "修改公告 -> 根据公告ID修改")
