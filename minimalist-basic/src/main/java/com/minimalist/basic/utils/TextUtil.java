@@ -1,15 +1,16 @@
 package com.minimalist.basic.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.hutool.core.util.ReUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HtmlUtil;
-
+import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
+@Slf4j
 public class TextUtil {
 
     /** <img src="" /> 数据 */
@@ -87,6 +88,29 @@ public class TextUtil {
             urls.add(url);
         }
         return urls;
+    }
+
+    /**
+     * url格式化，去除多个 /
+     * @param url url
+     * @return 格式化后的url
+     */
+    public static String urlNormalize(String url) {
+        try {
+            URI uri = new URI(url);
+            String normalizedPath = uri.getPath().replaceAll("/+", "/");
+            URI formattedUri = new URI(
+                    uri.getScheme(),
+                    uri.getAuthority(),
+                    new URI(normalizedPath).normalize().getPath(), // 标准化路径
+                    uri.getQuery(),
+                    uri.getFragment()
+            );
+            return formattedUri.toString();
+        } catch (URISyntaxException e) {
+            log.warn("格式化url失败：", e);
+        }
+        return url;
     }
 
 }

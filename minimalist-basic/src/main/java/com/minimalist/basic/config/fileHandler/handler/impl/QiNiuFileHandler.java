@@ -1,10 +1,8 @@
 package com.minimalist.basic.config.fileHandler.handler.impl;
 
 import cn.hutool.core.io.file.FileNameUtil;
-import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.core.util.URLUtil;
 import cn.hutool.json.JSONUtil;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
@@ -17,11 +15,7 @@ import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.po.MStorage;
 import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
-import com.minimalist.basic.utils.CommonConstant;
-import com.minimalist.basic.utils.SafetyUtil;
-import com.minimalist.basic.utils.UnqIdUtil;
-import com.minimalist.basic.utils.ValidateUtil;
-import com.mybatisflex.core.query.QueryWrapper;
+import com.minimalist.basic.utils.*;
 import com.qiniu.common.QiniuException;
 import com.qiniu.http.Response;
 import com.qiniu.storage.BucketManager;
@@ -36,7 +30,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayOutputStream;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -100,7 +93,7 @@ public class QiNiuFileHandler implements FileHandler {
         fileInfo.setFileBasePath(basePath);
         String fileKey = basePath + "/" + fileSourcePath + newFileName;
         fileInfo.setFilePath(basePath + "/" + fileSourcePath);
-        fileInfo.setFileUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + fileKey));
+        fileInfo.setFileUrl(TextUtil.urlNormalize(qnConfig.getEndPoint() + "/" + fileKey));
         fileInfo.setFileSource(fileSource);
         fileInfo.setStorageId(storage.getStorageId());
         //如果未指定文件来源，将状态置为正常
@@ -190,7 +183,7 @@ public class QiNiuFileHandler implements FileHandler {
             Configuration cfg = new Configuration(Region.createWithRegionId(qnConfig.getRegionId()));
             BucketManager bucketManager = new BucketManager(auth, cfg);
             //源文件名
-            String fromKey = file.getFilePath() + "/" + file.getNewFileName();
+            String fromKey = file.getFilePath() + file.getNewFileName();
             //基础路径 = 租户ID
             String basePath = SafetyUtil.getLoginUserTenantIdThrowException(String.class);
             //根据文件来源，获取相对路径
@@ -205,17 +198,17 @@ public class QiNiuFileHandler implements FileHandler {
             }
             //修改文件信息
             file.setFilePath(basePath + "/" + fileSourcePath);
-            file.setFileUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + toKey));
+            file.setFileUrl(TextUtil.urlNormalize(qnConfig.getEndPoint() + "/" + toKey));
             //如果有缩略图，需要将缩略图移动
             if (StrUtil.isNotBlank(file.getFileThFilename())) {
                 //源文件名
-                String fromKeyTh = file.getFilePath() + "/" + file.getFileThFilename();
+                String fromKeyTh = file.getFilePath() + file.getFileThFilename();
                 //目标文件名
                 String toKeyTh = basePath + "/" + fileSourcePath + file.getFileThFilename();
                 //移动文件
                 Response responseTh = bucketManager.move(qnConfig.getBucketName(), fromKeyTh, qnConfig.getBucketName(), toKeyTh);
                 //修改缩略图url
-                file.setFileThUrl(URLUtil.normalize(qnConfig.getEndPoint() + "/" + toKeyTh));
+                file.setFileThUrl(TextUtil.urlNormalize(qnConfig.getEndPoint() + "/" + toKeyTh));
                 if (!responseTh.isOK()) {
                     log.warn("移动文件失败：{}", JSONUtil.toJsonStr(responseTh));
                     return false;
