@@ -3,7 +3,6 @@ package com.minimalist.basic.service;
 import com.minimalist.basic.entity.po.MFile;
 import com.minimalist.basic.entity.vo.file.*;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
-
 import java.util.List;
 
 public interface FileService {
@@ -34,10 +33,9 @@ public interface FileService {
      * 后端处理时可以将文件从common目录移动到对应业务的目录中
      * @param fileId 文件ID
      * @param fileSource 文件来源
-     * @param status 文件状态
-     * @return 是否移动成功
+     * @return 移动后的文件
      */
-    MFile moveFile(Long fileId, Integer fileSource, Integer status);
+    MFile moveFile(Long fileId, Integer fileSource);
 
     /**
      * 查询文件列表(分页)
@@ -45,5 +43,23 @@ public interface FileService {
      * @return 文件分页数据
      */
     PageResp<FileVO> getPageFileList(FileQueryVO queryVO);
+
+    /**
+     * 移动文件
+     * 用于将前端传递的多个FileVO文件移动，并更新文件信息，已指定fileSource的只更新文件状态
+     * @param files 文件信息
+     * @param fileSource 文件来源
+     * @return 文件ID，逗号分隔
+     */
+    String moveFile(List<FileVO> files, Integer fileSource);
+
+    /**
+     * 移动文件
+     * 用于根据文件url将文件移动，并更新文件信息，已指定fileSource的只更新文件状态
+     * @param fileUrl 文件url
+     * @param fileSource 文件来源
+     * @return 移动后的文件
+     */
+    MFile moveFile(String fileUrl, Integer fileSource);
 
 }

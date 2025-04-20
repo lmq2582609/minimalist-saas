@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.fileHandler.FileManager;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
@@ -27,9 +28,9 @@ import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.StringJoiner;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -111,19 +112,17 @@ public class FileServiceImpl implements FileService {
      * 后端处理时可以将文件从common目录移动到对应业务的目录中
      * @param fileId     文件ID
      * @param fileSource 文件来源
-     * @param status     文件状态
-     * @return 是否移动成功
+     * @return 移动后的文件
      */
     @Override
-    public MFile moveFile(Long fileId, Integer fileSource, Integer status) {
+    public MFile moveFile(Long fileId, Integer fileSource) {
         //查询文件
         MFile file = fileMapper.selectFileByFileId(fileId);
         Assert.notNull(file, () -> new BusinessException(FileEnum.ErrorMsg.NONENTITY_FILE.getDesc()));
         MStorage storage = getStorage(file.getStorageId());
-        //设置文件来源 - 在文件选择中上传没有文件来源，所以这里要设置
+        //设置文件来源 - 在文件选择组件中上传的文件没有文件来源，所以这里要设置
         file.setFileSource(fileSource);
         //修改文件信息
-        file.setStatus(status);
         file.setUpdateId(StpUtil.getLoginIdAsLong());
         file.setUpdateTime(LocalDateTime.now());
         //移动文件
@@ -145,6 +144,60 @@ public class FileServiceImpl implements FileService {
         //数据转换
         List<FileVO> fileVOList = BeanUtil.copyToList(filePage.getRecords(), FileVO.class);
         return new PageResp<>(fileVOList, filePage.getTotalRow());
+    }
+
+    /**
+     * 移动文件
+     * 用于将前端传递的多个FileVO文件移动，并更新文件信息，已指定fileSource的只更新文件状态
+     * @param files 文件信息
+     * @param fileSource 文件来源
+     * @return 文件ID，逗号分隔
+     */
+    @Override
+    public String moveFile(List<FileVO> files, Integer fileSource) {
+        StringJoiner fileIds = new StringJoiner(",");
+        //处理公告封面图片
+        if (CollectionUtil.isNotEmpty(files)) {
+            for (FileVO fileVO : files) {
+                //已指定文件来源 - 跳过
+                if (ObjectUtil.isNotNull(fileVO.getFileSource()) && fileVO.getFileSource() != -1) {
+                    //文件ID，逗号分隔
+                    fileIds.add(fileVO.getFileId().toString());
+                    continue;
+                }
+                //移动文件到对应的目录
+                MFile newFile = moveFile(fileVO.getFileId(), fileSource);
+                //文件ID，逗号分隔
+                fileIds.add(fileVO.getFileId().toString());
+            }
+        }
+        return fileIds.toString();
+    }
+
+    /**
+     * 移动文件
+     * 用于根据文件url将文件移动，并更新文件信息，已指定fileSource的只更新文件状态
+     * @param fileUrl    文件url
+     * @param fileSource 文件来源
+     * @return 移动后的文件
+     */
+    @Override
+    public MFile moveFile(String fileUrl, Integer fileSource) {
+        //从url中提取文件名
+        String cleanUrl = StrUtil.subBefore(fileUrl, "?", true);
+        String fileName = StrUtil.subAfter(cleanUrl, "/", true);
+        //根据文件名查询文件
+        MFile file = fileMapper.selectOneByQuery(QueryWrapper.create().eq(MFile::getNewFileName, fileName));
+        //未查询到文件，跳过
+        if (ObjectUtil.isNull(file)) {
+            return null;
+        }
+        //已指定文件来源 - 跳过
+        if (ObjectUtil.isNotNull(file.getFileSource()) && file.getFileSource() != -1) {
+            return null;
+        }
+        //移动文件到对应的目录
+        return moveFile(file.getFileId(), fileSource);
     }
 
     /**
