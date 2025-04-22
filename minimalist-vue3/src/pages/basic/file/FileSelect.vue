@@ -82,7 +82,7 @@
 <script setup>
 import {getCurrentInstance, reactive, ref, watch} from "vue";
 import {getPageFileListApi, uploadFileApi} from "~/api/file.js";
-import {status, fileType, fileAccept} from "~/utils/sys.js";
+import {status, fileType, fileAccept, videoTypeHandler} from "~/utils/sys.js";
 
 //全局实例
 const {proxy} = getCurrentInstance()
@@ -224,12 +224,6 @@ const customUploadFile = (option) => {
     }).finally(() => {
         spinLoading.value = false
     })
-}
-
-//视频类型处理
-const videoTypeHandler = (url) => {
-    let type = url.split('.').pop().toLowerCase()
-    return `video/${type}`
 }
 
 //监听参数变化

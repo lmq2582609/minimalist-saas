@@ -94,6 +94,16 @@ export const randomCode = (length) => {
 }
 
 /**
+ * 视频类型处理
+ * @param url 视频url
+ * @returns {`video/${string}`}
+ */
+export const videoTypeHandler = (url) => {
+    let type = url.split('.').pop().toLowerCase()
+    return `video/${type}`
+}
+
+/**
  * 检查权限，不止按照权限标识检查，若 userIdArr 中任意数据与当前登录用户一致，则放行
  * 场景举例：假设有一个项目管理系统，有一个产品需求列表，有很多行数据，
  * 当某一行数据的产品经理 = 当前登录的用户时，才显示修改和删除按钮，其余数据隐藏按钮
