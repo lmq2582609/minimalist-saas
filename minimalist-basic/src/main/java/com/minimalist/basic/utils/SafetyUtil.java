@@ -1,5 +1,6 @@
 package com.minimalist.basic.utils;
 
+import cn.dev33.satoken.session.SaSession;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
@@ -33,9 +34,13 @@ public class SafetyUtil {
      * @return 租户ID
      */
     public static long getLoginUserTenantId() {
-        return Optional.ofNullable(StpUtil.getSession().getString(TenantIgnore.TENANT_ID))
-                .map(Long::valueOf)
-                .orElse(-1L);
+        try {
+            return Optional.ofNullable(StpUtil.getSession().getString(TenantIgnore.TENANT_ID))
+                    .map(Long::valueOf)
+                    .orElse(-1L);
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
     /**
@@ -62,9 +67,13 @@ public class SafetyUtil {
      * @return cookie中的租户ID
      */
     public static Long getCookieTenantId() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        Cookie cookie = JakartaServletUtil.getCookie(request, TenantIgnore.TENANT_ID);
-        return Optional.ofNullable(cookie).map(Cookie::getValue).filter(StrUtil::isNotBlank).map(Long::valueOf).orElse(null);
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            Cookie cookie = JakartaServletUtil.getCookie(request, TenantIgnore.TENANT_ID);
+            return Optional.ofNullable(cookie).map(Cookie::getValue).filter(StrUtil::isNotBlank).map(Long::valueOf).orElse(null);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /**
@@ -85,11 +94,15 @@ public class SafetyUtil {
      * @return 租户ID
      */
     public static long getTenantIdByHeader() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String tenantId = JakartaServletUtil.getHeader(request, TenantIgnore.TENANT_ID, StandardCharsets.UTF_8);
-        return Optional.ofNullable(tenantId)
-                .map(Long::valueOf)
-                .orElse(-1L);
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String tenantId = JakartaServletUtil.getHeader(request, TenantIgnore.TENANT_ID, StandardCharsets.UTF_8);
+            return Optional.ofNullable(tenantId)
+                    .map(Long::valueOf)
+                    .orElse(-1L);
+        } catch (Exception e) {
+            return -1;
+        }
     }
 
 }
