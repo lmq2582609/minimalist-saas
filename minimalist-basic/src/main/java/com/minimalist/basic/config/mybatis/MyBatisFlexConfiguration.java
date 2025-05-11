@@ -35,6 +35,8 @@ public class MyBatisFlexConfiguration {
                     return null;
                 }
             }
+
+            //项目中后台管理端是将token存储在cookie中
             //如果是系统租户，并且cookie中携带其他租户ID参数，表示查询其他租户数据
             if (SafetyUtil.checkIsSystemTenant()) {
                 Long cookieTenantId = SafetyUtil.getCookieTenantId();
@@ -43,8 +45,16 @@ public class MyBatisFlexConfiguration {
                     return new Object[]{ cookieTenantId };
                 }
             }
-            //返回当前登陆人的租户ID
-            return new Object[]{ SafetyUtil.getLoginUserTenantId() };
+            //当前登陆人的租户ID
+            long loginUserTenantId = SafetyUtil.getLoginUserTenantId();
+            if (loginUserTenantId != -1) {
+                //返回当前登陆人的租户ID
+                return new Object[]{ loginUserTenantId };
+            }
+
+            //项目中其他端，可能将租户ID存储在header中
+            long tenantId = SafetyUtil.getTenantIdByHeader();
+            return new Object[]{ tenantId };
         });
 
     }

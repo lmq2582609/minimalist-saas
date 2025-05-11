@@ -4,12 +4,15 @@ import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.JakartaServletUtil;
+import cn.hutool.extra.servlet.ServletUtil;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.tenant.TenantIgnore;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 /**
@@ -75,6 +78,18 @@ public class SafetyUtil {
             return cookieTenantId;
         }
         return getLoginUserTenantId();
+    }
+
+    /**
+     * 从header中获取租户ID
+     * @return 租户ID
+     */
+    public static long getTenantIdByHeader() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String tenantId = JakartaServletUtil.getHeader(request, TenantIgnore.TENANT_ID, StandardCharsets.UTF_8);
+        return Optional.ofNullable(tenantId)
+                .map(Long::valueOf)
+                .orElse(-1L);
     }
 
 }
