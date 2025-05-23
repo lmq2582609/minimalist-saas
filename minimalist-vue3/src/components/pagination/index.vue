@@ -1,6 +1,7 @@
 <template>
     <a-pagination show-total show-jumper show-page-size
-            :total="total" size="medium"
+            :total="total" :size="size"
+            :page-size-options="pageSizeOptions"
             v-model:current="current"
             v-model:page-size="limit"
             @change="handleCurrentChange"
@@ -27,6 +28,16 @@ const props = defineProps({
         type: Number,
         default: 10
     },
+    //数据条数选择器的选项列表
+    pageSizeOptions: {
+        type: Array,
+        default: () => [10, 20, 30, 40, 50]
+    },
+    //分页选择器的大小
+    size: {
+        type: String,
+        default: 'medium'
+    }
 })
 const emits = defineEmits(['update:pageNum', 'update:pageSize', 'pagination'])
 //计算属性 -> 当前页
