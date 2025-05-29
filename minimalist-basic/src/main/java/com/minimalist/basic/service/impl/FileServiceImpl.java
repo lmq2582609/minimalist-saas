@@ -142,7 +142,16 @@ public class FileServiceImpl implements FileService {
     public PageResp<FileVO> getPageFileList(FileQueryVO queryVO) {
         Page<MFile> filePage = fileMapper.selectPageFileList(queryVO);
         //数据转换
-        List<FileVO> fileVOList = BeanUtil.copyToList(filePage.getRecords(), FileVO.class);
+        List<FileVO> fileVOList = CollectionUtil.list(false);
+        for (MFile record : filePage.getRecords()) {
+            FileVO fileVO = BeanUtil.copyProperties(record, FileVO.class);
+            //文件类型后缀
+            if (StrUtil.isNotBlank(fileVO.getFileType())) {
+                String ft = StrUtil.subAfter(fileVO.getFileType(), "/", true);
+                fileVO.setFileTypeSuffix(ft);
+            }
+            fileVOList.add(fileVO);
+        }
         return new PageResp<>(fileVOList, filePage.getTotalRow());
     }
 

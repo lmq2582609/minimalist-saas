@@ -20,7 +20,8 @@
             <!-- 文件数据 -->
             <a-row class="w-full flex flex-1 flex-col pl-3 overflow-x-auto overflow-y-hidden">
 
-                <a-space class="w-full flex justify-between mb-3">
+                <!-- 文件名称搜索 -->
+                <a-space class="w-full flex justify-between mb-3 file-search-container">
                     <a-upload :action="uploadFileUrl" multiple with-credentials
                               :accept="accept"
                               :custom-request="customUploadFile" :show-file-list="false" />
@@ -33,20 +34,17 @@
                         <div class="image-item" v-for="file in datatable.records">
                             <div class="image-wrapper">
                                 <!-- 图片 -->
-                                <img :src="file.fileUrl" alt="" @click="selectFileBtnClick(file)" v-if="fileType.image.key === searchForm.fileType">
+                                <img :src="file.fileThUrl" alt="" @click="selectFileBtnClick(file)" v-if="fileAccept.img.includes(file.fileTypeSuffix)">
                                 <!-- 视频 -->
-                                <video controls muted @click.stop.prevent="selectFileBtnClick(file)" v-else-if="fileType.video.key === searchForm.fileType">
-                                    <source :src="file.fileUrl" :type="videoTypeHandler(file.fileUrl)" />
-                                    您的浏览器不支持视频播放
-                                </video>
+                                <div class="w-[100%] h-[100%] file-video" :id="file.fileId" @click.stop="selectFileBtnClick(file)" v-else-if="fileAccept.video.includes(file.fileTypeSuffix)"></div>
                                 <!-- 其他文件 -->
-                                <img class="p-5" src="../../../assets/default-file-icon.png" alt="" @click="selectFileBtnClick(file)" v-else>
+                                <img class="p-8" src="../../../assets/default-file-icon.png" @click="selectFileBtnClick(file)" alt="" v-else>
 
                                 <!-- 选中效果 -->
                                 <div class="flex items-center justify-center" v-if="checkSelect(file) >= 0"
                                      :class="checkSelect(file) >= 0 ? 'select-file-active' : ''"
                                      @click="selectFileBtnClick(file)">
-                                    <icon-check class="text-7xl" style="color: var(--color-text-4)" />
+                                    <icon-check class="text-6xl" style="color: var(--color-text-4)" />
                                 </div>
                             </div>
                             <a-tooltip :content="file.fileName">
@@ -80,9 +78,11 @@
     </a-spin>
 </template>
 <script setup>
-import {getCurrentInstance, reactive, ref, watch} from "vue";
+import {getCurrentInstance, nextTick, reactive, ref, watch} from "vue";
 import {getPageFileListApi, uploadFileApi} from "~/api/file.js";
 import {status, fileType, fileAccept, videoTypeHandler} from "~/utils/sys.js";
+import Player from 'xgplayer';
+import 'xgplayer/dist/index.min.css';
 
 //全局实例
 const {proxy} = getCurrentInstance()
@@ -118,7 +118,7 @@ const searchForm = reactive({
     //页码
     pageNum: 1,
     //条数
-    pageSize: 20
+    pageSize: 10
 })
 //数据列表
 const datatable = reactive({
@@ -140,6 +140,10 @@ const getPageList = () => {
     getPageFileListApi(searchForm).then(res => {
         datatable.records = res.records
         datatable.total = res.total
+        //渲染视频 - 需在dom加载后渲染
+        nextTick(() => {
+            renderVideo(datatable.records)
+        })
     }).finally(() => {
         spinLoading.value = false
     })
@@ -226,6 +230,32 @@ const customUploadFile = (option) => {
     })
 }
 
+//渲染视频
+const renderVideoCache = ref([])
+const renderVideo = (data) => {
+    //渲染前销毁
+    for (const player of renderVideoCache.value) {
+        player.destroy()
+    }
+    renderVideoCache.value = []
+    //渲染视频
+    for (const file of data) {
+        if (fileAccept.video.includes(file.fileTypeSuffix)) {
+            let player = new Player({
+                id: file.fileId,
+                url: file.fileUrl,
+                height: '100%',
+                width: '100%',
+                //关闭双击播放器进入全屏
+                closeVideoDblclick: true,
+                //关闭单击播放器区域切换播放/暂停
+                closeVideoClick: true
+            })
+            renderVideoCache.value.push(player)
+        }
+    }
+}
+
 //监听参数变化
 watch(() => props.fileType, (newVal, oldVal) => {
     //文件类型
@@ -260,7 +290,7 @@ watch(() => props.fileType, (newVal, oldVal) => {
 /* 图片容器 */
 .image-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 15px;
     height: 100%; /* 继承父容器高度 */
     overflow-y: auto; /* 纵向滚动条 */
@@ -294,7 +324,7 @@ watch(() => props.fileType, (newVal, oldVal) => {
     display: block;
     padding-top: 100%;
 }
-.image-container img,video {
+.image-wrapper img,.file-video {
     position: absolute;
     top: 0;
     left: 0;
@@ -306,11 +336,11 @@ watch(() => props.fileType, (newVal, oldVal) => {
     transition: transform 0.3s ease;
 }
 /* 可选悬停动画 */
-.image-container img:hover {
+.image-wrapper img:hover {
     cursor: pointer;
 }
 /* 可选悬停动画 */
-.image-container video:hover {
+.image-wrapper .file-video:hover {
     cursor: pointer;
 }
 .image-title {
@@ -333,6 +363,9 @@ watch(() => props.fileType, (newVal, oldVal) => {
     }
     .image-title {
         font-size: 12px;
+    }
+    .file-search-container {
+        display: none;
     }
 }
 /* 点击选中文件 */
