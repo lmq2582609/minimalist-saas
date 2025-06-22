@@ -129,7 +129,7 @@
         </div>
 
         <!-- 文件选择组件演示 -->
-        <a-modal v-model:visible="modal.visible" width="60%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
+        <a-modal v-model:visible="modal.visible" width="70%" :esc-to-close="false" :mask-closable="false" draggable :footer="false">
             <template #title>{{ modal.title }}</template>
             <file-select :file-type="modal.fileType" :limit="modal.limit" @ok="onOk" @cancel="onCancel" v-if="modal.visible" />
         </a-modal>
@@ -138,10 +138,10 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, shallowRef} from 'vue'
+import {ref, reactive, getCurrentInstance, shallowRef, onMounted} from 'vue'
 import { getPageFileListApi, deleteFileApi } from "~/api/file.js";
 import FileSelect from "~/pages/basic/file/FileSelect.vue";
-import {fileType} from "~/utils/sys.js";
+
 
 /********************** 文件选择组件演示 **********************/
 const modal = reactive({
@@ -167,7 +167,7 @@ const onCancel = () => {
 //点击选择
 const selectFileBtnClick = (() => {
     modal.visible = true
-    modal.fileType = fileType.image.key
+    //modal.fileType = fileType.image.key
 })
 /********************** 文件选择组件演示结束 **********************/
 

@@ -34,6 +34,9 @@ public class FileVO implements Serializable {
     @Schema(name = "fileType", description = "文件类型", type = "string")
     private String fileType;
 
+    @Schema(name = "fileType", description = "文件类型后缀", type = "string")
+    private String fileTypeSuffix;
+
     @Schema(name = "fileUrl", description = "文件URL", type = "string")
     private String fileUrl;
 
