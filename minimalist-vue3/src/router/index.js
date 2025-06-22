@@ -37,6 +37,13 @@ const router = createRouter({
     routes: commonRoutes
 })
 
+//从路径中自动提取组件名
+const getComponentNameFromPath = (path) => {
+    // 匹配最后一个 / 后的内容，并去掉 .vue 扩展名
+    const match = path.match(/\/([^/.]+)\.vue$/)
+    return match ? match[1] : null
+}
+
 /**
  * 动态添加路由
  * @param menus 菜单
@@ -62,7 +69,7 @@ function dynamicAddRoutes(menus) {
                         //向外层路由中添加子路由
                         router.addRoute('Container', {
                             path: e.permPath,
-                            meta: {title: e.permName},
+                            meta: {title: e.permName, name: getComponentNameFromPath(e.component)},
                             component: comp
                         })
                         hasNewRouter = true

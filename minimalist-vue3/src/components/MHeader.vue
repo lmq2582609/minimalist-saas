@@ -141,6 +141,8 @@ const skipLink = (url) => {
 }
 //租户切换
 const tenantId = ref()
+//租户切换父组件函数
+const emits = defineEmits(['tenantChange'])
 const tenantChange = () => {
     if (!tenantId.value) {
         //清除cookie
@@ -152,6 +154,8 @@ const tenantChange = () => {
         //多存储一个base64数据，是因为Long类型cookie.get后会丢失精度，所以get时获取base64的数据后再解码拿到tenantId
         cookie.set(TENANT_ID_BASE64, btoa(tenantId.value))
     }
+    //调用父组件租户切换处理
+    emits('tenantChange')
 }
 onMounted(() => {
     //初始化时，如果cookie中有tenantId，则回显

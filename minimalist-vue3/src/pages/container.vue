@@ -2,7 +2,7 @@
     <a-layout class="w-[100%] h-[100%]">
         <!-- 头部header -->
         <a-layout-header class="m-header">
-            <m-header />
+            <m-header @tenant-change="tenantChange" />
         </a-layout-header>
         <a-layout>
             <!-- 左侧菜单 -->
@@ -19,12 +19,12 @@
             </a-layout-sider>
             <a-layout-content class="m-content" :style="{left: siderWidth + 'px'}">
                 <!-- tab页 -->
-                <PageTabList />
+                <PageTabList ref="pageTabListRef" />
                 <!-- 主体内容，通过router动态变换 -->
                 <router-view v-slot="{ Component }">
                     <!-- transition动画效果，使用transition 每个页面必须只有1个根节点 -->
                     <transition name="fade">
-                        <keep-alive :max="10">
+                        <keep-alive :include="sysStore.includePage">
                             <component :is="Component"></component>
                         </keep-alive>
                     </transition>
@@ -40,10 +40,28 @@ import MHeader from "../components/MHeader.vue";
 import PageTabList from "../components/PageTabList.vue"
 import { storeToRefs } from 'pinia'
 import { useSysStore } from '~/store/module/sys-store.js'
+import {inject, ref} from "vue";
 //缓存
 const sysStore = useSysStore()
 //响应式数据：siderCollapsed: sider是否展开，siderWidth: sider宽度
 const { siderCollapsed, siderWidth } = storeToRefs(sysStore)
+
+//tabListRef
+const pageTabListRef = ref()
+//App.vue提供的reload方法
+const reload = inject('reload')
+//租户切换
+const tenantChange = () => {
+    //关闭所有tab页
+    pageTabListRef.value.tabDropdownSelect('clearAll')
+    //刷新主页 - 调用App.vue提供的reload
+    setTimeout(() => {
+        //清除页面缓存
+        sysStore.includePage = []
+        //重新加载
+        reload()
+    }, 500)
+}
 </script>
 <style scoped>
 .m-header {

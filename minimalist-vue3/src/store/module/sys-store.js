@@ -21,6 +21,8 @@ export const useSysStore = defineStore('sysStore', {
         siderMaxWidth: 200,
         //sider缩起时的宽度
         siderMinWidth: 48,
+        //缓存的页面 - 首页index默认被缓存
+        includePage: ['index']
     }),
     actions: {
         //修改用户头像
