@@ -124,7 +124,7 @@ public class QiNiuFileHandler implements FileHandler {
                 String thumbnailsFileKey = basePath + "/" + fileSourcePath + thFileName;
                 Response thumbnailsResponse = uploadManager.put(fileByte, thumbnailsFileKey, upToken, params, null, false);
                 if (thumbnailsResponse.isOK()) {
-                    fileInfo.setFileThUrl(qnConfig.getEndPoint() + thumbnailsFileKey);
+                    fileInfo.setFileThUrl(qnConfig.getEndPoint() + "/" + thumbnailsFileKey);
                     fileInfo.setFileThFilename(thFileName);
                     fileInfo.setFileThSize((long) fileByte.length);
                 } else {

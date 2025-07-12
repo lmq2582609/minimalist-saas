@@ -11,7 +11,7 @@
             </a-form-item>
         </a-row>
         <a-row justify="space-between" v-if="proxy.operationType.update.type === optType">
-            <a-form-item class="w-[49%]" field="endPoint" label="域名" tooltip="访问文件的域名，如：http://file.baidu.com">
+            <a-form-item class="w-[49%]" field="endPoint" label="域名" tooltip="访问文件的域名，末尾不要带斜杠。比如：http://file.baidu.com">
                 <a-input v-model="form.endPoint" placeholder="endPoint" />
             </a-form-item>
             <a-form-item class="w-[49%]" field="bucketName" label="桶名称">
