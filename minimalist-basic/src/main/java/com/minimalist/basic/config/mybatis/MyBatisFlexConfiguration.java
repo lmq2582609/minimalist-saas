@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
 import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.SafetyUtil;
+import com.minimalist.basic.utils.TenantUtil;
 import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.tenant.TenantManager;
 import org.slf4j.Logger;
@@ -26,14 +27,9 @@ public class MyBatisFlexConfiguration {
         //获取租户ID，目前支持返回一个租户ID
         TenantManager.setTenantFactory(() -> {
             //校验系统多租户是否开启
-            ConfigVO configVO = CommonConstant.systemConfigMap.get(CommonConstant.SYSTEM_CONFIG_TENANT);
-            if (ObjectUtil.isNotNull(configVO)) {
-                Boolean tenantOnOff = Boolean.valueOf(configVO.getConfigValue());
-                //忽略多租户
-                if (Boolean.FALSE.equals(tenantOnOff)) {
-                    //未打开，忽略多租户
-                    return null;
-                }
+            if (!TenantUtil.checkTenantOnOff()) {
+                //未打开，忽略多租户
+                return null;
             }
 
             //项目中后台管理端是将token存储在cookie中

@@ -1,7 +1,9 @@
 package com.minimalist.basic.config.tenant;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.util.ObjectUtil;
 import com.minimalist.basic.entity.enums.StatusEnum;
+import com.minimalist.basic.entity.po.MConfig;
 import com.minimalist.basic.entity.po.MStorage;
 import com.minimalist.basic.entity.po.MTenant;
 import com.minimalist.basic.entity.po.MTenantDatasource;
@@ -9,6 +11,7 @@ import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.manager.TenantManager;
+import com.minimalist.basic.mapper.MConfigMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.mapper.MTenantDatasourceMapper;
 import com.minimalist.basic.mapper.MTenantMapper;
@@ -38,8 +41,21 @@ public class TenantInit implements ApplicationRunner {
     @Autowired
     private MStorageMapper storageMapper;
 
+    @Autowired
+    private MConfigMapper configMapper;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        //查询系统多租户开关
+        MConfig mConfig = configMapper.selectConfigByConfigKey(CommonConstant.SYSTEM_CONFIG_TENANT, StatusEnum.STATUS_1.getCode());
+        if (ObjectUtil.isNotNull(mConfig)) {
+            boolean tenantOnOff = Boolean.parseBoolean(mConfig.getConfigValue());
+            if (!tenantOnOff) {
+                //未打开多租户开关，忽略多租户
+                return;
+            }
+        }
+
         List<MTenant> mTenants = tenantMapper.selectListByQuery(QueryWrapper.create()
                 .eq(MTenant::getStatus, StatusEnum.STATUS_1.getCode()));
         //租户数据库隔离数据源
