@@ -7,7 +7,7 @@
         <div class="flex items-center">
             <a-space>
                 <!-- 租户切换，管理员才能切换 -->
-                <a-select v-model="tenantId" placeholder="租户切换" class="min-w-[18em]" allow-clear @change="tenantChange">
+                <a-select v-model="tenantId" placeholder="租户切换" class="min-w-[18em]" allow-clear @change="tenantChange" v-role="['system_admin']">
                     <template v-for="(d, index) in dicts[proxy.DICT.tenantList]" :key="index">
                         <!-- 将系统租户隐藏，因为默认就是系统租户 -->
                         <a-option  :value="d.dictKey" :label="d.dictValue" v-if="d.dictKey !== 0" />
@@ -77,7 +77,7 @@ import { useFullscreen } from '@vueuse/core'
 import { logoutApi } from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
 import { useCookies } from '@vueuse/integrations/useCookies'
-import {TENANT_ID, TENANT_ID_BASE64} from "~/utils/cookie.js";
+import {CHANGE_TENANT_ID, CHANGE_TENANT_ID_BASE64} from "~/utils/cookie.js";
 import {Modal} from "@arco-design/web-vue";
 //cookie
 const cookie = useCookies()
@@ -146,20 +146,20 @@ const emits = defineEmits(['tenantChange'])
 const tenantChange = () => {
     if (!tenantId.value) {
         //清除cookie
-        cookie.remove(TENANT_ID)
-        cookie.remove(TENANT_ID_BASE64)
+        cookie.remove(CHANGE_TENANT_ID)
+        cookie.remove(CHANGE_TENANT_ID_BASE64)
     } else {
         //设置cookie
-        cookie.set(TENANT_ID, tenantId.value)
+        cookie.set(CHANGE_TENANT_ID, tenantId.value)
         //多存储一个base64数据，是因为Long类型cookie.get后会丢失精度，所以get时获取base64的数据后再解码拿到tenantId
-        cookie.set(TENANT_ID_BASE64, btoa(tenantId.value))
+        cookie.set(CHANGE_TENANT_ID_BASE64, btoa(tenantId.value))
     }
     //调用父组件租户切换处理
     emits('tenantChange')
 }
 onMounted(() => {
     //初始化时，如果cookie中有tenantId，则回显
-    let tid = cookie.get(TENANT_ID_BASE64)
+    let tid = cookie.get(CHANGE_TENANT_ID_BASE64)
     if (tid) {
         tenantId.value = atob(tid)
     }

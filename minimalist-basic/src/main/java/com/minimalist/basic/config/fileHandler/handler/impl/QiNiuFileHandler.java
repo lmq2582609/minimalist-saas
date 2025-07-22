@@ -89,7 +89,7 @@ public class QiNiuFileHandler implements FileHandler {
         fileInfo.setFileSize(multipartFile.getSize());
         fileInfo.setFileType(multipartFile.getContentType());
         //基础路径 = 租户ID
-        String basePath = SafetyUtil.getLoginUserTenantIdThrowException(String.class);
+        String basePath =  String.valueOf(TenantUtil.getTenantId());
         fileInfo.setFileBasePath(basePath);
         String fileKey = basePath + "/" + fileSourcePath + newFileName;
         fileInfo.setFilePath(basePath + "/" + fileSourcePath);
@@ -185,7 +185,7 @@ public class QiNiuFileHandler implements FileHandler {
             //源文件名
             String fromKey = file.getFilePath() + file.getNewFileName();
             //基础路径 = 租户ID
-            String basePath = SafetyUtil.getLoginUserTenantIdThrowException(String.class);
+            String basePath = String.valueOf(TenantUtil.getTenantId());
             //根据文件来源，获取相对路径
             String fileSourcePath = fileManager.getPathByFileSource(file.getFileSource());
             //目标文件名

@@ -38,10 +38,7 @@ import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.config.tenant.TenantIgnore;
-import com.minimalist.basic.utils.CommonConstant;
-import com.minimalist.basic.utils.RedisKeyConstant;
-import com.minimalist.basic.utils.SafetyUtil;
-import com.minimalist.basic.utils.UnqIdUtil;
+import com.minimalist.basic.utils.*;
 import com.mybatisflex.core.paginate.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,7 +108,7 @@ public class UserServiceImpl implements UserService {
                 userManager.checkUserEmailUniqueness(userVO.getEmail(), null)
         );
         //校验租户的套餐是否满足条件
-        tenantManager.checkTenantPackage(SafetyUtil.getOperationTenantId());
+        tenantManager.checkTenantPackage(TenantUtil.getTenantId());
         //新增用户数据
         MUser user = BeanUtil.copyProperties(userVO, MUser.class);
         long userId = UnqIdUtil.uniqueId();
@@ -159,7 +156,7 @@ public class UserServiceImpl implements UserService {
                 userManager.checkUserEmailUniqueness(userVO.getEmail(), userVO.getUserId())
         );
         //校验该租户套餐是否满足条件
-        tenantManager.checkTenantPackage(SafetyUtil.getOperationTenantId());
+        tenantManager.checkTenantPackage(TenantUtil.getTenantId());
         //查询用户信息
         MUser oldUser = userMapper.selectUserByUserId(userVO.getUserId());
         //修改用户信息

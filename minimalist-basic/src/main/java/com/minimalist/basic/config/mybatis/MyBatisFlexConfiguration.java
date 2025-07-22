@@ -1,9 +1,5 @@
 package com.minimalist.basic.config.mybatis;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.minimalist.basic.entity.vo.config.ConfigVO;
-import com.minimalist.basic.utils.CommonConstant;
-import com.minimalist.basic.utils.SafetyUtil;
 import com.minimalist.basic.utils.TenantUtil;
 import com.mybatisflex.core.audit.AuditManager;
 import com.mybatisflex.core.tenant.TenantManager;
@@ -32,25 +28,8 @@ public class MyBatisFlexConfiguration {
                 return null;
             }
 
-            //项目中后台管理端是将token存储在cookie中
-            //如果是系统租户，并且cookie中携带其他租户ID参数，表示查询其他租户数据
-            if (SafetyUtil.checkIsSystemTenant()) {
-                Long cookieTenantId = SafetyUtil.getCookieTenantId();
-                if (ObjectUtil.isNotNull(cookieTenantId)) {
-                    //返回cookie中的租户ID
-                    return new Object[]{ cookieTenantId };
-                }
-            }
-            //当前登陆人的租户ID
-            long loginUserTenantId = SafetyUtil.getLoginUserTenantId();
-            if (loginUserTenantId != -1) {
-                //返回当前登陆人的租户ID
-                return new Object[]{ loginUserTenantId };
-            }
-
-            //项目中其他端，可能将租户ID存储在header中
-            long tenantId = SafetyUtil.getTenantIdByHeader();
-            return new Object[]{ tenantId };
+            //放回当前要操作的租户ID
+            return new Object[]{ TenantUtil.getTenantId() };
         });
 
     }

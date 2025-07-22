@@ -10,12 +10,10 @@ import com.minimalist.basic.service.EDictService;
 import com.minimalist.basic.config.eDict.EDict;
 import com.minimalist.basic.config.eDict.EDictConstant;
 import com.minimalist.basic.utils.CommonConstant;
-import com.minimalist.basic.utils.SafetyUtil;
+import com.minimalist.basic.utils.TenantUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -186,7 +184,7 @@ public class EDictServiceImpl implements EDictService {
         DictCacheVO dictCacheVO = new DictCacheVO();
         dictCacheVO.setDictType(EDictConstant.STORAGE_LIST);
         //系统租户，查询全部存储
-        if (SafetyUtil.checkIsSystemTenant()) {
+        if (TenantUtil.checkIsSystemTenant()) {
             List<MStorage> mStorages = storageMapper.selectListByQuery(QueryWrapper.create()
                     .eq(MStorage::getStatus, StatusEnum.STATUS_1.getCode()));
             List<DictCacheVO.DictKV> dictKVList = mStorages.stream()
@@ -200,7 +198,7 @@ public class EDictServiceImpl implements EDictService {
             dictCacheVO.setDictList(dictKVList);
         } else {
             //普通租户，查询租户自己的存储
-            TenantVO tenantVO = CommonConstant.tenantMap.get(SafetyUtil.getLoginUserTenantId());
+            TenantVO tenantVO = CommonConstant.tenantMap.get(TenantUtil.getTenantId());
             MStorage storage = storageMapper.selectStorageByStorageId(tenantVO.getStorageId());
             List<DictCacheVO.DictKV> dictKVList = CollectionUtil.list(false);
             DictCacheVO.DictKV dictKV = new DictCacheVO.DictKV();

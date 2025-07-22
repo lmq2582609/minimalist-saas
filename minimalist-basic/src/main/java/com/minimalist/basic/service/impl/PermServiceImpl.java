@@ -13,7 +13,7 @@ import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.PermService;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.utils.CommonConstant;
-import com.minimalist.basic.utils.SafetyUtil;
+import com.minimalist.basic.utils.TenantUtil;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -135,7 +135,8 @@ public class PermServiceImpl implements PermService {
      */
     @Override
     public List<PermVO> getTenantEnablePermList() {
-        Long tenantId = SafetyUtil.getOperationTenantId();
+        //获取要操作的租户ID
+        long tenantId = TenantUtil.getTenantId();
         //如果是系统租户，查询全部
         if (CommonConstant.ZERO == tenantId) {
             return getEnablePermList();

@@ -21,7 +21,7 @@ import com.minimalist.basic.mapper.MFileMapper;
 import com.minimalist.basic.mapper.MStorageMapper;
 import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.service.FileService;
-import com.minimalist.basic.utils.SafetyUtil;
+import com.minimalist.basic.utils.TenantUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
@@ -219,7 +219,7 @@ public class FileServiceImpl implements FileService {
             return storageMapper.selectStorageByStorageId(storageId);
         }
         //未指定存储，根据租户ID获取
-        MTenant tenant = tenantMapper.selectTenantByTenantId(SafetyUtil.getLoginUserTenantId());
+        MTenant tenant = tenantMapper.selectTenantByTenantId(TenantUtil.getTenantId());
         Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.QUERY_NULL_TENANT.getDesc()));
         return storageMapper.selectStorageByStorageId(tenant.getStorageId());
     }

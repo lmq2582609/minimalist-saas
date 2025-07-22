@@ -2,10 +2,10 @@ import { useCookies } from '@vueuse/integrations/useCookies'
 
 const cookie = useCookies()
 
-//租户ID 字符串格式
-export const TENANT_ID = 'tenant_id'
-//租户ID base64格式
-export const TENANT_ID_BASE64 = 'tenant_id_base64'
+//租户切换的租户ID 字符串格式
+export const CHANGE_TENANT_ID = 'change_tenant_id'
+//租户切换的租户ID base64格式
+export const CHANGE_TENANT_ID_BASE64 = 'change_tenant_id_base64'
 //标签页
 export const PAGE_TAB_LIST = 'pageTabList'
 //token

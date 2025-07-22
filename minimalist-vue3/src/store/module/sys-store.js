@@ -3,7 +3,7 @@
  */
 import { defineStore } from 'pinia'
 import { useCookies } from '@vueuse/integrations/useCookies'
-import {Authentication, PAGE_TAB_LIST, TENANT_ID, TENANT_ID_BASE64} from "~/utils/cookie.js";
+import {Authentication, PAGE_TAB_LIST, CHANGE_TENANT_ID, CHANGE_TENANT_ID_BASE64} from "~/utils/cookie.js";
 
 //命名最好以 `use` 开头且以 `Store` 结尾，(比如 `useUserStore`，`useCartStore`，`useProductStore`)
 //"sysStore" -> 第一个参数是应用中 Store 的唯一ID
@@ -35,10 +35,10 @@ export const useSysStore = defineStore('sysStore', {
             let cookie = useCookies()
             //清空请求头
             cookie.remove(Authentication)
-            //清空租户ID
-            cookie.remove(TENANT_ID)
-            //清空租户ID
-            cookie.remove(TENANT_ID_BASE64)
+            //清空租户切换的租户ID
+            cookie.remove(CHANGE_TENANT_ID)
+            //清空租户切换的租户ID
+            cookie.remove(CHANGE_TENANT_ID_BASE64)
             //清空标签页
             cookie.remove(PAGE_TAB_LIST)
             //清除当前用户状态

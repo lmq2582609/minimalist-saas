@@ -14,13 +14,10 @@ import com.minimalist.basic.mapper.MTenantMapper;
 import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.config.exception.BusinessException;
-import com.minimalist.basic.utils.CommonConstant;
-import com.minimalist.basic.utils.SafetyUtil;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import javax.sql.DataSource;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -81,26 +78,6 @@ public class TenantManager {
         //如果租户到期时间 < 当天，返回负，说明已到期
         long exHours = duration.toHours();
         Assert.isFalse(exHours <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.EX_TENANT.getDesc()));
-    }
-
-    /**
-     * 检查两个用户的租户ID是否匹配
-     * @param optUserId 操作的用户ID
-     * @param loginUserId 当前登陆人用户ID
-     */
-    public MUser checkTenantEqual(long optUserId, long loginUserId) {
-        MUser optUser = userMapper.selectUserByUserId(optUserId);
-        Assert.notNull(optUser, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_OPT_ACCOUNT.getDesc()));
-        //管理员则跳过校验
-        if (CommonConstant.ZERO == SafetyUtil.getLoginUserTenantId()) {
-            return optUser;
-        }
-        //检查租户ID，要删除的用户的租户必须与本次操作人的租户一致
-        MUser loginUser = userMapper.selectUserByUserId(loginUserId);
-        Assert.notNull(loginUser, () -> new BusinessException(UserEnum.ErrorMsg.AUTH_EXPIRED.getDesc()));
-        Assert.isTrue(optUser.getTenantId().equals(loginUser.getTenantId()),
-                () -> new BusinessException(RespEnum.NO_OPERATION_PERMISSION.getDesc()));
-        return optUser;
     }
 
     public void updateTenantPermission(List<MRole> roleList, Long packageId) {
