@@ -73,11 +73,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByUserId(userId));
     }
 
-    @TenantIgnore
+    //@TenantIgnore
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息(登录后获取，含角色、权限、菜单、部门等)")
     public ResponseEntity<UserInfoVO> getUserInfo() {
-        return ResponseEntity.ok(userService.getUserInfo(StpUtil.getLoginIdAsLong()));
+        return ResponseEntity.ok(userService.getUserInfo());
     }
 
     @SaIgnore

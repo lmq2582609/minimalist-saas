@@ -40,7 +40,10 @@ import MHeader from "../components/MHeader.vue";
 import PageTabList from "../components/PageTabList.vue"
 import { storeToRefs } from 'pinia'
 import { useSysStore } from '~/store/module/sys-store.js'
-import {inject, ref} from "vue";
+import {getCurrentInstance, inject, ref} from "vue";
+
+//全局实例
+const {proxy} = getCurrentInstance()
 //缓存
 const sysStore = useSysStore()
 //响应式数据：siderCollapsed: sider是否展开，siderWidth: sider宽度
@@ -50,17 +53,35 @@ const { siderCollapsed, siderWidth } = storeToRefs(sysStore)
 const pageTabListRef = ref()
 //App.vue提供的reload方法
 const reload = inject('reload')
+//刷新倒计时
+const reloadCountDown = ref(5)
 //租户切换
 const tenantChange = () => {
+    //消息提示
+    reloadCountDown.value = 5
+    proxy.$msg.error(`注意：正在为您切换到该租户的管理员身份，${reloadCountDown.value} 秒后将刷新页面`)
+    reloadCountDown.value--
     //关闭所有tab页
     pageTabListRef.value.tabDropdownSelect('clearAll')
-    //刷新主页 - 调用App.vue提供的reload
-    setTimeout(() => {
-        //清除页面缓存
-        sysStore.includePage = []
-        //重新加载
-        reload()
-    }, 500)
+    //清除页面缓存
+    sysStore.includePage = []
+
+    //倒计时刷新页面
+    const timer = setInterval(() => {
+        proxy.$msg.error(`注意：正在为您切换到该租户的管理员身份，${reloadCountDown.value} 秒后将刷新页面`)
+        reloadCountDown.value--
+        //倒计时 = 0，刷新页面
+        if (reloadCountDown.value <= 0) {
+            clearInterval(timer)
+            // 延迟1秒后执行
+            setTimeout(() => {
+                //重新加载
+                //reload()
+                //重新刷新页面
+                location.reload()
+            }, 1000)
+        }
+    }, 1000)
 }
 </script>
 <style scoped>

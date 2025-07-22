@@ -43,10 +43,9 @@ public interface UserService {
 
     /**
      * 获取用户信息
-     * @param userId 用户ID
      * @return 用户VO
      */
-    UserInfoVO getUserInfo(Long userId);
+    UserInfoVO getUserInfo();
 
     /**
      * 获取图形验证码
