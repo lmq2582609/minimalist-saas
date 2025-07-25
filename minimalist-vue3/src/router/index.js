@@ -1,10 +1,8 @@
 import {createRouter, createWebHashHistory} from "vue-router";
-import { useCookies } from '@vueuse/integrations/useCookies'
-import {getToken} from "~/utils/cookie";
+import {CHANGE_TENANT_ALLOW, getToken, setCookie} from "~/utils/cookie";
 import Container from '~/pages/container.vue'
 import Index from '~/pages/index.vue'
 import UserSetting from '~/pages/basic/user/UserSetting.vue'
-import Msg from '~/utils/msg';
 import {getUserInfoApi} from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
 //页面加载条
@@ -141,6 +139,15 @@ router.beforeEach(async (to, from, next) => {
             useStore.hasGetUserinfo = true
             //渲染动态路由
             hasNewRouter = dynamicAddRoutes(useStore.user.menus)
+            //此处将校验是否允许进行租户切换操作
+            //目前是系统管理员角色允许操作，可以自定义调整
+            //在MHeader.vue中租户切换功能配合v-if="getCookie(CHANGE_TENANT_ALLOW)"来实现是否显示
+            //退出登录后，该cookie会被清除
+            let roles = res.roles || []
+            if (roles.includes('system_admin')) {
+                //允许操作租户切换
+                setCookie(CHANGE_TENANT_ALLOW, true)
+            }
         }).catch(res => {
             //401 认证失败，重新登录
             if (res.response.status === 401) {

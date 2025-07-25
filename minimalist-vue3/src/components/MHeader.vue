@@ -6,13 +6,15 @@
         </div>
         <div class="flex items-center">
             <a-space>
-                <!-- 租户切换，管理员才能切换 -->
-                <a-select v-model="tenantId" placeholder="租户切换" class="min-w-[18em]" allow-clear @change="tenantChange" v-role="['system_admin']">
-                    <template v-for="(d, index) in dicts[proxy.DICT.tenantList]" :key="index">
-                        <!-- 将系统租户隐藏，因为默认就是系统租户 -->
-                        <a-option  :value="d.dictKey" :label="d.dictValue" v-if="d.dictKey !== 0" />
-                    </template>
-                </a-select>
+                <!-- 租户切换 -->
+                <template v-if="getCookie(CHANGE_TENANT_ALLOW)">
+                    <a-select v-model="tenantId" placeholder="租户切换" class="min-w-[18em]" allow-clear @change="tenantChange">
+                        <template v-for="(d, index) in dicts[proxy.DICT.tenantList]" :key="index">
+                            <!-- 将系统租户隐藏，因为默认就是系统租户 -->
+                            <a-option  :value="d.dictKey" :label="d.dictValue" v-if="d.dictKey !== 0" />
+                        </template>
+                    </a-select>
+                </template>
                 <!-- 全屏 -->
                 <a-button shape="circle" size="small" @click="toggle">
                     <template #icon>
@@ -77,7 +79,7 @@ import { useFullscreen } from '@vueuse/core'
 import { logoutApi } from "~/api/user.js";
 import { useSysStore } from '~/store/module/sys-store.js'
 import { useCookies } from '@vueuse/integrations/useCookies'
-import {CHANGE_TENANT_ID, CHANGE_TENANT_ID_BASE64} from "~/utils/cookie.js";
+import {CHANGE_TENANT_ALLOW, CHANGE_TENANT_ID, CHANGE_TENANT_ID_BASE64, getCookie} from "~/utils/cookie.js";
 import {Modal} from "@arco-design/web-vue";
 //cookie
 const cookie = useCookies()
