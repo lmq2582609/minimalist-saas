@@ -196,8 +196,7 @@ public class QiNiuFileHandler implements FileHandler {
                 log.warn("移动文件失败：{}", JSONUtil.toJsonStr(response));
                 return false;
             }
-            //修改文件信息
-            file.setFilePath(basePath + "/" + fileSourcePath);
+            //修改文件url
             file.setFileUrl(TextUtil.urlNormalize(qnConfig.getEndPoint() + "/" + toKey));
             //如果有缩略图，需要将缩略图移动
             if (StrUtil.isNotBlank(file.getFileThFilename())) {
@@ -214,6 +213,8 @@ public class QiNiuFileHandler implements FileHandler {
                     return false;
                 }
             }
+            //修改文件路径
+            file.setFilePath(basePath + "/" + fileSourcePath);
             return true;
         } catch (QiniuException ex) {
             log.error("移动文件失败，错误码：{}，错误信息：{}", ex.code(), ex.response.toString());
