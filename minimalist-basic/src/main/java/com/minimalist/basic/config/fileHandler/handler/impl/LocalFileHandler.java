@@ -179,6 +179,8 @@ public class LocalFileHandler implements FileHandler {
         Path targetPath = Paths.get(FileUtil.normalize(storagePath + "/" + fileSourcePath + "/" + file.getNewFileName()));
         try {
             FileUtil.move(sourcePath, targetPath, true);
+            //修改文件url
+            file.setFileUrl(url + fileSourcePath + file.getNewFileName());
             //如果有缩略图，需要将缩略图移动
             if (StrUtil.isNotBlank(file.getFileThFilename())) {
                 //源文件路径
@@ -187,11 +189,11 @@ public class LocalFileHandler implements FileHandler {
                 Path targetPathTh = Paths.get(FileUtil.normalize(storagePath + "/" + fileSourcePath + "/" + file.getFileThFilename()));
                 //移动缩略图
                 FileUtil.move(sourcePathTh, targetPathTh, true);
+                //修改缩略图url
                 file.setFileThUrl(url + fileSourcePath + file.getFileThFilename());
             }
-            //文件信息
+            //修改文件路径
             file.setFilePath(FileUtil.normalize(storagePath + "/" + fileSourcePath));
-            file.setFileUrl(url + fileSourcePath + file.getNewFileName());
             return true;
         } catch (Exception e) {
             log.warn("移动文件，异常：", e);

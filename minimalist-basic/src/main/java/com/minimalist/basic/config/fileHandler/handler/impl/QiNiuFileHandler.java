@@ -206,12 +206,12 @@ public class QiNiuFileHandler implements FileHandler {
                 String toKeyTh = basePath + "/" + fileSourcePath + file.getFileThFilename();
                 //移动文件
                 Response responseTh = bucketManager.move(qnConfig.getBucketName(), fromKeyTh, qnConfig.getBucketName(), toKeyTh, true);
-                //修改缩略图url
-                file.setFileThUrl(TextUtil.urlNormalize(qnConfig.getEndPoint() + "/" + toKeyTh));
                 if (!responseTh.isOK()) {
                     log.warn("移动文件失败：{}", JSONUtil.toJsonStr(responseTh));
                     return false;
                 }
+                //修改缩略图url
+                file.setFileThUrl(TextUtil.urlNormalize(qnConfig.getEndPoint() + "/" + toKeyTh));
             }
             //修改文件路径
             file.setFilePath(basePath + "/" + fileSourcePath);
