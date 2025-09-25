@@ -216,8 +216,8 @@ public class UserServiceImpl implements UserService {
     public UserInfoVO getUserInfo() {
         //获取当前登陆人的userId
         Long userId = StpUtil.getLoginIdAsLong();
-        //如果多租户开启 && 当前登陆人是系统租户
-        if (TenantUtil.checkTenantOnOff() && TenantUtil.checkIsSystemTenant()) {
+        //如果多租户开启 && 当前登陆人是系统租户 && 要查询其他租户数据
+        if (TenantUtil.checkTenantOnOff() && TenantUtil.checkIsSystemTenant() && TenantUtil.checkQueryTenantData()) {
             //获取当前操作的租户信息，可能涉及租户切换
             TenantVO tenantVO = CommonConstant.tenantMap.get(TenantUtil.getTenantId());
             if (ObjectUtil.isNull(tenantVO)) {

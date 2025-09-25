@@ -73,6 +73,16 @@ public class TenantUtil {
     }
 
     /**
+     * 检查是否要查询其他租户数据
+     * 前端在租户切换后，会将切换的租户ID放到cookie中
+     * @return true是，false否
+     */
+    public static boolean checkQueryTenantData() {
+        return TenantUtil.getCookieChangeTenantId() != null;
+    }
+
+
+    /**
      * 检查是否为系统租户，系统租户ID = 0
      * @return 是/否
      */
