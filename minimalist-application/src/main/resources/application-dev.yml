@@ -26,9 +26,6 @@ springdoc:
         - group: '1.全部'
           paths-to-match: '/**'
           packages-to-scan: com.minimalist
-        - group: '2.common公共模块'
-          paths-to-match: '/common/**'
-          packages-to-scan: com.minimalist.common
         - group: '3.basic基础模块'
           paths-to-match: '/basic/**'
           packages-to-scan: com.minimalist.basic
@@ -97,17 +94,6 @@ spring:
                     max-idle: 10
                     # 连接池中的最小空闲连接
                     min-idle: 0
-    # 文件存储配置 更多配置请访问：http://spring-file-storage.xuyanwu.cn
-    file-storage:
-        # 默认使用的存储平台
-        default-platform: "local-1"
-        local: # 本地存储（不推荐使用），不使用的情况下可以不写
-            -   platform: local-1 # 存储平台标识
-                enable-storage: true  #启用存储
-                enable-access: true #启用访问（线上请使用 Nginx 配置，效率更高）
-                domain: http://localhost:${server.port}${server.servlet.context-path}/files/ # 访问域名，例如：“http://127.0.0.1:8030/test/file/”，注意后面要和 path-patterns 保持一致，“/”结尾，本地存储建议使用相对路径，方便后期更换域名
-                base-path: ${user.dir}/files/ # 文件存储路径：${user.dir}/files中间不能写 + 拼接，会被当成字符串
-                path-patterns: "/**" # 访问路径，开启 enable-access 后，通过此路径可以访问到上传的文件
 
 redisson:
     address: redis://${spring.data.redis.host}:${spring.data.redis.port}
