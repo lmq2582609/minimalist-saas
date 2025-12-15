@@ -2,9 +2,6 @@
     <a-spin class="w-[100%]" :size="35" :loading="spinLoading" tip="正在处理, 请稍候...">
         <a-descriptions :column="2" bordered>
             <a-descriptions-item label="存储名称">{{ form.storageName }}</a-descriptions-item>
-            <a-descriptions-item label="是否默认使用">
-                <dict-convert :dict-data="dicts[proxy.DICT.yesNo]" :dict-key="form.storageDefault" />
-            </a-descriptions-item>
             <a-descriptions-item label="存储状态">
                 <dict-convert :dict-data="dicts[proxy.DICT.commonNumberStatus]" :dict-key="form.status" />
             </a-descriptions-item>
@@ -20,6 +17,9 @@
 
         <!-- minio -->
         <minio ref="storageConfigRef" :params="form.storageConfig" :optType="proxy.operationType.detail.type" v-if="form.storageType === 'minio'" />
+
+        <!-- 七牛云 -->
+        <minio ref="storageConfigRef" :params="form.storageConfig" :optType="proxy.operationType.detail.type" v-if="form.storageType === 'qiniu'" />
     </a-spin>
 </template>
 <script setup>
