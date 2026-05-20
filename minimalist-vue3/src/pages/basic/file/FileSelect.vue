@@ -211,7 +211,7 @@ const customUploadFile = (option) => {
     //上传参数
     const formData = new FormData();
     formData.append("file", option.fileItem.file);
-    formData.append("fileSource", -1);
+    formData.append("fileSource", searchForm.fileSource ?? -1);
     if (props.storageId) {
         formData.append("storageId", props.storageId)
     }
