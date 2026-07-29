@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 强制主数据源切面
- * 配合 @UseMasterDS 注解使用，确保系统级数据查询走主库
+ * 配合 @UseMasterDS 注解使用（支持类级别和方法级别），确保系统级数据查询走主库
  */
 @Slf4j
 @Aspect
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 @Order(-1)
 public class UseMasterDSAspect {
 
-    @Around("@annotation(useMasterDS)")
+    @Around("@within(useMasterDS) || @annotation(useMasterDS)")
     public Object around(ProceedingJoinPoint joinPoint, UseMasterDS useMasterDS) throws Throwable {
         try {
             DynamicDataSourceContextHolder.push("master");
