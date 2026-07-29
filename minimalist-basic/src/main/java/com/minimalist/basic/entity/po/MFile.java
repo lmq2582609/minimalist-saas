@@ -109,7 +109,6 @@ public class MFile extends BaseEntity implements Serializable {
     /**
      * 租户ID
      */
-    @Column(tenantId = true)
     private Long tenantId;
 
 }

@@ -79,7 +79,6 @@ public class MDept extends BaseEntity implements Serializable {
     /**
      * 租户编号
      */
-    @Column(tenantId = true)
     private Long tenantId;
 
 }
