@@ -11,10 +11,12 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.entity.enums.*;
 import com.minimalist.basic.entity.po.MPerms;
 import com.minimalist.basic.entity.po.MUser;
 import com.minimalist.basic.entity.po.MUserDept;
+import com.minimalist.basic.entity.po.MUserIndex;
 import com.minimalist.basic.entity.po.MUserPost;
 import com.minimalist.basic.entity.po.MUserRole;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
@@ -30,6 +32,7 @@ import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.manager.UserManager;
 import com.minimalist.basic.mapper.MUserDeptMapper;
+import com.minimalist.basic.mapper.MUserIndexMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.mapper.MUserPostMapper;
 import com.minimalist.basic.mapper.MUserRoleMapper;
@@ -91,6 +94,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private MUserIndexMapper userIndexMapper;
 
     /**
      * 新增用户
@@ -329,6 +335,7 @@ public class UserServiceImpl implements UserService {
 
     /**
      * 用户登录
+     * 流程：查主库索引路由 → 切租户库验密 → 校验租户状态 → 登录
      * @param reqVO 用户登录信息
      * @return token
      */
@@ -343,27 +350,48 @@ public class UserServiceImpl implements UserService {
             boolean checkImageCaptcha = checkImageCaptcha(reqVO.getCaptcha(), reqVO.getCaptchaId());
             Assert.isTrue(checkImageCaptcha, () -> new BusinessException(UserEnum.ErrorMsg.CAPTCHA_INCORRECT.getDesc()));
         }
-        MUser loginUser = userMapper.selectUserByUsername(reqVO.getUsername());
-        Assert.notNull(loginUser, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
-        //校验密码是否正确
-        String passwordEncrypt = userManager.passwordEncrypt(reqVO.getPassword(), loginUser.getSalt());
-        Assert.isTrue(loginUser.getPassword().equals(passwordEncrypt), () -> new BusinessException(UserEnum.ErrorMsg.U_OR_P_INCORRECT.getDesc()));
-        //校验用户状态
-        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(loginUser.getStatus()),
+
+        //① 查主库 m_user_index，获取用户所属租户
+        MUserIndex userIndex = userIndexMapper.selectByUsername(reqVO.getUsername());
+        Assert.notNull(userIndex, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
+        //校验账号状态
+        Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(userIndex.getStatus()),
                 () -> new BusinessException(UserEnum.ErrorMsg.USER_FROZEN.getDesc()));
-        //根据用户ID查询租户
-        TenantVO tenantVO = tenantService.getTenantByTenantId(loginUser.getTenantId());
-        //账户未绑定租户
+
+        Long tenantId = userIndex.getTenantId();
+        boolean needSwitch = CommonConstant.ZERO != tenantId;
+
+        //② 切换到租户数据源验证密码
+        MUser loginUser;
+        if (needSwitch) {
+            DynamicDataSourceContextHolder.push(String.valueOf(tenantId));
+        }
+        try {
+            loginUser = userMapper.selectUserByUsername(reqVO.getUsername());
+            Assert.notNull(loginUser, () -> new BusinessException(UserEnum.ErrorMsg.NONENTITY_ACCOUNT.getDesc()));
+            //校验密码是否正确
+            String passwordEncrypt = userManager.passwordEncrypt(reqVO.getPassword(), loginUser.getSalt());
+            Assert.isTrue(loginUser.getPassword().equals(passwordEncrypt), () -> new BusinessException(UserEnum.ErrorMsg.U_OR_P_INCORRECT.getDesc()));
+            //校验用户状态
+            Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(loginUser.getStatus()),
+                    () -> new BusinessException(UserEnum.ErrorMsg.USER_FROZEN.getDesc()));
+        } finally {
+            if (needSwitch) {
+                DynamicDataSourceContextHolder.poll();
+            }
+        }
+
+        //③ 校验租户状态（主库 m_tenant）
+        TenantVO tenantVO = tenantService.getTenantByTenantId(tenantId);
         Assert.notNull(tenantVO, () -> new BusinessException(UserEnum.ErrorMsg.USER_UNBOUND_TENANT.getDesc()));
-        //租户状态
         Assert.isTrue(StatusEnum.STATUS_1.getCode().equals(tenantVO.getStatus().intValue()),
                 () -> new BusinessException(TenantEnum.ErrorMsg.DISABLED_TENANT.getDesc()));
-        //检查租户是否过期
         tenantManager.checkTenantExpireTime(tenantVO.getExpireTime());
-        //登录
+
+        //④ 登录
         StpUtil.login(loginUser.getUserId());
         //在登录时缓存参数 - 缓存租户ID
-        StpUtil.getSession().set(TenantIgnore.TENANT_ID, loginUser.getTenantId());
+        StpUtil.getSession().set(TenantIgnore.TENANT_ID, tenantId);
         return StpUtil.getTokenInfo();
     }
 

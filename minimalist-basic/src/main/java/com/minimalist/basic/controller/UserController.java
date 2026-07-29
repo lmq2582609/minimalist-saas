@@ -88,7 +88,6 @@ public class UserController {
     }
 
     @SaIgnore
-    @TenantIgnore
     @PostMapping("/login")
     @Operation(summary = "用户登录，返回token")
     public ResponseEntity<SaTokenInfo> login(@RequestBody @Valid UserLoginReqVO reqVO) {
