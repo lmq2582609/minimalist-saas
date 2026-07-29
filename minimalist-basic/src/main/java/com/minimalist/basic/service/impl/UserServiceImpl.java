@@ -105,14 +105,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addUser(UserVO userVO) {
-        //校验用户名唯一
-        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
-            userManager.checkUsernameUniqueness(userVO.getUsername(), null)
-        );
-        //校验邮箱唯一
-        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
-                userManager.checkUserEmailUniqueness(userVO.getEmail(), null)
-        );
+        //校验用户名全局唯一（查主库 m_user_index）
+        MUserIndex existIndex = userIndexMapper.selectByUsername(userVO.getUsername());
+        Assert.isNull(existIndex, () -> new BusinessException("用户账号已存在，请更换账号"));
         //校验租户的套餐是否满足条件
         tenantManager.checkTenantPackage(TenantUtil.getTenantId());
         //新增用户数据
@@ -131,6 +126,19 @@ public class UserServiceImpl implements UserService {
         userMapper.insert(user, true);
         //新增用户关联信息
         userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userId);
+
+        //同步主库用户索引
+        Long tenantId = TenantUtil.getTenantId();
+        DynamicDataSourceContextHolder.push("master");
+        try {
+            MUserIndex userIndex = new MUserIndex();
+            userIndex.setUsername(userVO.getUsername());
+            userIndex.setTenantId(tenantId);
+            userIndex.setStatus(StatusEnum.STATUS_1.getCode().intValue());
+            userIndexMapper.insert(userIndex, true);
+        } finally {
+            DynamicDataSourceContextHolder.poll();
+        }
     }
 
     /**
@@ -140,10 +148,23 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteUserByUserId(Long userId) {
+        //先查询用户信息（获取username用于删除索引）
+        MUser user = userMapper.selectUserByUserId(userId);
         //删除用户
         userMapper.deleteUserByUserId(userId);
         //删除用户关联信息
         userManager.deleteUserRelation(userId);
+
+        //同步删除主库用户索引
+        if (ObjectUtil.isNotNull(user)) {
+            Long tenantId = TenantUtil.getTenantId();
+            DynamicDataSourceContextHolder.push("master");
+            try {
+                userIndexMapper.deleteByUsernameAndTenantId(user.getUsername(), tenantId);
+            } finally {
+                DynamicDataSourceContextHolder.poll();
+            }
+        }
     }
 
     /**
@@ -153,14 +174,6 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updateUserByUserId(UserVO userVO) {
-        //校验用户名唯一
-        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
-                userManager.checkUsernameUniqueness(userVO.getUsername(), userVO.getUserId())
-        );
-        //校验邮箱唯一
-        com.mybatisflex.core.tenant.TenantManager.withoutTenantCondition(() ->
-                userManager.checkUserEmailUniqueness(userVO.getEmail(), userVO.getUserId())
-        );
         //校验该租户套餐是否满足条件
         tenantManager.checkTenantPackage(TenantUtil.getTenantId());
         //查询用户信息
@@ -178,6 +191,17 @@ public class UserServiceImpl implements UserService {
         userManager.deleteUserRelation(userVO.getUserId());
         //新增用户关联信息
         userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userVO.getUserId());
+
+        //如果用户状态变更，同步主库索引状态
+        if (ObjectUtil.isNotNull(userVO.getStatus()) && !userVO.getStatus().equals(oldUser.getStatus())) {
+            Long tenantId = TenantUtil.getTenantId();
+            DynamicDataSourceContextHolder.push("master");
+            try {
+                userIndexMapper.updateStatusByUsernameAndTenantId(oldUser.getUsername(), tenantId, userVO.getStatus().intValue());
+            } finally {
+                DynamicDataSourceContextHolder.poll();
+            }
+        }
     }
 
     /**
