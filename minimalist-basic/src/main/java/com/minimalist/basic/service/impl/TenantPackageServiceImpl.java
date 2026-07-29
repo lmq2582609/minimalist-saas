@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
@@ -106,10 +107,18 @@ public class TenantPackageServiceImpl implements TenantPackageService {
             //根据套餐查租户
             List<MTenant> tenants = tenantMapper.selectTenantByTenantPackageId(tenantPackageVO.getPackageId());
             for (MTenant tenant : tenants) {
-                //查询租户下所有角色
-                List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-                //修改租户权限
-                tenantManager.updateTenantPermission(roleList, tenantPackageVO.getPackageId());
+                //切换到租户数据源更新权限
+                DynamicDataSourceContextHolder.push(String.valueOf(tenant.getTenantId()));
+                try {
+                    //查询租户下所有角色
+                    List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
+                    //修改租户角色权限
+                    tenantManager.updateTenantPermission(roleList, tenantPackageVO.getPackageId());
+                    //重新拷贝权限到租户库 m_perms
+                    syncPermsToTenantDb(tenantPackageVO.getPackageId());
+                } finally {
+                    DynamicDataSourceContextHolder.poll();
+                }
             }
         }
     }
@@ -155,6 +164,32 @@ public class TenantPackageServiceImpl implements TenantPackageService {
             tpp.setPermId(permId);
             return tpp;
         }).toList();
+    }
+
+    /**
+     * 同步权限数据到租户库 m_perms
+     * 注意：调用时已处于租户数据源上下文中
+     * @param packageId 套餐ID
+     */
+    private void syncPermsToTenantDb(Long packageId) {
+        //从主库查询套餐关联的权限详情
+        DynamicDataSourceContextHolder.push("master");
+        List<MPerms> permsList;
+        try {
+            List<MTenantPackagePerm> packagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(packageId);
+            if (CollectionUtil.isEmpty(packagePerms)) {
+                return;
+            }
+            List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+            permsList = permsMapper.selectListByIds(permIds);
+        } finally {
+            DynamicDataSourceContextHolder.poll();
+        }
+        //删除租户库旧的权限数据，插入新的
+        permsMapper.deleteByQuery(QueryWrapper.create());
+        if (CollectionUtil.isNotEmpty(permsList)) {
+            permsMapper.insertBatch(permsList);
+        }
     }
 
 }
