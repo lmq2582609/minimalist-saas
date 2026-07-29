@@ -16,11 +16,6 @@
                 <a-form-item class="w-[49%]" field="accountCount" label="账号额度" required tooltip="表示该租户下可以创建多少个用户账号">
                     <a-input-number v-model="form.accountCount" :min="0" placeholder="账号额度" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="dataIsolation" label="数据隔离方式" required tooltip="多租户数据隔离方式">
-                    <a-select v-model="form.dataIsolation" placeholder="数据隔离方式" allow-clear>
-                        <a-option v-for="(d, index) in dicts[proxy.DICT.tenantDataIsolation]" :key="index" :value="d.dictKey" :label="d.dictValue" />
-                    </a-select>
-                </a-form-item>
                 <a-form-item class="w-[49%]" field="storageId" label="文件存储方式" required>
                     <a-select v-model="form.storageId" placeholder="文件存储方式" allow-clear>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.storageList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
@@ -36,24 +31,22 @@
                 </a-form-item>
 
 
-                <!-- 数据源名称：选择隔离方式为db时，需要配置数据源信息 -->
-                <template v-if="form.dataIsolation === 'db'">
-                    <a-divider orientation="left">
-                        租户的数据源信息
-                    </a-divider>
-                    <a-form-item class="w-[49%]" field="datasourceName" label="数据源名称">
-                        <a-input v-model="form.tenantDatasource.datasourceName" placeholder="数据源名称" />
-                    </a-form-item>
-                    <a-form-item class="w-[49%]" field="datasourceUrl" label="数据源连接">
-                        <a-textarea v-model="form.tenantDatasource.datasourceUrl" placeholder="数据源连接" />
-                    </a-form-item>
-                    <a-form-item class="w-[49%]" field="username" label="数据源用户名">
-                        <a-input v-model="form.tenantDatasource.username" placeholder="数据源用户名" />
-                    </a-form-item>
-                    <a-form-item class="w-[49%]" field="password" label="数据源密码">
-                        <a-input-password v-model="form.tenantDatasource.password" placeholder="数据源密码" />
-                    </a-form-item>
-                </template>
+                <!-- 租户的数据源信息（必填） -->
+                <a-divider orientation="left">
+                    租户的数据源信息
+                </a-divider>
+                <a-form-item class="w-[49%]" field="datasourceName" label="数据源名称" required>
+                    <a-input v-model="form.tenantDatasource.datasourceName" placeholder="数据源名称" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="datasourceUrl" label="数据源连接" required>
+                    <a-textarea v-model="form.tenantDatasource.datasourceUrl" placeholder="数据源连接" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="username" label="数据源用户名" required>
+                    <a-input v-model="form.tenantDatasource.username" placeholder="数据源用户名" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="password" label="数据源密码" required>
+                    <a-input-password v-model="form.tenantDatasource.password" placeholder="数据源密码" />
+                </a-form-item>
 
                 <!-- 租户与用户绑定 -->
                 <a-divider orientation="left" v-if="props.params.operationType === proxy.operationType.add.type">
@@ -141,8 +134,8 @@ const form = reactive({
     accountCount: null,
     //过期时间
     expireTime: null,
-    //数据隔离方式
-    dataIsolation: null,
+    //数据隔离方式（已废弃，固定为数据库隔离）
+    // dataIsolation: null,
     //数据源名称
     datasource: null,
     //存储ID
