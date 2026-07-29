@@ -6,8 +6,10 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.entity.enums.RoleEnum;
+import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
@@ -18,6 +20,7 @@ import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.manager.UserManager;
 import com.minimalist.basic.mapper.*;
 import com.minimalist.basic.service.RoleService;
+import com.minimalist.basic.service.TenantDbInitService;
 import com.minimalist.basic.service.TenantService;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
@@ -68,8 +71,18 @@ public class TenantServiceImpl implements TenantService {
     @Autowired
     private RedisManager redisManager;
 
+    @Autowired
+    private MUserIndexMapper userIndexMapper;
+
+    @Autowired
+    private TenantDbInitService tenantDbInitService;
+
+    @Autowired
+    private MPermsMapper permsMapper;
+
     /**
      * 添加租户
+     * 流程：校验 → 建表 → 切租户库初始化数据 → 写主库 → 注册数据源 → 发布消息
      * @param tenantVO 租户信息
      */
     @Override
@@ -77,48 +90,68 @@ public class TenantServiceImpl implements TenantService {
     public void addTenant(TenantVO tenantVO) {
         //根据租户名查询租户，租户名不能重复
         checkTenantNameExists(tenantVO.getTenantName());
-        MTenant mTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
-        long tenantId = UnqIdUtil.uniqueId();
 
-        //为租户创建用户
+        //校验用户信息
         UserVO userInfo = tenantVO.getUser();
         checkAddTenantUser(userInfo);
+        //校验用户名全局唯一
+        MUserIndex existIndex = userIndexMapper.selectByUsername(userInfo.getUsername());
+        Assert.isNull(existIndex, () -> new BusinessException("用户账号已存在，请更换账号"));
+
+        long tenantId = UnqIdUtil.uniqueId();
         long userId = UnqIdUtil.uniqueId();
         userInfo.setUserId(userId);
-        addTenantUser(userInfo, tenantId);
+        TenantDatasourceVO tenantDatasourceVO = tenantVO.getTenantDatasource();
+        Assert.notNull(tenantDatasourceVO, () -> new BusinessException("租户数据源信息不能为空"));
 
-        //为租户创建角色
-        long roleId = UnqIdUtil.uniqueId();
-        addTenantRole(roleId, tenantId, tenantVO.getPackageId());
-        //用户与角色关联关系
-        addTenantUserRole(userId, roleId);
+        //① 连接目标数据库，执行建表模板SQL
+        tenantDbInitService.initTenantDatabase(tenantDatasourceVO);
 
-        //隔离方式为数据库隔离，则插入租户数据源数据
-        if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
-            TenantDatasourceVO tenantDatasourceVO = tenantVO.getTenantDatasource();
-            //数据源名称
-            mTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
-            //插入多租户数据源
-            MTenantDatasource tenantDatasource = new MTenantDatasource();
-            tenantDatasource.setTenantId(tenantId);
-            tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
-            tenantDatasource.setDatasourceName(tenantDatasourceVO.getDatasourceName());
-            tenantDatasource.setDatasourceUrl(tenantDatasourceVO.getDatasourceUrl());
-            tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
-            tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
-            tenantDatasourceMapper.insert(tenantDatasource, true);
-        } else {
-            //字段隔离
-            mTenant.setDatasource(TenantEnum.MASTER);
-            mTenant.setDataIsolation(TenantEnum.DataIsolation.COLUMN.getCode());
+        //② 切换到租户数据源，初始化数据
+        DynamicDataSourceContextHolder.push(String.valueOf(tenantId));
+        try {
+            //创建租户管理员用户
+            addTenantUser(userInfo, tenantId);
+            //创建租户管理员角色
+            long roleId = UnqIdUtil.uniqueId();
+            addTenantRole(roleId, tenantId, tenantVO.getPackageId());
+            //用户与角色关联关系
+            addTenantUserRole(userId, roleId);
+            //拷贝套餐权限到租户库 m_perms
+            copyPermsToTenantDb(tenantVO.getPackageId());
+        } finally {
+            DynamicDataSourceContextHolder.poll();
         }
 
-        //插入租户数据
+        //③ 写入主库
+        MTenant mTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
+        mTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
         mTenant.setUserId(userId);
         mTenant.setTenantId(tenantId);
         tenantMapper.insert(mTenant, true);
 
-        //发布消息 - 缓存租户信息
+        //插入租户数据源连接信息
+        MTenantDatasource tenantDatasource = new MTenantDatasource();
+        tenantDatasource.setTenantId(tenantId);
+        tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
+        tenantDatasource.setDatasourceName(tenantDatasourceVO.getDatasourceName());
+        tenantDatasource.setDatasourceUrl(tenantDatasourceVO.getDatasourceUrl());
+        tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
+        tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
+        tenantDatasourceMapper.insert(tenantDatasource, true);
+
+        //插入主库用户索引
+        MUserIndex userIndex = new MUserIndex();
+        userIndex.setUsername(userInfo.getUsername());
+        userIndex.setTenantId(tenantId);
+        userIndex.setStatus(StatusEnum.STATUS_1.getCode().intValue());
+        userIndexMapper.insert(userIndex, true);
+
+        //④ 动态注册数据源
+        tenantManager.dynamicAddDatasource(String.valueOf(tenantId), tenantDatasourceVO);
+
+        //⑤ 发布消息 - 缓存租户信息
+        tenantVO.setTenantId(tenantId);
         redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantVO));
     }
 
@@ -149,16 +182,14 @@ public class TenantServiceImpl implements TenantService {
         Assert.notNull(tenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
         MTenant newTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
 
-        //删除租户数据源信息
-        tenantDatasourceMapper.deleteTenantDatasourceByTenantId(tenant.getTenantId());
-
-        //检查租户数据源是否需要更新
-        if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
-            //数据库隔离
-            TenantDatasourceVO tenantDatasourceVO = tenantVO.getTenantDatasource();
+        //更新租户数据源信息
+        TenantDatasourceVO tenantDatasourceVO = tenantVO.getTenantDatasource();
+        if (ObjectUtil.isNotNull(tenantDatasourceVO)) {
+            //删除旧数据源信息
+            tenantDatasourceMapper.deleteTenantDatasourceByTenantId(tenant.getTenantId());
             //数据源名称
             newTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
-            //插入多租户数据源
+            //插入新数据源
             MTenantDatasource tenantDatasource = new MTenantDatasource();
             tenantDatasource.setTenantId(tenant.getTenantId());
             tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
@@ -167,20 +198,22 @@ public class TenantServiceImpl implements TenantService {
             tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
             tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
             tenantDatasourceMapper.insert(tenantDatasource, true);
-        } else {
-            //字段隔离
-            newTenant.setDatasource(TenantEnum.MASTER);
-            newTenant.setDataIsolation(TenantEnum.DataIsolation.COLUMN.getCode());
         }
 
         //更新租户
         tenantMapper.updateTenantByTenantId(newTenant);
-        //如果租户套餐变更，则修改租户套餐
+        //如果租户套餐变更，则修改租户权限
         if (!tenantVO.getPackageId().equals(tenant.getPackageId())) {
-            //查询租户下所有角色
-            List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-            //修改租户权限
-            tenantManager.updateTenantPermission(roleList, tenantVO.getPackageId());
+            //切换到租户数据源更新权限
+            DynamicDataSourceContextHolder.push(String.valueOf(tenant.getTenantId()));
+            try {
+                List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
+                tenantManager.updateTenantPermission(roleList, tenantVO.getPackageId());
+                //重新拷贝权限到租户库
+                copyPermsToTenantDb(tenantVO.getPackageId());
+            } finally {
+                DynamicDataSourceContextHolder.poll();
+            }
         }
 
         //发布消息 - 缓存租户信息
@@ -222,14 +255,19 @@ public class TenantServiceImpl implements TenantService {
     @Override
     public TenantVO getTenantByTenantId(Long tenantId) {
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
+        if (ObjectUtil.isNull(mTenant)) {
+            return null;
+        }
         MUser mUser = userMapper.selectUserByUserId(mTenant.getUserId());
         TenantVO tenantVO = BeanUtil.copyProperties(mTenant, TenantVO.class);
-        tenantVO.setContactName(mUser.getUserRealName());
-        tenantVO.setPhone(mUser.getPhone());
-        tenantVO.setEmail(mUser.getEmail());
+        if (ObjectUtil.isNotNull(mUser)) {
+            tenantVO.setContactName(mUser.getUserRealName());
+            tenantVO.setPhone(mUser.getPhone());
+            tenantVO.setEmail(mUser.getEmail());
+        }
         //查询数据源信息
-        if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())) {
-            MTenantDatasource tenantDatasource = tenantDatasourceMapper.selectTenantDatasourceByTenantId(tenantId);
+        MTenantDatasource tenantDatasource = tenantDatasourceMapper.selectTenantDatasourceByTenantId(tenantId);
+        if (ObjectUtil.isNotNull(tenantDatasource)) {
             tenantVO.setTenantDatasource(BeanUtil.copyProperties(tenantDatasource, TenantDatasourceVO.class));
         }
         return tenantVO;
@@ -302,6 +340,31 @@ public class TenantServiceImpl implements TenantService {
         userRole.setUserId(userId);
         userRole.setRoleId(roleId);
         userRoleMapper.insert(userRole, true);
+    }
+
+    /**
+     * 拷贝套餐权限到租户库 m_perms
+     * @param packageId 套餐ID
+     */
+    private void copyPermsToTenantDb(Long packageId) {
+        //查询套餐关联的权限ID
+        List<MTenantPackagePerm> packagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(packageId);
+        if (CollectionUtil.isEmpty(packagePerms)) {
+            return;
+        }
+        List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+        //从主库查询权限详情（此时已在租户数据源上下文中，需临时切主库查询）
+        DynamicDataSourceContextHolder.push("master");
+        List<MPerms> permsList;
+        try {
+            permsList = permsMapper.selectListByIds(permIds);
+        } finally {
+            DynamicDataSourceContextHolder.poll();
+        }
+        //插入到租户库 m_perms
+        if (CollectionUtil.isNotEmpty(permsList)) {
+            permsMapper.insertBatch(permsList);
+        }
     }
 
 }
