@@ -107,7 +107,10 @@ public class TenantServiceImpl implements TenantService {
         //① 连接目标数据库，执行建表模板SQL
         tenantDbInitService.initTenantDatabase(tenantDatasourceVO);
 
-        //② 切换到租户数据源，初始化数据
+        //② 先动态注册数据源（必须在切换数据源之前注册）
+        tenantManager.dynamicAddDatasource(String.valueOf(tenantId), tenantDatasourceVO);
+
+        //③ 切换到租户数据源，初始化数据
         DynamicDataSourceContextHolder.push(String.valueOf(tenantId));
         try {
             //创建租户管理员用户
@@ -123,7 +126,7 @@ public class TenantServiceImpl implements TenantService {
             DynamicDataSourceContextHolder.poll();
         }
 
-        //③ 写入主库
+        //④ 写入主库
         MTenant mTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
         mTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
         mTenant.setUserId(userId);
@@ -147,9 +150,6 @@ public class TenantServiceImpl implements TenantService {
         userIndex.setTenantId(tenantId);
         userIndex.setStatus(StatusEnum.STATUS_1.getCode().intValue());
         userIndexMapper.insert(userIndex, true);
-
-        //④ 动态注册数据源
-        tenantManager.dynamicAddDatasource(String.valueOf(tenantId), tenantDatasourceVO);
 
         //⑤ 发布消息 - 缓存租户信息
         tenantVO.setTenantId(tenantId);
