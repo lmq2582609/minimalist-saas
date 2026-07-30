@@ -135,7 +135,8 @@ public class TenantServiceImpl implements TenantService {
         tenantDatasource.setTenantId(tenantId);
         tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
         tenantDatasource.setDatasourceName(tenantDatasourceVO.getDatasourceName());
-        tenantDatasource.setDatasourceUrl(tenantDatasourceVO.getDatasourceUrl());
+        tenantDatasource.setHost(tenantDatasourceVO.getHost());
+        tenantDatasource.setPort(tenantDatasourceVO.getPort());
         tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
         tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
         tenantDatasourceMapper.insert(tenantDatasource, true);
@@ -194,7 +195,8 @@ public class TenantServiceImpl implements TenantService {
             tenantDatasource.setTenantId(tenant.getTenantId());
             tenantDatasource.setDatasourceId(UnqIdUtil.uniqueId());
             tenantDatasource.setDatasourceName(tenantDatasourceVO.getDatasourceName());
-            tenantDatasource.setDatasourceUrl(tenantDatasourceVO.getDatasourceUrl());
+            tenantDatasource.setHost(tenantDatasourceVO.getHost());
+            tenantDatasource.setPort(tenantDatasourceVO.getPort());
             tenantDatasource.setUsername(tenantDatasourceVO.getUsername());
             tenantDatasource.setPassword(tenantDatasourceVO.getPassword());
             tenantDatasourceMapper.insert(tenantDatasource, true);

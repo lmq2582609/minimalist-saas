@@ -43,14 +43,19 @@ public class MTenantDatasource implements Serializable {
     private Long tenantId;
 
     /**
-     * 数据源名称
+     * 数据库名称
      */
     private String datasourceName;
 
     /**
-     * 数据源连接
+     * 数据库主机地址
      */
-    private String datasourceUrl;
+    private String host;
+
+    /**
+     * 数据库端口
+     */
+    private String port;
 
     /**
      * 数据源用户名

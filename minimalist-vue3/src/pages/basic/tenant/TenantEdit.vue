@@ -35,17 +35,20 @@
                 <a-divider orientation="left">
                     租户的数据源信息
                 </a-divider>
-                <a-form-item class="w-[49%]" field="tenantDatasource.datasourceName" label="数据源名称" required>
-                    <a-input v-model="form.tenantDatasource.datasourceName" placeholder="数据源名称" />
+                <a-form-item class="w-[49%]" field="tenantDatasource.datasourceName" label="数据库名称" required>
+                    <a-input v-model="form.tenantDatasource.datasourceName" placeholder="数据库名称" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="tenantDatasource.datasourceUrl" label="数据源连接" required>
-                    <a-textarea v-model="form.tenantDatasource.datasourceUrl" placeholder="数据源连接" />
+                <a-form-item class="w-[24%]" field="tenantDatasource.host" label="主机地址" required>
+                    <a-input v-model="form.tenantDatasource.host" placeholder="主机地址" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="tenantDatasource.username" label="数据源用户名" required>
-                    <a-input v-model="form.tenantDatasource.username" placeholder="数据源用户名" />
+                <a-form-item class="w-[24%]" field="tenantDatasource.port" label="端口" required>
+                    <a-input v-model="form.tenantDatasource.port" placeholder="端口" />
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="tenantDatasource.password" label="数据源密码" required>
-                    <a-input-password v-model="form.tenantDatasource.password" placeholder="数据源密码" />
+                <a-form-item class="w-[49%]" field="tenantDatasource.username" label="数据库用户名" required>
+                    <a-input v-model="form.tenantDatasource.username" placeholder="数据库用户名" />
+                </a-form-item>
+                <a-form-item class="w-[49%]" field="tenantDatasource.password" label="数据库密码" required>
+                    <a-input-password v-model="form.tenantDatasource.password" placeholder="数据库密码" />
                 </a-form-item>
 
                 <!-- 租户与用户绑定 -->
@@ -116,7 +119,8 @@ const formRef = ref(null)
 //默认数据源信息
 const defaultTenantDatasource = {
     datasourceName: null,
-    datasourceUrl: 'jdbc:mysql://localhost:3306/minimalist?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true',
+    host: 'localhost',
+    port: '3306',
     username: null,
     password: null
 }
@@ -171,10 +175,11 @@ const rules = {
     accountCount: [{required: true, message: '账号额度不能为空', trigger: 'submit'}],
     expireTime: [{required: true, message: '过期时间不能为空', trigger: 'submit'}],
     storageId: [{required: true, message: '租户文件存储方式不能为空', trigger: 'submit'}],
-    'tenantDatasource.datasourceName': [{required: true, message: '数据源名称不能为空', trigger: 'submit'}],
-    'tenantDatasource.datasourceUrl': [{required: true, message: '数据源连接不能为空', trigger: 'submit'}],
-    'tenantDatasource.username': [{required: true, message: '数据源用户名不能为空', trigger: 'submit'}],
-    'tenantDatasource.password': [{required: true, message: '数据源密码不能为空', trigger: 'submit'}]
+    'tenantDatasource.datasourceName': [{required: true, message: '数据库名称不能为空', trigger: 'submit'}],
+    'tenantDatasource.host': [{required: true, message: '主机地址不能为空', trigger: 'submit'}],
+    'tenantDatasource.port': [{required: true, message: '端口不能为空', trigger: 'submit'}],
+    'tenantDatasource.username': [{required: true, message: '数据库用户名不能为空', trigger: 'submit'}],
+    'tenantDatasource.password': [{required: true, message: '数据库密码不能为空', trigger: 'submit'}]
 }
 //确定 -> 点击
 const okBtnClick = () => {

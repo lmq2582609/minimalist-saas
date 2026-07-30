@@ -27,21 +27,49 @@ public class TenantDbInitServiceImpl implements TenantDbInitService {
     private static final String TEMPLATE_SQL_PATH = "sql/tenant_init_template.sql";
 
     /**
-     * 初始化租户数据库（执行建表模板SQL）
+     * 初始化租户数据库（自动建库 + 建表）
      * @param datasourceVO 数据源连接信息
      */
     @Override
     public void initTenantDatabase(TenantDatasourceVO datasourceVO) {
-        String sql = loadTemplateSql();
+        //① 连接 MySQL（不指定库），创建数据库
+        createDatabaseIfNotExists(datasourceVO);
+        //② 连接目标数据库，执行建表模板SQL
+        executeTemplateSql(datasourceVO);
+    }
+
+    /**
+     * 创建数据库（如果不存在）
+     */
+    private void createDatabaseIfNotExists(TenantDatasourceVO datasourceVO) {
+        String sql = "CREATE DATABASE IF NOT EXISTS `" + datasourceVO.getDatasourceName() + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci";
         try (Connection conn = DriverManager.getConnection(
-                datasourceVO.getDatasourceUrl(),
+                datasourceVO.buildJdbcUrlWithoutDb(),
                 datasourceVO.getUsername(),
                 datasourceVO.getPassword());
              Statement stmt = conn.createStatement()) {
             stmt.execute(sql);
-            log.info("租户数据库初始化建表成功，数据源：{}", datasourceVO.getDatasourceName());
+            log.info("租户数据库创建成功（或已存在），数据库名：{}", datasourceVO.getDatasourceName());
         } catch (Exception e) {
-            log.error("租户数据库初始化建表失败：", e);
+            log.error("租户数据库创建失败：", e);
+            throw new BusinessException("租户数据库创建失败：" + e.getMessage());
+        }
+    }
+
+    /**
+     * 执行建表模板SQL
+     */
+    private void executeTemplateSql(TenantDatasourceVO datasourceVO) {
+        String sql = loadTemplateSql();
+        try (Connection conn = DriverManager.getConnection(
+                datasourceVO.buildJdbcUrl(),
+                datasourceVO.getUsername(),
+                datasourceVO.getPassword());
+             Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+            log.info("租户数据库建表成功，数据库：{}", datasourceVO.getDatasourceName());
+        } catch (Exception e) {
+            log.error("租户数据库建表失败：", e);
             throw new BusinessException("租户数据库初始化失败：" + e.getMessage());
         }
     }

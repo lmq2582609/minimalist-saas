@@ -118,7 +118,7 @@ public class TenantManager {
      */
     public void dynamicAddDatasource(String tenantId, TenantDatasourceVO tenantDatasourceVO) {
         DataSourceProperty dataSourceProperty = new DataSourceProperty();
-        dataSourceProperty.setUrl(tenantDatasourceVO.getDatasourceUrl());
+        dataSourceProperty.setUrl(tenantDatasourceVO.buildJdbcUrl());
         dataSourceProperty.setUsername(tenantDatasourceVO.getUsername());
         dataSourceProperty.setPassword(tenantDatasourceVO.getPassword());
         DynamicRoutingDataSource ds = (DynamicRoutingDataSource) dataSource;

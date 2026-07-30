@@ -15,20 +15,42 @@ public class TenantDatasourceVO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotBlank(message = "数据源名称不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "datasourceName", description = "数据源连接", type = "string")
+    @NotBlank(message = "数据库名称不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "datasourceName", description = "数据库名称", type = "string")
     private String datasourceName;
 
-    @NotBlank(message = "数据源连接不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "datasourceUrl", description = "数据源连接", type = "string")
-    private String datasourceUrl;
+    @NotBlank(message = "数据库主机不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "host", description = "数据库主机地址", type = "string")
+    private String host;
 
-    @NotBlank(message = "数据源用户名不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "username", description = "数据源用户名", type = "string")
+    @NotBlank(message = "数据库端口不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "port", description = "数据库端口", type = "string")
+    private String port;
+
+    @NotBlank(message = "数据库用户名不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "username", description = "数据库用户名", type = "string")
     private String username;
 
-    @NotBlank(message = "数据源密码不能为空", groups = {Add.class, Update.class})
-    @Schema(name = "password", description = "数据源密码", type = "string")
+    @NotBlank(message = "数据库密码不能为空", groups = {Add.class, Update.class})
+    @Schema(name = "password", description = "数据库密码", type = "string")
     private String password;
+
+    /**
+     * 拼接完整的 JDBC URL
+     */
+    public String buildJdbcUrl() {
+        return "jdbc:mysql://" + host + ":" + port + "/" + datasourceName
+                + "?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai"
+                + "&allowMultiQueries=true&useAffectedRows=true&rewriteBatchedStatements=true";
+    }
+
+    /**
+     * 拼接不指定数据库的 JDBC URL（用于建库）
+     */
+    public String buildJdbcUrlWithoutDb() {
+        return "jdbc:mysql://" + host + ":" + port
+                + "?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai"
+                + "&allowMultiQueries=true";
+    }
 
 }
