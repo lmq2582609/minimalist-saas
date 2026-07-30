@@ -305,7 +305,6 @@ public class TenantServiceImpl implements TenantService {
         role.setRoleCode(RoleEnum.Role.ADMIN.getCode());
         role.setRoleSort(CommonConstant.ZERO);
         role.setRemark("系统自动创建角色");
-        role.setTenantId(tenantId);
         //插入角色
         roleMapper.insert(role, true);
         //插入角色和权限关联数据
@@ -333,7 +332,6 @@ public class TenantServiceImpl implements TenantService {
         String salt = RandomUtil.randomString(6);
         user.setSalt(salt);
         user.setPassword(userManager.passwordEncrypt(userInfo.getPassword(), salt));
-        user.setTenantId(tenantId);
         userMapper.insert(user, true);
     }
 

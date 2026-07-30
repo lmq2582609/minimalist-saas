@@ -91,9 +91,4 @@ public class MUser extends BaseEntity implements Serializable {
      */
     private Integer status;
 
-    /**
-     * 租户编号
-     */
-    private Long tenantId;
-
 }

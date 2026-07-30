@@ -106,9 +106,4 @@ public class MFile extends BaseEntity implements Serializable {
      */
     private Integer status;
 
-    /**
-     * 租户ID
-     */
-    private Long tenantId;
-
 }

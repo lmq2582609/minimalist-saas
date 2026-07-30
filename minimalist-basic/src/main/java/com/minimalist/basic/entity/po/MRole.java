@@ -61,9 +61,4 @@ public class MRole extends BaseEntity implements Serializable {
      */
     private String remark;
 
-    /**
-     * 租户编号
-     */
-    private Long tenantId;
-
 }

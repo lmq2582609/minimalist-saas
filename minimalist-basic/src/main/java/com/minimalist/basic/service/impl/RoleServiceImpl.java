@@ -138,13 +138,13 @@ public class RoleServiceImpl implements RoleService {
     }
 
     /**
-     * 根据租户ID查询角色列表
-     * @param tenantId 租户ID
+     * 查询当前租户库的所有角色（已切换到租户数据源）
+     * @param tenantId 租户ID（仅作为标识，实际查询当前库所有角色）
      * @return 角色列表
      */
     @Override
     public List<MRole> getRoleByTenantId(Long tenantId) {
-        return roleMapper.selectListByQuery(QueryWrapper.create().eq(MRole::getTenantId, tenantId));
+        return roleMapper.selectListByQuery(QueryWrapper.create());
     }
 
     /**

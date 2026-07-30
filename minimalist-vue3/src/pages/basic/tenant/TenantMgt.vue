@@ -144,7 +144,7 @@ const datatable = reactive({
         {title: '租户名', dataIndex: 'tenantName', slotName: 'tenantName', align: 'center', width: 200, ellipsis: true, tooltip: true},
         {title: '租户套餐', dataIndex: 'packageId', slotName: 'packageId', align: 'center', width: 150, ellipsis: true, tooltip: true},
         
-        {title: '数据源名称', dataIndex: 'datasource', slotName: 'datasource', align: 'center', width: 150},
+        {title: '数据源名称', dataIndex: 'datasource', slotName: 'datasource', align: 'center', width: 200},
         {title: '文件存储方式', dataIndex: 'storageId', slotName: 'storageId', align: 'center', width: 150},
         {title: '联系人', dataIndex: 'contactName', align: 'center', width: 150, ellipsis: true, tooltip: true},
         {title: '联系人手机', dataIndex: 'phone', align: 'center', width: 125, ellipsis: true, tooltip: true},
