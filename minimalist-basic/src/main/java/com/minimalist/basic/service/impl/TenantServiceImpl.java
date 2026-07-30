@@ -82,11 +82,11 @@ public class TenantServiceImpl implements TenantService {
 
     /**
      * 添加租户
-     * 流程：校验 → 建表 → 切租户库初始化数据 → 写主库 → 注册数据源 → 发布消息
+     * 流程：校验 → 建表 → 注册数据源 → 切租户库初始化数据 → 写主库 → 发布消息
+     * 注意：跨库操作不能使用 @Transactional，否则事务绑定主库连接导致数据源切换失效
      * @param tenantVO 租户信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void addTenant(TenantVO tenantVO) {
         //根据租户名查询租户，租户名不能重复
         checkTenantNameExists(tenantVO.getTenantName());
@@ -176,7 +176,6 @@ public class TenantServiceImpl implements TenantService {
      * @param tenantVO 租户信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void updateTenantByTenantId(TenantVO tenantVO) {
         //根据租户ID查询租户
         MTenant tenant = tenantMapper.selectTenantByTenantId(tenantVO.getTenantId());
