@@ -306,10 +306,17 @@ public class TenantServiceImpl implements TenantService {
         role.setRoleCode(RoleEnum.Role.ADMIN.getCode());
         role.setRoleSort(CommonConstant.ZERO);
         role.setRemark("系统自动创建角色");
-        //插入角色
+        //插入角色（租户库）
         roleMapper.insert(role, true);
-        //插入角色和权限关联数据
-        List<MTenantPackagePerm> mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
+        //从主库查询套餐权限关联数据
+        List<MTenantPackagePerm> mTenantPackagePerms;
+        DynamicDataSourceContextHolder.push("master");
+        try {
+            mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
+        } finally {
+            DynamicDataSourceContextHolder.poll();
+        }
+        //插入角色和权限关联数据（租户库）
         List<MRolePerm> rolePerms = mTenantPackagePerms.stream().map(tpp -> {
             MRolePerm rolePerm = new MRolePerm();
             rolePerm.setRoleId(roleId);
@@ -317,7 +324,6 @@ public class TenantServiceImpl implements TenantService {
             return rolePerm;
         }).toList();
         rolePermMapper.insertBatch(rolePerms);
-
     }
 
     private void addTenantUser(UserVO userInfo, Long tenantId) {
