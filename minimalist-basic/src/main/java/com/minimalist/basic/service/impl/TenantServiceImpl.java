@@ -111,18 +111,28 @@ public class TenantServiceImpl implements TenantService {
         //② 先动态注册数据源（必须在切换数据源之前注册）
         tenantManager.dynamicAddDatasource(String.valueOf(tenantId), tenantDatasourceVO);
 
-        //③ 切换到租户数据源，初始化数据
+        //③ 在主库上下文中查询套餐权限数据（必须在切换租户之前完成）
+        List<MTenantPackagePerm> packagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantVO.getPackageId());
+        List<MPerms> permsList = CollectionUtil.list(false);
+        if (CollectionUtil.isNotEmpty(packagePerms)) {
+            List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+            permsList = permsMapper.selectListByIds(permIds);
+        }
+
+        //④ 切换到租户数据源，初始化数据
         DynamicDataSourceContextHolder.push(String.valueOf(tenantId));
         try {
             //创建租户管理员用户
             addTenantUser(userInfo, tenantId);
-            //创建租户管理员角色
+            //创建租户管理员角色 + 角色权限关联
             long roleId = UnqIdUtil.uniqueId();
-            addTenantRole(roleId, tenantId, tenantVO.getPackageId());
+            addTenantRole(roleId, packagePerms);
             //用户与角色关联关系
             addTenantUserRole(userId, roleId);
             //拷贝套餐权限到租户库 m_perms
-            copyPermsToTenantDb(tenantVO.getPackageId());
+            if (CollectionUtil.isNotEmpty(permsList)) {
+                permsMapper.insertBatch(permsList);
+            }
         } finally {
             DynamicDataSourceContextHolder.poll();
         }
@@ -299,7 +309,7 @@ public class TenantServiceImpl implements TenantService {
         Assert.notNull(user.getUserSex(), () -> new BusinessException(TenantEnum.ErrorMsg.ADD_TENANT_USERSEX_NULL.getDesc()));
     }
 
-    private void addTenantRole(Long roleId, Long tenantId, Long tenantPackageId) {
+    private void addTenantRole(Long roleId, List<MTenantPackagePerm> packagePerms) {
         MRole role = new MRole();
         role.setRoleId(roleId);
         role.setRoleName(RoleEnum.Role.ADMIN.getName());
@@ -308,22 +318,16 @@ public class TenantServiceImpl implements TenantService {
         role.setRemark("系统自动创建角色");
         //插入角色（租户库）
         roleMapper.insert(role, true);
-        //从主库查询套餐权限关联数据
-        List<MTenantPackagePerm> mTenantPackagePerms;
-        DynamicDataSourceContextHolder.push("master");
-        try {
-            mTenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageId);
-        } finally {
-            DynamicDataSourceContextHolder.poll();
-        }
         //插入角色和权限关联数据（租户库）
-        List<MRolePerm> rolePerms = mTenantPackagePerms.stream().map(tpp -> {
-            MRolePerm rolePerm = new MRolePerm();
-            rolePerm.setRoleId(roleId);
-            rolePerm.setPermId(tpp.getPermId());
-            return rolePerm;
-        }).toList();
-        rolePermMapper.insertBatch(rolePerms);
+        if (CollectionUtil.isNotEmpty(packagePerms)) {
+            List<MRolePerm> rolePerms = packagePerms.stream().map(tpp -> {
+                MRolePerm rolePerm = new MRolePerm();
+                rolePerm.setRoleId(roleId);
+                rolePerm.setPermId(tpp.getPermId());
+                return rolePerm;
+            }).toList();
+            rolePermMapper.insertBatch(rolePerms);
+        }
     }
 
     private void addTenantUser(UserVO userInfo, Long tenantId) {
@@ -347,31 +351,6 @@ public class TenantServiceImpl implements TenantService {
         userRole.setUserId(userId);
         userRole.setRoleId(roleId);
         userRoleMapper.insert(userRole, true);
-    }
-
-    /**
-     * 拷贝套餐权限到租户库 m_perms
-     * @param packageId 套餐ID
-     */
-    private void copyPermsToTenantDb(Long packageId) {
-        //查询套餐关联的权限ID
-        List<MTenantPackagePerm> packagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(packageId);
-        if (CollectionUtil.isEmpty(packagePerms)) {
-            return;
-        }
-        List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-        //从主库查询权限详情（此时已在租户数据源上下文中，需临时切主库查询）
-        DynamicDataSourceContextHolder.push("master");
-        List<MPerms> permsList;
-        try {
-            permsList = permsMapper.selectListByIds(permIds);
-        } finally {
-            DynamicDataSourceContextHolder.poll();
-        }
-        //插入到租户库 m_perms
-        if (CollectionUtil.isNotEmpty(permsList)) {
-            permsMapper.insertBatch(permsList);
-        }
     }
 
 }
