@@ -102,7 +102,7 @@ import { addTenantApi, updateTenantByTenantIdApi, getTenantByTenantIdApi } from 
 //全局实例
 const {proxy} = getCurrentInstance()
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.tenantDataIsolation, proxy.DICT.storageList])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.tenantPackageList, proxy.DICT.userSex, proxy.DICT.storageList])
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -138,8 +138,6 @@ const form = reactive({
     accountCount: null,
     //过期时间
     expireTime: null,
-    //数据隔离方式（已废弃，固定为数据库隔离）
-    // dataIsolation: null,
     //数据源名称
     datasource: null,
     //存储ID
