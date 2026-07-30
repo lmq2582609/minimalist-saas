@@ -62,12 +62,7 @@ public class MTenant extends BaseEntity implements Serializable {
     private Integer accountCount;
 
     /**
-     * 数据隔离方式  column字段隔离(默认)  db数据库隔离
-     */
-    private String dataIsolation;
-
-    /**
-     * 数据源名称  master默认使用主库
+     * 数据源名称
      */
     private String datasource;
 

@@ -3,7 +3,6 @@ package com.minimalist.basic.mq;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
-import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.manager.TenantManager;
 import com.minimalist.basic.utils.CommonConstant;
@@ -42,17 +41,13 @@ public class TenantDatasourceSyncConsumer implements ApplicationRunner {
                 if (CommonConstant.ADD.equals(opt) || CommonConstant.UPDATE.equals(opt)) {
                     TenantVO tenantVO = JSONUtil.toBean(msg, TenantVO.class);
                     CommonConstant.tenantMap.put(tenantVO.getTenantId(), tenantVO);
-                    //动态加载数据源
-                    if (TenantEnum.DataIsolation.DB.getCode().equals(tenantVO.getDataIsolation())
-                        && ObjectUtil.isNotNull(tenantVO.getTenantDatasource())) {
+                    //动态加载数据源（所有租户均有独立数据源）
+                    if (ObjectUtil.isNotNull(tenantVO.getTenantDatasource())) {
                         String tenantId = tenantVO.getTenantId().toString();
                         //删除旧数据源
                         tenantManager.dynamicDeleteDatasource(tenantId);
                         //动态添加数据源
                         tenantManager.dynamicAddDatasource(tenantId, tenantVO.getTenantDatasource());
-                    } else {
-                        //不需要数据库隔离，删除数据源
-                        tenantManager.dynamicDeleteDatasource(tenantVO.getTenantId().toString());
                     }
                 }
                 if (CommonConstant.DELETE.equals(opt)) {

@@ -4,7 +4,6 @@ import cn.hutool.core.date.DatePattern;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.vo.storage.StorageVO;
 import com.minimalist.basic.entity.vo.user.UserVO;
 import com.minimalist.basic.entity.enums.StatusEnum;
@@ -65,12 +64,7 @@ public class TenantVO implements Serializable {
     @Schema(name = "accountCount", description = "可创建账号数量，表示这个租户下可以创建多少账号", type = "integer")
     private Integer accountCount;
 
-    @NotBlank(message = "数据隔离方式不能为空", groups = {Add.class, Update.class})
-    @SchemaEnum(implementation = TenantEnum.DataIsolation.class)
-    @Schema(name = "dataIsolation", description = "数据隔离方式", type = "string")
-    private String dataIsolation;
-
-    @Schema(name = "datasource", description = "所使用的数据源，默认使用master主库", type = "string")
+    @Schema(name = "datasource", description = "所使用的数据源", type = "string")
     private String datasource;
 
     @JsonSerialize(using = ToStringSerializer.class)
