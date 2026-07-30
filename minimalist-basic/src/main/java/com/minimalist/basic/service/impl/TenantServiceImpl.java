@@ -271,20 +271,11 @@ public class TenantServiceImpl implements TenantService {
     public PageResp<TenantVO> getPageTenantList(TenantQueryVO queryVO) {
         //查询租户分页数据
         Page<TenantVO> tenantVOPage = tenantMapper.selectPageTenantList(queryVO);
-        //查询租户绑定的用户信息
+        //跨库查询每个租户的联系人信息
         if (CollectionUtil.isNotEmpty(tenantVOPage.getRecords())) {
-            List<Long> userIdList = tenantVOPage.getRecords().stream().map(TenantVO::getUserId).toList();
-            List<MUser> mUserList = userMapper.selectUserByUserIds(userIdList);
-            Map<Long, MUser> userMap = mUserList.stream()
-                    .collect(Collectors.toMap(MUser::getUserId, Function.identity(), (v1, v2) -> v1));
-            tenantVOPage.getRecords().forEach(t -> {
-                MUser user = userMap.get(t.getUserId());
-                if (ObjectUtil.isNotNull(user)) {
-                    t.setContactName(user.getUserRealName());
-                    t.setPhone(user.getPhone());
-                    t.setEmail(user.getEmail());
-                }
-            });
+            for (TenantVO t : tenantVOPage.getRecords()) {
+                fillTenantContactInfo(t);
+            }
         }
         return new PageResp<>(tenantVOPage.getRecords(), tenantVOPage.getTotalRow());
     }
@@ -300,19 +291,45 @@ public class TenantServiceImpl implements TenantService {
         if (ObjectUtil.isNull(mTenant)) {
             return null;
         }
-        MUser mUser = userMapper.selectUserByUserId(mTenant.getUserId());
         TenantVO tenantVO = BeanUtil.copyProperties(mTenant, TenantVO.class);
-        if (ObjectUtil.isNotNull(mUser)) {
-            tenantVO.setContactName(mUser.getUserRealName());
-            tenantVO.setPhone(mUser.getPhone());
-            tenantVO.setEmail(mUser.getEmail());
-        }
+        //跨库查询联系人信息
+        fillTenantContactInfo(tenantVO);
         //查询数据源信息
         MTenantDatasource tenantDatasource = tenantDatasourceMapper.selectTenantDatasourceByTenantId(tenantId);
         if (ObjectUtil.isNotNull(tenantDatasource)) {
             tenantVO.setTenantDatasource(BeanUtil.copyProperties(tenantDatasource, TenantDatasourceVO.class));
         }
         return tenantVO;
+    }
+
+    /**
+     * 跨库查询租户联系人信息
+     * 系统租户（tenant_id=0）直接查主库，其他租户切换到对应数据源查询
+     * @param tenantVO 租户信息
+     */
+    private void fillTenantContactInfo(TenantVO tenantVO) {
+        if (ObjectUtil.isNull(tenantVO.getUserId())) {
+            return;
+        }
+        Long tid = tenantVO.getTenantId();
+        MUser mUser;
+        if (CommonConstant.ZERO == tid) {
+            //系统租户，用户在主库
+            mUser = userMapper.selectUserByUserId(tenantVO.getUserId());
+        } else {
+            //其他租户，切换到租户库查询
+            DynamicDataSourceContextHolder.push(String.valueOf(tid));
+            try {
+                mUser = userMapper.selectUserByUserId(tenantVO.getUserId());
+            } finally {
+                DynamicDataSourceContextHolder.poll();
+            }
+        }
+        if (ObjectUtil.isNotNull(mUser)) {
+            tenantVO.setContactName(mUser.getUserRealName());
+            tenantVO.setPhone(mUser.getPhone());
+            tenantVO.setEmail(mUser.getEmail());
+        }
     }
 
     /**
