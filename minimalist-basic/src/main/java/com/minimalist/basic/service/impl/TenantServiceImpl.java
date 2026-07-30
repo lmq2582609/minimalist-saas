@@ -29,6 +29,7 @@ import com.minimalist.basic.utils.CommonConstant;
 import com.minimalist.basic.utils.RedisKeyConstant;
 import com.minimalist.basic.utils.UnqIdUtil;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -217,13 +218,41 @@ public class TenantServiceImpl implements TenantService {
         tenantMapper.updateTenantByTenantId(newTenant);
         //如果租户套餐变更，则修改租户权限
         if (!tenantVO.getPackageId().equals(tenant.getPackageId())) {
+            //先在主库查询新套餐的权限数据
+            List<MTenantPackagePerm> newPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantVO.getPackageId());
+            List<Long> newPermIds = CollectionUtil.isNotEmpty(newPackagePerms)
+                    ? newPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList()
+                    : CollectionUtil.list(false);
+            List<MPerms> newPermsList = CollectionUtil.isNotEmpty(newPermIds)
+                    ? permsMapper.selectListByIds(newPermIds)
+                    : CollectionUtil.list(false);
+
             //切换到租户数据源更新权限
             DynamicDataSourceContextHolder.push(String.valueOf(tenant.getTenantId()));
             try {
+                //更新租户管理员角色的权限关联
                 List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-                tenantManager.updateTenantPermission(roleList, tenantVO.getPackageId());
-                //重新拷贝权限到租户库
-                copyPermsToTenantDb(tenantVO.getPackageId());
+                for (MRole role : roleList) {
+                    if (RoleEnum.Role.ADMIN.getCode().equals(role.getRoleCode())) {
+                        //删除旧关联
+                        rolePermMapper.deleteByQuery(QueryWrapper.create().eq(MRolePerm::getRoleId, role.getRoleId()));
+                        //插入新关联
+                        if (CollectionUtil.isNotEmpty(newPackagePerms)) {
+                            List<MRolePerm> rolePerms = newPackagePerms.stream().map(tpp -> {
+                                MRolePerm rp = new MRolePerm();
+                                rp.setRoleId(role.getRoleId());
+                                rp.setPermId(tpp.getPermId());
+                                return rp;
+                            }).toList();
+                            rolePermMapper.insertBatch(rolePerms);
+                        }
+                    }
+                }
+                //重新拷贝权限到租户库 m_perms
+                permsMapper.deleteByQuery(QueryWrapper.create());
+                if (CollectionUtil.isNotEmpty(newPermsList)) {
+                    permsMapper.insertBatch(newPermsList);
+                }
             } finally {
                 DynamicDataSourceContextHolder.poll();
             }
