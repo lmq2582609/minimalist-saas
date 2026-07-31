@@ -117,7 +117,7 @@ public class TenantServiceImpl implements TenantService {
         List<MPerms> permsList = CollectionUtil.list(false);
         if (CollectionUtil.isNotEmpty(packagePerms)) {
             List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-            permsList = permsMapper.selectListByIds(permIds);
+            permsList = permsMapper.selectListByQuery(QueryWrapper.create().in(MPerms::getPermId, permIds));
         }
 
         //④ 切换到租户数据源，初始化数据
@@ -224,7 +224,7 @@ public class TenantServiceImpl implements TenantService {
                     ? newPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList()
                     : CollectionUtil.list(false);
             List<MPerms> newPermsList = CollectionUtil.isNotEmpty(newPermIds)
-                    ? permsMapper.selectListByIds(newPermIds)
+                    ? permsMapper.selectListByQuery(QueryWrapper.create().in(MPerms::getPermId, newPermIds))
                     : CollectionUtil.list(false);
 
             //切换到租户数据源更新权限

@@ -181,7 +181,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
                 return;
             }
             List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-            permsList = permsMapper.selectListByIds(permIds);
+            permsList = permsMapper.selectListByQuery(QueryWrapper.create().in(MPerms::getPermId, permIds));
         } finally {
             DynamicDataSourceContextHolder.poll();
         }
