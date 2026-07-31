@@ -163,9 +163,8 @@ public class TenantServiceImpl implements TenantService {
         userIndex.setStatus(StatusEnum.STATUS_1.getCode().intValue());
         userIndexMapper.insert(userIndex, true);
 
-        //⑤ 发布消息 - 缓存租户信息
+        //设置租户ID（供Controller层发布消息使用）
         tenantVO.setTenantId(tenantId);
-        redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantVO));
     }
 
     /**
