@@ -4,7 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
-import com.minimalist.basic.config.datasource.UseMasterDS;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.minimalist.basic.entity.enums.ConfigEnum;
 import com.minimalist.basic.entity.enums.RespEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@UseMasterDS
+@DS("master")
 public class ConfigServiceImpl implements ConfigService {
 
     @Autowired

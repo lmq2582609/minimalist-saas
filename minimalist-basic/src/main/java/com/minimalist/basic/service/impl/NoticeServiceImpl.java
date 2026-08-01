@@ -6,7 +6,7 @@ import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
-import com.minimalist.basic.config.datasource.UseMasterDS;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.minimalist.basic.entity.enums.FileEnum;
 import com.minimalist.basic.entity.enums.NoticeEnum;
 import com.minimalist.basic.entity.po.MFile;
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@UseMasterDS
+@DS("master")
 public class NoticeServiceImpl implements NoticeService {
 
     @Autowired

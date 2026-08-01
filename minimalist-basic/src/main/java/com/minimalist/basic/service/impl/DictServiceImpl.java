@@ -8,7 +8,7 @@ import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.minimalist.basic.config.datasource.UseMasterDS;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.minimalist.basic.config.eDict.BeanMethod;
 import com.minimalist.basic.entity.enums.DictEnum;
 import com.minimalist.basic.entity.po.MDict;
@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
-@UseMasterDS
+@DS("master")
 public class DictServiceImpl implements DictService {
 
     @Autowired

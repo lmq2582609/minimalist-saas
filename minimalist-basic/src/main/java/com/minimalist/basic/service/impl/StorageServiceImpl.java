@@ -1,7 +1,7 @@
 package com.minimalist.basic.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.minimalist.basic.config.datasource.UseMasterDS;
+import com.baomidou.dynamic.datasource.annotation.DS;
 import com.minimalist.basic.config.fileHandler.FileManager;
 import com.minimalist.basic.config.fileHandler.handler.FileHandler;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@UseMasterDS
+@DS("master")
 public class StorageServiceImpl implements StorageService {
 
     @Autowired
