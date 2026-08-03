@@ -11,7 +11,6 @@ import com.minimalist.basic.entity.po.*;
 import com.minimalist.basic.entity.vo.tenant.TenantDatasourceVO;
 import com.minimalist.basic.mapper.MRolePermMapper;
 import com.minimalist.basic.mapper.MTenantMapper;
-import com.minimalist.basic.mapper.MTenantPackagePermMapper;
 import com.minimalist.basic.mapper.MUserMapper;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.mybatisflex.core.logicdelete.LogicDeleteManager;
@@ -39,9 +38,6 @@ public class TenantManager {
     private MRolePermMapper rolePermMapper;
 
     @Autowired
-    private MTenantPackagePermMapper tenantPackagePermMapper;
-
-    @Autowired
     private DataSource dataSource;
 
     @Autowired
@@ -55,7 +51,7 @@ public class TenantManager {
         //检查租户下用户数是否满足套餐
         MTenant mTenant = tenantMapper.selectTenantByTenantId(tenantId);
         Assert.notNull(mTenant, () -> new BusinessException(TenantEnum.ErrorMsg.NONENTITY_TENANT.getDesc()));
-        long userCount = userMapper.selectUserCountByTenantId(tenantId);
+        long userCount = userMapper.selectUserCount();
         // +1是去除租户本身的用户
         Assert.isFalse((userCount + 1) >= mTenant.getAccountCount(),
                 () -> new BusinessException(TenantEnum.ErrorMsg.TENANT_USER_COUNT_LIMIT.getDesc()));
@@ -80,9 +76,7 @@ public class TenantManager {
         Assert.isFalse(exHours <= 0, () -> new BusinessException(TenantEnum.ErrorMsg.EX_TENANT.getDesc()));
     }
 
-    public void updateTenantPermission(List<MRole> roleList, Long packageId) {
-        //修改后的套餐权限
-        List<MTenantPackagePerm> newTpp = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(packageId);
+    public void updateTenantPermission(List<MRole> roleList, List<MTenantPackagePerm> newTpp) {
         List<Long> permIds = newTpp.stream().map(MTenantPackagePerm::getPermId).toList();
         for (MRole role : roleList) {
             //如果是租户管理员，将套餐所有权限重新分配给租户管理员

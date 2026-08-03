@@ -230,7 +230,7 @@ public class TenantServiceImpl implements TenantService {
             DynamicDataSourceContextHolder.push(String.valueOf(tenant.getTenantId()));
             try {
                 //更新租户管理员角色的权限关联
-                List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
+                List<MRole> roleList = roleService.getAllRoles();
                 for (MRole role : roleList) {
                     if (RoleEnum.Role.ADMIN.getCode().equals(role.getRoleCode())) {
                         //删除旧关联

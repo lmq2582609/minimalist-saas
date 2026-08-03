@@ -49,10 +49,9 @@ public interface RoleService {
     RoleVO getRoleByRoleId(Long roleId);
 
     /**
-     * 根据租户ID查询角色列表
-     * @param tenantId 租户ID
+     * 查询当前数据源下的所有角色
      * @return 角色列表
      */
-    List<MRole> getRoleByTenantId(Long tenantId);
+    List<MRole> getAllRoles();
 
 }

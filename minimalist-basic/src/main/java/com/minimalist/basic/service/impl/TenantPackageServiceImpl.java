@@ -106,16 +106,23 @@ public class TenantPackageServiceImpl implements TenantPackageService {
             tenantPackagePermMapper.insertBatch(mTenantPackagePerms);
             //根据套餐查租户
             List<MTenant> tenants = tenantMapper.selectTenantByTenantPackageId(tenantPackageVO.getPackageId());
+            //在主库上下文中预先查询套餐权限数据（必须在切换租户之前完成）
+            List<MTenantPackagePerm> newPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenantPackageVO.getPackageId());
+            List<MPerms> permsList = CollectionUtil.list(false);
+            if (CollectionUtil.isNotEmpty(newPackagePerms)) {
+                List<Long> permIds = newPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+                permsList = permsMapper.selectListByQuery(QueryWrapper.create().in(MPerms::getPermId, permIds));
+            }
             for (MTenant tenant : tenants) {
                 //切换到租户数据源更新权限
                 DynamicDataSourceContextHolder.push(String.valueOf(tenant.getTenantId()));
                 try {
                     //查询租户下所有角色
-                    List<MRole> roleList = roleService.getRoleByTenantId(tenant.getTenantId());
-                    //修改租户角色权限
-                    tenantManager.updateTenantPermission(roleList, tenantPackageVO.getPackageId());
-                    //重新拷贝权限到租户库 m_perms
-                    syncPermsToTenantDb(tenantPackageVO.getPackageId());
+                    List<MRole> roleList = roleService.getAllRoles();
+                    //修改租户角色权限（使用预查询的主库数据）
+                    tenantManager.updateTenantPermission(roleList, newPackagePerms);
+                    //重新拷贝权限到租户库 m_perms（使用预查询的主库数据）
+                    syncPermsToTenantDb(permsList);
                 } finally {
                     DynamicDataSourceContextHolder.poll();
                 }
@@ -169,22 +176,9 @@ public class TenantPackageServiceImpl implements TenantPackageService {
     /**
      * 同步权限数据到租户库 m_perms
      * 注意：调用时已处于租户数据源上下文中
-     * @param packageId 套餐ID
+     * @param permsList 预查询的主库权限数据
      */
-    private void syncPermsToTenantDb(Long packageId) {
-        //从主库查询套餐关联的权限详情
-        DynamicDataSourceContextHolder.push("master");
-        List<MPerms> permsList;
-        try {
-            List<MTenantPackagePerm> packagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(packageId);
-            if (CollectionUtil.isEmpty(packagePerms)) {
-                return;
-            }
-            List<Long> permIds = packagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-            permsList = permsMapper.selectListByQuery(QueryWrapper.create().in(MPerms::getPermId, permIds));
-        } finally {
-            DynamicDataSourceContextHolder.poll();
-        }
+    private void syncPermsToTenantDb(List<MPerms> permsList) {
         //删除租户库旧的权限数据，插入新的
         permsMapper.deleteByQuery(QueryWrapper.create());
         if (CollectionUtil.isNotEmpty(permsList)) {
