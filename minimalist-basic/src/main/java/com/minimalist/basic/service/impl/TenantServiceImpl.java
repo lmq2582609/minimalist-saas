@@ -5,7 +5,6 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.config.redis.RedisManager;
@@ -136,7 +135,7 @@ public class TenantServiceImpl implements TenantService {
             DynamicDataSourceContextHolder.poll();
         }
 
-        //④ 写入主库
+        //⑤ 写入主库
         MTenant mTenant = BeanUtil.copyProperties(tenantVO, MTenant.class);
         mTenant.setDatasource(tenantDatasourceVO.getDatasourceName());
         mTenant.setUserId(userId);
@@ -255,8 +254,6 @@ public class TenantServiceImpl implements TenantService {
             }
         }
 
-        //发布消息 - 缓存租户信息
-        redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantVO));
     }
 
     /**

@@ -5,7 +5,6 @@ import com.minimalist.basic.entity.vo.tenant.TenantPackageQueryVO;
 import com.minimalist.basic.entity.vo.tenant.TenantPackageVO;
 import com.minimalist.basic.service.TenantPackageService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
-import com.minimalist.basic.config.tenant.TenantIgnore;
 import com.minimalist.basic.utils.Add;
 import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +25,6 @@ public class TenantPackageController {
     @Autowired
     private TenantPackageService tenantPackageService;
 
-    @TenantIgnore
     @PostMapping("/addTenantPackage")
     @SaCheckPermission("basic:tenantPackage:add")
     @Operation(summary = "添加租户套餐")
@@ -35,7 +33,6 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
-    @TenantIgnore
     @DeleteMapping("/deleteTenantPackageByTenantPackageId")
     @SaCheckPermission("basic:tenantPackage:delete")
     @Operation(summary = "删除租户套餐 -> 根据租户套餐ID删除租户套餐")
@@ -46,7 +43,6 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
-    @TenantIgnore
     @PutMapping("/updateTenantPackageByTenantPackageId")
     @SaCheckPermission("basic:tenantPackage:update")
     @Operation(summary = "修改租户套餐 -> 根据租户套餐ID修改")
@@ -55,7 +51,6 @@ public class TenantPackageController {
         return ResponseEntity.ok().build();
     }
 
-    @TenantIgnore
     @GetMapping("/getPageTenantPackageList")
     @SaCheckPermission("basic:tenantPackage:get")
     @Operation(summary = "查询租户套餐(分页)")
@@ -63,7 +58,6 @@ public class TenantPackageController {
         return ResponseEntity.ok(tenantPackageService.getPageTenantPackageList(queryVO));
     }
 
-    @TenantIgnore
     @GetMapping("/getTenantPackageByTenantPackageId/{tenantPackageId}")
     @SaCheckPermission("basic:tenantPackage:get")
     @Operation(summary = "根据租户套餐ID查询租户套餐")

@@ -8,7 +8,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.minimalist.basic.entity.vo.user.*;
 import com.minimalist.basic.service.UserService;
 import com.minimalist.basic.config.mybatis.bo.PageResp;
-import com.minimalist.basic.config.tenant.TenantIgnore;
 import com.minimalist.basic.utils.Add;
 import com.minimalist.basic.utils.Update;
 import io.swagger.v3.oas.annotations.Operation;
@@ -73,7 +72,6 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserByUserId(userId));
     }
 
-    //@TenantIgnore
     @GetMapping("/getUserInfo")
     @Operation(summary = "获取用户信息(登录后获取，含角色、权限、菜单、部门等)")
     public ResponseEntity<UserInfoVO> getUserInfo() {

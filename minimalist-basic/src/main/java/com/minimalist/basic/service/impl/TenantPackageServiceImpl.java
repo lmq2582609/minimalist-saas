@@ -3,6 +3,7 @@ package com.minimalist.basic.service.impl;
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.entity.enums.TenantEnum;
 import com.minimalist.basic.entity.po.*;
@@ -81,7 +82,7 @@ public class TenantPackageServiceImpl implements TenantPackageService {
      * @param tenantPackageVO 租户套餐信息
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional
     public void updateTenantPackageByTenantPackageId(TenantPackageVO tenantPackageVO) {
         //修改租户套餐数据
         MTenantPackage newTenantPackage = BeanUtil.copyProperties(tenantPackageVO, MTenantPackage.class);

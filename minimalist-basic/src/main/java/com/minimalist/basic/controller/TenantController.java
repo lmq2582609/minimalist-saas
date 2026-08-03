@@ -57,6 +57,8 @@ public class TenantController {
     @Operation(summary = "修改租户 -> 根据租户ID修改")
     public ResponseEntity<Void> updateTenantByTenantId(@RequestBody @Validated(Update.class) TenantVO tenantVO) {
         tenantService.updateTenantByTenantId(tenantVO);
+        //事务提交后发布消息，通知其他节点同步租户信息
+        redisManager.publishMessage(RedisKeyConstant.TENANT_DATA_TOPIC_KEY + "." + CommonConstant.ADD, JSONUtil.toJsonStr(tenantVO));
         return ResponseEntity.ok().build();
     }
 

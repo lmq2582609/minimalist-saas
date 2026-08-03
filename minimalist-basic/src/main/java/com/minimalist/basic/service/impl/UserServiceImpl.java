@@ -11,6 +11,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.dynamic.datasource.annotation.DSTransactional;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.entity.enums.*;
 import com.minimalist.basic.entity.po.MPerms;
@@ -46,8 +47,6 @@ import com.mybatisflex.core.paginate.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -103,7 +102,7 @@ public class UserServiceImpl implements UserService {
      * @param userVO 用户实体
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional
     public void addUser(UserVO userVO) {
         //校验用户名全局唯一（查主库 m_user_index）
         MUserIndex existIndex = userIndexMapper.selectByUsername(userVO.getUsername());
@@ -146,7 +145,7 @@ public class UserServiceImpl implements UserService {
      * @param userId 用户ID
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional
     public void deleteUserByUserId(Long userId) {
         //先查询用户信息（获取username用于删除索引）
         MUser user = userMapper.selectUserByUserId(userId);
@@ -172,7 +171,7 @@ public class UserServiceImpl implements UserService {
      * @param userVO 用户数据
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @DSTransactional
     public void updateUserByUserId(UserVO userVO) {
         //校验该租户套餐是否满足条件
         tenantManager.checkTenantPackage(TenantUtil.getTenantId());
