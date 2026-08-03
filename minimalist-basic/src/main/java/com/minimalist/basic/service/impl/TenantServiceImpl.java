@@ -34,8 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Service
 public class TenantServiceImpl implements TenantService {
@@ -124,7 +122,7 @@ public class TenantServiceImpl implements TenantService {
         DynamicDataSourceContextHolder.push(String.valueOf(tenantId));
         try {
             //创建租户管理员用户
-            addTenantUser(userInfo, tenantId);
+            addTenantUser(userInfo);
             //创建租户管理员角色 + 角色权限关联
             long roleId = UnqIdUtil.uniqueId();
             addTenantRole(roleId, packagePerms);
@@ -160,7 +158,7 @@ public class TenantServiceImpl implements TenantService {
         MUserIndex userIndex = new MUserIndex();
         userIndex.setUsername(userInfo.getUsername());
         userIndex.setTenantId(tenantId);
-        userIndex.setStatus(StatusEnum.STATUS_1.getCode().intValue());
+        userIndex.setStatus(StatusEnum.STATUS_1.getCode());
         userIndexMapper.insert(userIndex, true);
 
         //设置租户ID（供Controller层发布消息使用）
@@ -375,7 +373,7 @@ public class TenantServiceImpl implements TenantService {
         }
     }
 
-    private void addTenantUser(UserVO userInfo, Long tenantId) {
+    private void addTenantUser(UserVO userInfo) {
         MUser user = new MUser();
         user.setUserId(userInfo.getUserId());
         user.setUsername(userInfo.getUsername());

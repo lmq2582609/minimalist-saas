@@ -1,7 +1,6 @@
 package com.minimalist.basic.mapper;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.po.table.MDeptTableDef;
 import com.minimalist.basic.entity.po.table.MUserDeptTableDef;
@@ -12,10 +11,7 @@ import com.minimalist.basic.utils.CommonConstant;
 import com.mybatisflex.core.BaseMapper;
 import com.minimalist.basic.entity.po.MUser;
 import com.mybatisflex.core.paginate.Page;
-import com.mybatisflex.core.query.QueryColumn;
-import com.mybatisflex.core.query.QueryMethods;
 import com.mybatisflex.core.query.QueryWrapper;
-import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 /**
@@ -92,19 +88,6 @@ public interface MUserMapper extends BaseMapper<MUser> {
      */
     default void updateUserByUserId(MUser user) {
         updateByQuery(user, QueryWrapper.create().eq(MUser::getUserId, user.getUserId()));
-    }
-
-    /**
-     * 根据部门ID列表，查询用户数
-     * @param deptIds 部门ID
-     * @return 用户数
-     */
-    default long selectUserCountByDeptIds(List<Long> deptIds) {
-        long result = 0;
-        for (Long deptId : deptIds) {
-            result += selectCountByQuery(QueryWrapper.create().where("FIND_IN_SET("  + deptId +", ancestors)"));
-        }
-        return result;
     }
 
     /**
