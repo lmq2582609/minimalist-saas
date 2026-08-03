@@ -41,15 +41,6 @@ public interface MUserMapper extends BaseMapper<MUser> {
     }
 
     /**
-     * 根据用户ID查询用户
-     * @param userIdList 用户ID列表
-     * @return 用户PO
-     */
-    default List<MUser> selectUserByUserIds(List<Long> userIdList) {
-        return selectListByQuery(QueryWrapper.create().in(MUser::getUserId, userIdList));
-    }
-
-    /**
      * 根据租户ID查询用户 -> 字典查询（区分租户和管理员）
      * @return 用户列表
      */
@@ -63,15 +54,6 @@ public interface MUserMapper extends BaseMapper<MUser> {
      */
     default long selectUserCount() {
         return selectCountByQuery(QueryWrapper.create());
-    }
-
-    /**
-     * 根据手机号查询用户
-     * @param phone 手机号
-     * @return 用户实体
-     */
-    default MUser selectUserByPhone(String phone) {
-        return selectOneByQuery(QueryWrapper.create().eq(MUser::getPhone, phone));
     }
 
     /**
