@@ -60,7 +60,7 @@ public class TenantDatasourceSyncConsumer implements ApplicationRunner {
                 log.error("租户数据源信息同步处理异常：", e);
             }
         });
-        System.out.println("-------------------- 租户数据源信息同步消费者监听启动完毕 --------------------");
+        log.info("租户数据源信息同步消费者监听启动完毕");
     }
 
 }
