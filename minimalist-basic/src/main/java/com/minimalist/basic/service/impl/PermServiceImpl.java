@@ -4,6 +4,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Assert;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.minimalist.basic.entity.enums.PermEnum;
 import com.minimalist.basic.entity.enums.StatusEnum;
 import com.minimalist.basic.entity.po.*;
@@ -141,11 +142,20 @@ public class PermServiceImpl implements PermService {
         if (CommonConstant.ZERO == tenantId) {
             return getEnablePermList();
         }
-        //查询租户及套餐权限
-        MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
-        List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
-        List<Long> permIds = tenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
-        List<MPerms> enablePermList = permsMapper.selectPermsByPermsIds(permIds);
+        //非系统租户，需要切换到主库查询租户信息和套餐权限（m_tenant、m_tenant_package_perm均为主库表）
+        DynamicDataSourceContextHolder.push("master");
+        List<MPerms> enablePermList;
+        try {
+            MTenant tenant = tenantMapper.selectTenantByTenantId(tenantId);
+            List<MTenantPackagePerm> tenantPackagePerms = tenantPackagePermMapper.selectTenantPackagePermByTenantPackageId(tenant.getPackageId());
+            List<Long> permIds = tenantPackagePerms.stream().map(MTenantPackagePerm::getPermId).toList();
+            //切回租户数据源查询权限详情（m_perms在租户库）
+            DynamicDataSourceContextHolder.poll();
+            enablePermList = permsMapper.selectPermsByPermsIds(permIds);
+        } catch (Exception e) {
+            DynamicDataSourceContextHolder.poll();
+            throw e;
+        }
         return permsToTree(enablePermList);
     }
 
