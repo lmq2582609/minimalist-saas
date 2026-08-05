@@ -3,7 +3,7 @@
 
         <div class="w-full h-full flex justify-between">
             <!-- 部门数据 -->
-            <a-row class="h-full border-r pr-3" v-perm="['basic:dept:get']">
+            <a-row class="h-full border-r pr-3" v-if="isDeptEnabled" v-perm="['basic:dept:get']">
                 <a-spin class="w-[240px] h-full" :size="35" :loading="loadDeptListLoading" tip="正在处理, 请稍候...">
                     <a-tree class="w-full h-full overflow-y-auto" :data="deptTree" v-if="deptTree.length > 0" show-line  blockNode
                             v-model:selected-keys="selectDept" @select="selectDeptChange" ref="treeRef"
@@ -135,16 +135,19 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, shallowRef, onMounted} from 'vue'
+import {ref, reactive, getCurrentInstance, shallowRef, onMounted, computed} from 'vue'
 import { getPageUserListApi, deleteUserByUserIdApi } from "~/api/user.js";
 import UserEdit from "~/pages/basic/user/UserEdit.vue";
 import UserDetail from "~/pages/basic/user/UserDetail.vue";
 import {getDeptListApi} from "~/api/dept.js";
+import { useSysStore } from '~/store/module/sys-store.js'
 
 //全局实例
 const {proxy} = getCurrentInstance()
+const sysStore = useSysStore()
+const isDeptEnabled = computed(() => sysStore.isDeptEnabled())
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.deptList, proxy.DICT.userSex])
+const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.userSex])
 //是否展示搜索区域
 const showSearchRow = ref(true)
 //搜索参数表单
@@ -191,7 +194,11 @@ const getPageList = (isReset = false) => {
         searchForm.pageSize = 10
     }
     datatable.loading = true
-    searchForm.deptId = selectDept.value[0]
+    if (isDeptEnabled.value) {
+        searchForm.deptId = selectDept.value[0]
+    } else {
+        searchForm.deptId = null
+    }
     getPageUserListApi(searchForm).then(res => {
         datatable.records = res.records
         datatable.total = res.total
@@ -274,7 +281,9 @@ onMounted(() => {
     //查询数据列表
     getPageList()
     //查询部门数据列表
-    getDeptList()
+    if (isDeptEnabled.value) {
+        getDeptList()
+    }
 })
 </script>
 <style scoped>

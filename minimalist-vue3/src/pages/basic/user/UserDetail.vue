@@ -18,7 +18,7 @@
                     {{ index < form.roleIds.length - 1 ? ', ' : '' }}
                 </template>
             </a-descriptions-item>
-            <a-descriptions-item label="用户岗位">
+            <a-descriptions-item label="用户岗位" v-if="isPostEnabled">
                 <template v-for="(postId, index) in form.postIds" :key="index">
                     <dict-convert :dict-data="dicts[proxy.DICT.postList]" :dict-key="postId" />
                     {{index < form.postIds.length - 1 ? '   ' : ''}}
@@ -26,7 +26,7 @@
             </a-descriptions-item>
         </a-descriptions>
 
-        <a-descriptions :column="2" bordered class="mt-3">
+        <a-descriptions :column="2" bordered class="mt-3" v-if="isDeptEnabled">
             <a-descriptions-item :span="2" label="所属部门">
                 <a-spin class="w-[100%]" :size="35" :loading="deptTreeSpinLoading" tip="正在处理, 请稍候...">
                     <a-scrollbar class="w-[100%] max-h-[250px] overflow-auto" :outer-style="{width: '100%'}" type="track">
@@ -44,15 +44,21 @@
     </a-spin>
 </template>
 <script setup>
-import {ref, reactive, getCurrentInstance, watch, nextTick} from 'vue'
+import {ref, reactive, getCurrentInstance, watch, nextTick, computed} from 'vue'
 import { getUserByUserIdApi } from "~/api/user.js";
 import { getEnableDeptListApi } from "~/api/dept.js";
 import {getAllTreeParentId} from "~/utils/sys.js";
+import { useSysStore } from '~/store/module/sys-store.js'
 
 //全局实例
 const { proxy } = getCurrentInstance()
+const sysStore = useSysStore()
+const isDeptEnabled = computed(() => sysStore.isDeptEnabled())
+const isPostEnabled = computed(() => sysStore.isPostEnabled())
 //加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.userSex, proxy.DICT.roleList, proxy.DICT.postList])
+const dictKeys = [proxy.DICT.commonNumberStatus, proxy.DICT.userSex, proxy.DICT.roleList]
+if (isPostEnabled.value) dictKeys.push(proxy.DICT.postList)
+const dicts = proxy.LoadDicts(dictKeys)
 //加载中...
 const spinLoading = ref(false)
 //接收父组件参数
@@ -144,10 +150,16 @@ watch(() => props.params, (newVal, oldVal) => {
     //角色ID
     if (props.params.userId) {
         //加载部门树
-        getDeptTree(true)
+        if (isDeptEnabled.value) {
+            getDeptTree(true)
+        } else {
+            loadUserInfo(props.params.userId)
+        }
     } else {
         //加载部门树
-        getDeptTree()
+        if (isDeptEnabled.value) {
+            getDeptTree()
+        }
     }
 }, { deep: true, immediate: true })
 </script>

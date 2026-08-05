@@ -15,7 +15,7 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.userList]" :key="index" :value="String(d.dictKey)" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[33%]" field="publishDeptId" label="发布部门" tooltip="表示发布此公告的部门，可为空">
+                <a-form-item class="w-[33%]" field="publishDeptId" label="发布部门" tooltip="表示发布此公告的部门，可为空" v-if="isDeptEnabled">
                     <a-tree-select v-model="form.publishDeptId" :data="deptTree" placeholder="发布部门" allow-clear
                                    :fieldNames="{key: 'deptId', title: 'deptName', children: 'children'}" />
                 </a-form-item>
@@ -102,15 +102,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, getCurrentInstance, watch } from 'vue'
+import { ref, reactive, getCurrentInstance, watch, computed } from 'vue'
 import { addNoticeApi, updateNoticeByNoticeIdApi, getNoticeByNoticeIdApi } from "~/api/notice.js";
 import { getDeptListApi } from "~/api/dept.js";
 import TinymceEditor from '~/components/tinymceEditor/index.vue'
 import {fileSource, fileType} from "~/utils/sys.js";
 import FileSelect from "~/pages/basic/file/FileSelect.vue";
+import { useSysStore } from '~/store/module/sys-store.js'
 
 //全局实例
 const {proxy} = getCurrentInstance()
+const sysStore = useSysStore()
+const isDeptEnabled = computed(() => sysStore.isDeptEnabled())
 //加载字典
 const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.noticeType, proxy.DICT.yesNo, proxy.DICT.userList])
 //接收父组件参数
@@ -278,7 +281,9 @@ watch(() => props.params, (newVal, oldVal) => {
         loadNoticeInfo(props.params.noticeId)
     }
     //加载部门树
-    getDeptTree()
+    if (isDeptEnabled.value) {
+        getDeptTree()
+    }
 }, { deep: true, immediate: true })
 </script>
 <style scoped></style>

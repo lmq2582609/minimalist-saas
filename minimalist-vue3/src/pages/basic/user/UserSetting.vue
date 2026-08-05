@@ -23,13 +23,13 @@
                         <a-descriptions-item label="用户性别">
                             <dict-convert :dict-data="dicts[proxy.DICT.userSex]" :dict-key="userInfoForm.userSex" />
                         </a-descriptions-item>
-                        <a-descriptions-item label="用户岗位">
+                        <a-descriptions-item label="用户岗位" v-if="isPostEnabled">
                             <template v-for="(post, index) in sysStore.user.postList" :key="index">
                                 {{ post.postName }}
                                 {{index < sysStore.user.postList.length - 1 ? '   ' : ''}}
                             </template>
                         </a-descriptions-item>
-                        <a-descriptions-item label="所属部门">
+                        <a-descriptions-item label="所属部门" v-if="isDeptEnabled">
                             <template v-for="(dept, index) in sysStore.user.deptList" :key="index">
                                 {{ dept.deptName }}
                                 {{index < sysStore.user.deptList.length - 1 ? '   ' : ''}}
@@ -148,7 +148,7 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance} from 'vue'
+import {ref, reactive, getCurrentInstance, computed} from 'vue'
 import { useSysStore } from '~/store/module/sys-store.js'
 import { useRouter } from 'vue-router'
 import {resetPasswordApi, updateUserInfoApi, updateUserAvatarApi} from "~/api/user.js";
@@ -164,6 +164,8 @@ const {proxy} = getCurrentInstance()
 const dicts = proxy.LoadDicts([proxy.DICT.userSex])
 //缓存
 const sysStore = useSysStore()
+const isDeptEnabled = computed(() => sysStore.isDeptEnabled())
+const isPostEnabled = computed(() => sysStore.isPostEnabled())
 //裁剪头像组件ref
 const cropperRef = ref(null)
 //头像文件

@@ -35,6 +35,18 @@ export const useSysStore = defineStore('sysStore', {
         updateUserAvatar(userAvatar) {
             this.user.userAvatar = userAvatar
         },
+        //部门管理是否启用
+        isDeptEnabled() {
+            const funcConfigs = this.user?.funcConfigs
+            if (!funcConfigs) return true
+            return funcConfigs['feature.dept.enable'] === 'true'
+        },
+        //岗位管理是否启用
+        isPostEnabled() {
+            const funcConfigs = this.user?.funcConfigs
+            if (!funcConfigs) return true
+            return funcConfigs['feature.post.enable'] === 'true'
+        },
         //用户退出登录后的处理
         userLogoutHandler() {
             //清空cookie

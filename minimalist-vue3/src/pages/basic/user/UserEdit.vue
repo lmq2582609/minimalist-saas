@@ -55,12 +55,12 @@
                         <a-option v-for="(d, index) in dicts[proxy.DICT.roleList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[49%]" field="postIds" label="用户岗位">
+                <a-form-item class="w-[49%]" field="postIds" label="用户岗位" v-if="isPostEnabled">
                     <a-select v-model="form.postIds" placeholder="用户岗位" multiple :max-tag-count="2" allow-clear allow-search>
                         <a-option v-for="(d, index) in dicts[proxy.DICT.postList]" :key="index" :value="d.dictKey" :label="d.dictValue" />
                     </a-select>
                 </a-form-item>
-                <a-form-item class="w-[100%]" field="checkedDeptIds" label="所在部门">
+                <a-form-item class="w-[100%]" field="checkedDeptIds" label="所在部门" v-if="isDeptEnabled">
                     <a-spin class="w-[100%]" :size="35" :loading="deptTreeSpinLoading" tip="正在处理, 请稍候...">
                         <a-scrollbar class="w-[100%] max-h-[250px] overflow-auto border" :outer-style="{width: '100%'}" type="track">
                             <a-tree v-model:checked-keys="form.checkedDeptIds" :data="deptTreeData" ref="treeRef" v-if="deptTreeData.length > 0"
@@ -90,15 +90,21 @@
 </template>
 
 <script setup>
-import {ref, reactive, getCurrentInstance, watch, nextTick} from 'vue'
+import {ref, reactive, getCurrentInstance, watch, nextTick, computed} from 'vue'
 import { getUserByUserIdApi, addUserApi, updateUserByUserIdApi } from "~/api/user.js";
 import { getEnableDeptListApi } from "~/api/dept.js";
 import { getAllTreeParentId } from "~/utils/sys.js";
+import { useSysStore } from '~/store/module/sys-store.js'
 
 //全局实例
 const {proxy} = getCurrentInstance()
-//加载字典
-const dicts = proxy.LoadDicts([proxy.DICT.commonNumberStatus, proxy.DICT.userSex, proxy.DICT.roleList, proxy.DICT.postList])
+const sysStore = useSysStore()
+const isDeptEnabled = computed(() => sysStore.isDeptEnabled())
+const isPostEnabled = computed(() => sysStore.isPostEnabled())
+//加载字典 - 根据功能开关动态加载
+const dictKeys = [proxy.DICT.commonNumberStatus, proxy.DICT.userSex, proxy.DICT.roleList]
+if (isPostEnabled.value) dictKeys.push(proxy.DICT.postList)
+const dicts = proxy.LoadDicts(dictKeys)
 //接收父组件参数
 const props = defineProps({
     params: {
@@ -161,7 +167,11 @@ const rules = {
 //确定 -> 点击
 const okBtnClick = () => {
     //获取部门 -> 全勾选+半勾选
-    form.deptIds = getDeptTreeSelectData(true)
+    if (isDeptEnabled.value) {
+        form.deptIds = getDeptTreeSelectData(true)
+    } else {
+        form.deptIds = []
+    }
     //表单验证
     formRef.value.validate((valid) => {
         if (valid) {return false}
@@ -269,10 +279,16 @@ watch(() => props.params, (newVal, oldVal) => {
     //部门ID
     if (props.params.userId) {
         //加载部门树
-        getDeptTree(true)
+        if (isDeptEnabled.value) {
+            getDeptTree(true)
+        } else {
+            loadUserInfo(props.params.userId)
+        }
     } else {
         //加载部门树
-        getDeptTree()
+        if (isDeptEnabled.value) {
+            getDeptTree()
+        }
     }
 }, { deep: true, immediate: true })
 </script>

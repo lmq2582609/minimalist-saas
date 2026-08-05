@@ -227,4 +227,31 @@ CREATE TABLE `m_user_post`  (
   INDEX `user_id_idx`(`user_id`) USING BTREE COMMENT '用户ID索引'
 ) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '用户与岗位关联表 1用户-N岗位' ROW_FORMAT = Dynamic;
 
+-- ----------------------------
+-- 功能配置表
+-- ----------------------------
+DROP TABLE IF EXISTS `m_func_config`;
+CREATE TABLE `m_func_config`  (
+  `id` bigint(0) NOT NULL AUTO_INCREMENT,
+  `config_id` bigint(0) NOT NULL COMMENT '配置ID',
+  `config_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置名称',
+  `config_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置键名',
+  `config_value` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '配置键值',
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NULL DEFAULT NULL COMMENT '说明',
+  `create_id` bigint(0) NULL DEFAULT 0 COMMENT '创建人ID',
+  `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_id` bigint(0) NULL DEFAULT 0 COMMENT '更新人ID',
+  `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除  0未删除  1已删除',
+  `version` int(0) NULL DEFAULT 0 COMMENT '版本号',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `config_key_unq`(`config_key`) USING BTREE COMMENT '配置键唯一索引'
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci COMMENT = '功能配置表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- 功能配置预置数据
+-- ----------------------------
+INSERT INTO `m_func_config` (`config_id`, `config_name`, `config_key`, `config_value`, `description`) VALUES (1, '部门管理开关', 'feature.dept.enable', 'true', '是否启用部门管理功能');
+INSERT INTO `m_func_config` (`config_id`, `config_name`, `config_key`, `config_value`, `description`) VALUES (2, '岗位管理开关', 'feature.post.enable', 'true', '是否启用岗位管理功能');
+
 SET FOREIGN_KEY_CHECKS = 1;

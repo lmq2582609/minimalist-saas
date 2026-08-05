@@ -21,7 +21,10 @@ import com.minimalist.basic.entity.po.MUserIndex;
 import com.minimalist.basic.entity.po.MUserPost;
 import com.minimalist.basic.entity.po.MUserRole;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
+import com.minimalist.basic.entity.vo.perm.PermVO;
 import com.minimalist.basic.entity.vo.role.RoleVO;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.minimalist.basic.entity.vo.tenant.TenantVO;
 import com.minimalist.basic.entity.vo.user.ImageCaptchaVO;
 import com.minimalist.basic.entity.vo.user.RePasswordVO;
@@ -43,11 +46,15 @@ import com.minimalist.basic.config.mybatis.bo.PageResp;
 import com.minimalist.basic.config.redis.RedisManager;
 import com.minimalist.basic.config.tenant.TenantIgnore;
 import com.minimalist.basic.utils.*;
+import com.mybatisflex.core.logicdelete.LogicDeleteManager;
 import com.mybatisflex.core.paginate.Page;
+import com.mybatisflex.core.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -93,6 +100,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ConfigService configService;
+
+    @Autowired
+    private FuncConfigService funcConfigService;
 
     @Autowired
     private MUserIndexMapper userIndexMapper;
@@ -186,10 +196,35 @@ public class UserServiceImpl implements UserService {
         }
         //修改用户
         userMapper.updateUserByUserId(newUser);
-        //删除用户关联信息
-        userManager.deleteUserRelation(userVO.getUserId());
+
+        //功能开关判断 - 关联数据保护
+        Map<String, String> funcConfigMap = funcConfigService.getFuncConfigMap();
+        boolean postEnabled = Boolean.parseBoolean(funcConfigMap.getOrDefault("feature.post.enable", "true"));
+        boolean deptEnabled = Boolean.parseBoolean(funcConfigMap.getOrDefault("feature.dept.enable", "true"));
+
+        //删除用户关联信息 - 功能关闭时不触碰对应关联
+        if (postEnabled || deptEnabled) {
+            //至少有一个功能开启，才需要处理关联
+            if (postEnabled) {
+                LogicDeleteManager.execWithoutLogicDelete(()->
+                        userPostMapper.deleteByQuery(QueryWrapper.create().eq(MUserPost::getUserId, userVO.getUserId()))
+                );
+            }
+            if (deptEnabled) {
+                LogicDeleteManager.execWithoutLogicDelete(()->
+                        userDeptMapper.deleteByQuery(QueryWrapper.create().eq(MUserDept::getUserId, userVO.getUserId()))
+                );
+            }
+        }
+        //角色关联始终处理
+        LogicDeleteManager.execWithoutLogicDelete(()->
+                userRoleMapper.deleteByQuery(QueryWrapper.create().eq(MUserRole::getUserId, userVO.getUserId()))
+        );
         //新增用户关联信息
-        userManager.insertUserRelation(userVO.getRoleIds(), userVO.getPostIds(), userVO.getDeptIds(), userVO.getUserId());
+        userManager.insertUserRelation(userVO.getRoleIds(),
+                postEnabled ? userVO.getPostIds() : null,
+                deptEnabled ? userVO.getDeptIds() : null,
+                userVO.getUserId());
 
         //如果用户状态变更，同步主库索引状态
         if (ObjectUtil.isNotNull(userVO.getStatus()) && !userVO.getStatus().equals(oldUser.getStatus())) {
@@ -304,14 +339,66 @@ public class UserServiceImpl implements UserService {
             redisManager.set(StrUtil.indexedFormat(RedisKeyConstant.USER_ROLE_CACHE_KEY, userId), roleCodes, RedisKeyConstant.USER_PERM_CACHE_EX);
             redisManager.set(StrUtil.indexedFormat(RedisKeyConstant.USER_PERM_CACHE_KEY, userId), permCodes, RedisKeyConstant.USER_PERM_CACHE_EX);
         }
+        //读取功能开关配置
+        Map<String, String> funcConfigMap = funcConfigService.getFuncConfigMap();
+        boolean postEnabled = Boolean.parseBoolean(funcConfigMap.getOrDefault("feature.post.enable", "true"));
+        boolean deptEnabled = Boolean.parseBoolean(funcConfigMap.getOrDefault("feature.dept.enable", "true"));
+        //系统租户（未切换租户）：功能关闭时从菜单树中过滤掉对应菜单（因为系统租户不修改m_perms.visible，避免通过套餐同步影响所有租户）
+        boolean isSystemTenant = TenantUtil.checkTenantOnOff() && TenantUtil.checkIsSystemTenant() && !TenantUtil.checkQueryTenantData();
+        if (isSystemTenant && userInfoVO.getMenus() != null) {
+            if (!deptEnabled) {
+                filterMenuByConfigKey(userInfoVO.getMenus(), "dept_enable_params");
+            }
+            if (!postEnabled) {
+                filterMenuByConfigKey(userInfoVO.getMenus(), "post_enable_params");
+            }
+        }
         //用户岗位
-        userInfoVO.setPostList(postService.getPostByUserId(userId));
+        if (postEnabled) {
+            userInfoVO.setPostList(postService.getPostByUserId(userId));
+        } else {
+            userInfoVO.setPostList(List.of());
+        }
         //用户所属部门
-        List<MUserDept> userDeptList = userDeptMapper.selectUserDeptRelation(userId);
-        //部门选中回显
-        List<Long> deptIds = userDeptList.stream().map(MUserDept::getDeptId).toList();
-        userInfoVO.setDeptList(deptService.getDeptByDeptIds(deptIds));
+        if (deptEnabled) {
+            List<MUserDept> userDeptList = userDeptMapper.selectUserDeptRelation(userId);
+            List<Long> deptIds = userDeptList.stream().map(MUserDept::getDeptId).toList();
+            userInfoVO.setDeptList(deptService.getDeptByDeptIds(deptIds));
+        } else {
+            userInfoVO.setDeptList(List.of());
+        }
+        //设置功能配置到返回对象
+        userInfoVO.setFuncConfigs(funcConfigMap);
         return userInfoVO;
+    }
+
+    /**
+     * 根据主库m_config中的菜单匹配参数，从菜单树中过滤掉对应菜单
+     * @param menus 菜单树
+     * @param paramsKey 菜单匹配参数key（如 dept_enable_params）
+     */
+    private void filterMenuByConfigKey(List<PermVO> menus, String paramsKey) {
+        ConfigVO paramsConfig = configService.getConfigByConfigKey(paramsKey);
+        if (paramsConfig == null) return;
+        JSONObject json = JSONUtil.parseObj(paramsConfig.getConfigValue());
+        String permName = json.getStr("perm_name");
+        String permPath = json.getStr("perm_path");
+        removeMenuFromTree(menus, permName, permPath);
+    }
+
+    /**
+     * 递归遍历菜单树，移除匹配的菜单节点
+     */
+    private void removeMenuFromTree(List<PermVO> menus, String permName, String permPath) {
+        Iterator<PermVO> iterator = menus.iterator();
+        while (iterator.hasNext()) {
+            PermVO menu = iterator.next();
+            if (permName.equals(menu.getPermName()) && permPath.equals(menu.getPermPath())) {
+                iterator.remove();
+            } else if (menu.getChildren() != null && !menu.getChildren().isEmpty()) {
+                removeMenuFromTree(menu.getChildren(), permName, permPath);
+            }
+        }
     }
 
     /**

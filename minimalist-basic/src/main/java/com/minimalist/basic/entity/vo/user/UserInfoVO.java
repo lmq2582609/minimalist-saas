@@ -14,6 +14,7 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Data
@@ -78,5 +79,8 @@ public class UserInfoVO implements Serializable {
 
     @Schema(name = "menus", description = "用户菜单")
     private List<PermVO> menus;
+
+    @Schema(name = "funcConfigs", description = "功能配置键值对")
+    private Map<String, String> funcConfigs;
 
 }
