@@ -18,13 +18,9 @@
 |------|------|
 | `minimalist-basic/src/main/java/com/minimalist/basic/entity/po/MUserIndex.java` | 用户索引实体 |
 | `minimalist-basic/src/main/java/com/minimalist/basic/mapper/MUserIndexMapper.java` | 用户索引 Mapper |
-| `minimalist-basic/src/main/java/com/minimalist/basic/config/datasource/UseMasterDS.java` | 强制主库注解 |
-| `minimalist-basic/src/main/java/com/minimalist/basic/config/datasource/UseMasterDSAspect.java` | 强制主库 AOP 切面 |
 | `minimalist-basic/src/main/java/com/minimalist/basic/service/TenantDbInitService.java` | 租户库初始化接口 |
 | `minimalist-basic/src/main/java/com/minimalist/basic/service/impl/TenantDbInitServiceImpl.java` | 租户库初始化实现 |
 | `minimalist-basic/src/main/resources/sql/tenant_init_template.sql` | 租户库建表模板 |
-| `resources/sql/mysql/migration_v2.0.sql` | 主库变更 SQL |
-| `resources/sql/mysql/migration_data_transfer.sql` | 数据迁移参考脚本 |
 
 ### 修改文件
 
@@ -36,9 +32,10 @@
 | `minimalist-basic/.../service/impl/UserServiceImpl.java` | 新登录流程 + 索引同步 |
 | `minimalist-basic/.../service/impl/TenantServiceImpl.java` | 新创建租户流程 |
 | `minimalist-basic/.../service/impl/TenantPackageServiceImpl.java` | 套餐变更同步租户库 |
-| `minimalist-basic/.../service/impl/DictServiceImpl.java` | 添加 @UseMasterDS |
-| `minimalist-basic/.../service/impl/ConfigServiceImpl.java` | 添加 @UseMasterDS |
-| `minimalist-basic/.../service/impl/NoticeServiceImpl.java` | 添加 @UseMasterDS |
+| `minimalist-basic/.../service/impl/DictServiceImpl.java` | 添加 @DS("master") |
+| `minimalist-basic/.../service/impl/ConfigServiceImpl.java` | 添加 @DS("master") |
+| `minimalist-basic/.../service/impl/NoticeServiceImpl.java` | 添加 @DS("master") |
+| `minimalist-basic/.../service/impl/StorageServiceImpl.java` | 添加 @DS("master") |
 | `minimalist-basic/.../manager/TenantManager.java` | 调整权限更新逻辑 |
 | `minimalist-basic/.../entity/po/MUser.java` | 移除 tenantId 的 @Column(tenantId=true) |
 | `minimalist-basic/.../entity/po/MRole.java` | 同上 |
@@ -53,44 +50,14 @@
 | 文件 | 原因 |
 |------|------|
 | `minimalist-basic/.../config/tenant/TenantIgnoreAspect.java` | 不再需要字段过滤忽略 |
-| `minimalist-basic/.../config/tenant/TenantIgnore.java` | 不再需要（或保留重命名） |
+
+> 注：`TenantIgnore.java` 保留，仅作为常量定义（TENANT_ID、CHANGE_TENANT_ID）。
 
 ---
 
-## 任务 1：主库 SQL 变更
+## 任务 1：~~主库 SQL 变更~~（未创建）
 
-**文件：**
-- 创建：`resources/sql/mysql/migration_v2.0.sql`
-
-- [ ] **步骤 1：编写主库变更 SQL**
-
-```sql
--- v2.0 多租户数据库隔离改造 - 主库变更
-
--- 1. 新增全局用户账号索引表
-CREATE TABLE IF NOT EXISTS `m_user_index` (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `username` varchar(30) NOT NULL COMMENT '用户账号',
-  `tenant_id` bigint NOT NULL COMMENT '所属租户ID',
-  `status` tinyint NULL DEFAULT 1 COMMENT '状态 0禁用 1正常',
-  PRIMARY KEY (`id`),
-  UNIQUE INDEX `unq_username`(`username`)
-) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='全局用户账号索引';
-
--- 2. 从现有 m_user 表填充索引数据
-INSERT INTO m_user_index (username, tenant_id, status)
-SELECT username, tenant_id, status FROM m_user WHERE deleted = 0;
-
--- 3. m_tenant 表移除 data_isolation 字段
-ALTER TABLE m_tenant DROP COLUMN `data_isolation`;
-```
-
-- [ ] **步骤 2：Commit**
-
-```bash
-git add resources/sql/mysql/migration_v2.0.sql
-git commit -m "feat: 新增v2.0主库变更SQL（m_user_index + 移除data_isolation）"
-```
+> 注：`migration_v2.0.sql` 暂未创建，待正式发布时再处理。包括：新增 m_user_index 表、填充索引数据、m_tenant 表移除 data_isolation 字段。
 
 ---
 
@@ -101,7 +68,7 @@ git commit -m "feat: 新增v2.0主库变更SQL（m_user_index + 移除data_isola
 
 - [ ] **步骤 1：编写租户库建表模板 SQL**
 
-从全量 SQL 中提取 11 张表的 DDL，移除 tenant_id 字段，不含 INSERT：
+从全量 SQL 中提取 12 张表的 DDL，移除 tenant_id 字段，不含 INSERT（m_func_config 除外，含预置数据）：
 
 ```sql
 -- 租户库初始化建表模板
@@ -308,6 +275,29 @@ CREATE TABLE `m_user_post` (
   INDEX `user_id_idx`(`user_id`)
 ) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='用户与岗位关联表';
 
+-- m_func_config（功能配置表）
+DROP TABLE IF EXISTS `m_func_config`;
+CREATE TABLE `m_func_config` (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `config_id` bigint NOT NULL COMMENT '配置ID',
+  `config_name` varchar(100) NOT NULL COMMENT '配置名称',
+  `config_key` varchar(100) NOT NULL COMMENT '配置键名',
+  `config_value` varchar(255) NOT NULL COMMENT '配置键值',
+  `description` varchar(255) NULL DEFAULT NULL COMMENT '说明',
+  `create_id` bigint NULL DEFAULT 0 COMMENT '创建人ID',
+  `create_time` datetime(6) NULL DEFAULT NULL COMMENT '创建时间',
+  `update_id` bigint NULL DEFAULT 0 COMMENT '更新人ID',
+  `update_time` datetime(6) NULL DEFAULT NULL COMMENT '更新时间',
+  `deleted` bit(1) NULL DEFAULT b'0' COMMENT '逻辑删除',
+  `version` int NULL DEFAULT 0 COMMENT '版本号',
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `config_key_unq`(`config_key`)
+) ENGINE=InnoDB CHARACTER SET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='功能配置表';
+
+-- 功能配置预置数据
+INSERT INTO `m_func_config` (`config_id`, `config_name`, `config_key`, `config_value`, `description`) VALUES (1, '部门管理开关', 'feature.dept.enable', 'true', '是否启用部门管理功能');
+INSERT INTO `m_func_config` (`config_id`, `config_name`, `config_key`, `config_value`, `description`) VALUES (2, '岗位管理开关', 'feature.post.enable', 'true', '是否启用岗位管理功能');
+
 SET FOREIGN_KEY_CHECKS = 1;
 ```
 
@@ -315,7 +305,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 ```bash
 git add minimalist-basic/src/main/resources/sql/tenant_init_template.sql
-git commit -m "feat: 新增租户库建表模板SQL（11张表，无tenant_id）"
+git commit -m "feat: 新增租户库建表模板SQL（12张表，无tenant_id，含m_func_config预置数据）"
 ```
 
 ---
@@ -409,70 +399,35 @@ git commit -m "feat: 新增MUserIndex实体和Mapper（全局用户账号索引�
 
 ---
 
-## 任务 4：新增 @UseMasterDS 注解和切面
+## 任务 4：系统级数据服务添加 @DS("master")
 
 **文件：**
-- 创建：`minimalist-basic/src/main/java/com/minimalist/basic/config/datasource/UseMasterDS.java`
-- 创建：`minimalist-basic/src/main/java/com/minimalist/basic/config/datasource/UseMasterDSAspect.java`
+- 修改：`DictServiceImpl.java`、`ConfigServiceImpl.java`、`NoticeServiceImpl.java`、`StorageServiceImpl.java`
 
-- [ ] **步骤 1：创建注解**
+> 注：原计划创建自定义 `@UseMasterDS` 注解和 AOP 切面，实际实现中改为直接使用 dynamic-datasource 提供的 `@DS("master")` 注解（类级别），更简洁且无需额外维护切面。
+
+- [ ] **步骤 1：在字典/配置/通知/存储的 Service 类上添加 @DS("master")**
+
+在 `DictServiceImpl`、`ConfigServiceImpl`、`NoticeServiceImpl`、`StorageServiceImpl` 的类声明上添加 `@DS("master")` 注解，确保这些系统级数据的所有操作均走主库。
 
 ```java
-package com.minimalist.basic.config.datasource;
-
-import java.lang.annotation.*;
-
-/**
- * 标记此方法强制使用主数据源（用于系统级数据查询：字典、配置、通知、存储）
- */
-@Target({ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
-@Documented
-public @interface UseMasterDS {
+@Service
+@DS("master")
+public class DictServiceImpl implements DictService {
+    // ...
 }
 ```
 
-- [ ] **步骤 2：创建 AOP 切面**
-
-```java
-package com.minimalist.basic.config.datasource;
-
-import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
-import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.springframework.core.annotation.Order;
-import org.springframework.stereotype.Component;
-
-@Slf4j
-@Aspect
-@Component
-@Order(-1)
-public class UseMasterDSAspect {
-
-    @Around("@annotation(useMasterDS)")
-    public Object around(ProceedingJoinPoint joinPoint, UseMasterDS useMasterDS) throws Throwable {
-        try {
-            DynamicDataSourceContextHolder.push("master");
-            return joinPoint.proceed();
-        } finally {
-            DynamicDataSourceContextHolder.poll();
-        }
-    }
-}
-```
-
-- [ ] **步骤 3：编译验证**
+- [ ] **步骤 2：编译验证**
 
 运行：`mvn compile -pl minimalist-basic -q`
 预期：BUILD SUCCESS
 
-- [ ] **步骤 4：Commit**
+- [ ] **步骤 3：Commit**
 
 ```bash
-git add minimalist-basic/src/main/java/com/minimalist/basic/config/datasource/
-git commit -m "feat: 新增@UseMasterDS注解和切面（强制主库查询）"
+git add minimalist-basic/src/main/java/com/minimalist/basic/service/impl/
+git commit -m "feat: 系统级数据查询添加@DS(\"master\")（字典/配置/通知/存储）"
 ```
 
 ---
@@ -760,26 +715,9 @@ git commit -m "feat: 用户CRUD同步主库索引（新增/删除/禁用/启用�
 
 ---
 
-## 任务 10：系统级数据服务添加 @UseMasterDS
+## 任务 10：~~系统级数据服务添加 @UseMasterDS~~ → 已合并至任务 4
 
-**文件：**
-- 修改：`DictServiceImpl.java`、`ConfigServiceImpl.java`、`NoticeServiceImpl.java`、`StorageServiceImpl.java`
-
-- [ ] **步骤 1：在字典/配置/通知/存储的查询方法上添加 @UseMasterDS**
-
-确保租户用户访问这些系统级数据时强制走主库。
-
-- [ ] **步骤 2：编译验证**
-
-运行：`mvn compile -pl minimalist-basic -q`
-预期：BUILD SUCCESS
-
-- [ ] **步骤 3：Commit**
-
-```bash
-git add minimalist-basic/src/main/java/com/minimalist/basic/service/impl/
-git commit -m "feat: 系统级数据查询添加@UseMasterDS（字典/配置/通知/存储）"
-```
+> 注：此任务已合并到任务 4 中统一处理。实际实现中使用 `@DS("master")` 类级别注解替代自定义 `@UseMasterDS` 方法级别注解。
 
 ---
 
@@ -859,43 +797,12 @@ git commit -m "feat: 前端移除数据隔离方式选择（数据源信息改�
 
 ---
 
-## 任务 14：数据迁移脚本
+## 任务 14：~~数据迁移脚本~~（未创建）
 
-**文件：**
-- 创建：`resources/sql/mysql/migration_data_transfer.sql`
-
-- [ ] **步骤 1：编写数据迁移参考脚本**
-
-提供 SQL 模板，说明如何将主库中各租户数据拆分到独立数据库（按 tenant_id 筛选导出）。
-
-- [ ] **步骤 2：Commit**
-
-```bash
-git add resources/sql/mysql/migration_data_transfer.sql
-git commit -m "docs: 新增数据迁移参考脚本"
-```
+> 注：数据迁移脚本 `migration_data_transfer.sql` 暂未创建，待实际需要数据迁移时再编写。迁移方案已在设计文档中描述（第十节）。
 
 ---
 
-## 任务 15：更新全量 SQL 和验证
+## 任务 15：~~更新全量 SQL 和验证~~（未执行）
 
-**文件：**
-- 修改：`resources/sql/mysql/minimalist_全部sql,如果是第一次使用本项目直接执行这个.sql`
-
-- [ ] **步骤 1：更新全量 SQL**
-
-- 新增 m_user_index 表和初始数据
-- m_tenant 表移除 data_isolation 字段
-- 移除 m_dict 中的 tenant-data-isolation 字典数据
-
-- [ ] **步骤 2：全量编译验证**
-
-运行：`mvn clean compile -q`
-预期：BUILD SUCCESS
-
-- [ ] **步骤 3：Commit**
-
-```bash
-git add resources/sql/mysql/
-git commit -m "feat: 更新全量SQL（v2.0数据库隔离版本）"
-```
+> 注：全量 SQL 更新和 migration_v2.0.sql 暂未创建，待正式发布时再处理。包括：新增 m_user_index 表、m_tenant 表移除 data_isolation 字段、移除 tenant-data-isolation 字典数据等。

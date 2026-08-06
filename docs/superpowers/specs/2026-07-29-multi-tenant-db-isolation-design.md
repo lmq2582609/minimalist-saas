@@ -52,6 +52,7 @@
 | m_user_post | 用户-岗位关联 |
 | m_file | 文件记录（无 tenant_id） |
 | m_perms | 权限副本（从主库拷贝） |
+| m_func_config | 功能配置（租户级功能开关） |
 
 ### m_user_index 表结构（新增）
 
@@ -187,11 +188,11 @@ registry.addInterceptor(new TenantDatasourceInterceptor())
 
 ### 租户库建表模板
 
-文件位置：`resources/sql/mysql/tenant_init_template.sql`
+文件位置：`minimalist-basic/src/main/resources/sql/tenant_init_template.sql`
 
-包含 11 张表的 DDL：m_user、m_role、m_dept、m_post、m_file、m_perms、m_role_perm、m_role_dept、m_user_role、m_user_dept、m_user_post。
+包含 12 张表的 DDL：m_user、m_role、m_dept、m_post、m_file、m_perms、m_role_perm、m_role_dept、m_user_role、m_user_dept、m_user_post、m_func_config。
 
-业务表（m_user、m_role、m_dept、m_post、m_file）移除 tenant_id 字段。不含 INSERT 语句。
+业务表（m_user、m_role、m_dept、m_post、m_file）移除 tenant_id 字段。m_func_config 表含预置数据 INSERT（部门/岗位功能开关），其余表不含 INSERT 语句。
 
 ## 五、用户管理与主库索引同步
 
@@ -237,12 +238,12 @@ m_config、m_dict、m_notice、m_storage 为系统级数据，仅存于主库。
 
 租户用户也需要读取字典（前端下拉框渲染等），因此这些查询接口不能简单走租户数据源。
 
-处理方式：在字典、配置、通知、存储相关的 Service/Mapper 层，使用 `DynamicDataSourceContextHolder.push("master")` 强制切换主库查询，查询完毕后恢复。
+处理方式：使用 dynamic-datasource 提供的 `@DS("master")` 注解，标记在需要访问主库系统级数据的 Service 类上（类级别），该注解会自动将方法执行切换到主数据源。
 
 具体实现：
-- 创建一个工具方法或 AOP 注解（如 `@UseMasterDS`），标记在需要访问主库系统级数据的 Service 方法上
-- 方法执行前 push master，执行后 clear/恢复原数据源
-- 适用于：DictService、ConfigService、NoticeService、StorageService 的查询方法
+- 在 DictServiceImpl、ConfigServiceImpl、NoticeServiceImpl、StorageServiceImpl 的类声明上添加 `@DS("master")` 注解
+- 注解生效后，该 Service 内所有方法均走主库，无需手动 push/poll 数据源
+- 适用于：DictService、ConfigService、NoticeService、StorageService
 
 ### 写入权限
 
@@ -280,7 +281,7 @@ m_config、m_dict、m_notice、m_storage 为系统级数据，仅存于主库。
 - `MyBatisFlexConfiguration` 中的 `TenantManager.setTenantFactory(...)` — 不再需要字段过滤
 - 实体类上的 `@Column(tenantId = true)` 注解（MUser、MRole、MDept、MPost、MFile）
 - `TenantIgnoreAspect` 切面
-- `@TenantIgnore` 注解（或保留改作他用）
+- `@TenantIgnore` 注解 — 保留，仅作为常量定义（TENANT_ID、CHANGE_TENANT_ID），不再作为切面标识
 - `TenantEnum.DataIsolation` 枚举（不再有隔离方式选择）
 - m_tenant 表的 `data_isolation` 字段相关逻辑
 
@@ -299,7 +300,7 @@ m_config、m_dict、m_notice、m_storage 为系统级数据，仅存于主库。
 - `MUserIndexMapper` — 主库索引表 Mapper
 - `TenantDbInitService` — 租户库初始化服务（执行建表 SQL + 初始数据）
 - `tenant_init_template.sql` — 建表模板文件
-- `@UseMasterDS` 注解 + AOP 切面 — 标记强制走主库的方法（用于系统级数据查询）
+- `@DS("master")` 注解（dynamic-datasource 内置）— 标记在系统级数据 Service 类上，强制走主库查询
 
 ## 十、数据迁移方案
 
