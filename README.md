@@ -65,8 +65,8 @@ Github：[https://github.com/lmq2582609/minimalist-saas](https://github.com/lmq2
 
 | 名称                 | 版本     | 说明      |
 | ------------------ | ------ | ------- |
-| Java               | 17     |         |
-| SpringBoot         | 3.1.1  | 开发框架    |
+| Java               | 21     |         |
+| SpringBoot         | 3.1.4  | 开发框架    |
 | Mybatis-flex       | 1.9.7  | ORM 框架  |
 | Satoken            | 1.39.0 | 权限认证框架  |
 | Dynamic-Datasource | 4.3.1  | 多数据源管理  |
@@ -88,7 +88,7 @@ Github：[https://github.com/lmq2582609/minimalist-saas](https://github.com/lmq2
 
 | 环境      | 版本要求 |
 | --------- | ------ |
-| JDK       | 17+    |
+| JDK       | 21+    |
 | Maven     | 3.6+   |
 | MySQL     | 8.0+   |
 | Redis     | 7.0+   |

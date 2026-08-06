@@ -16,7 +16,7 @@
 
     <properties>
         <!-- springboot版本 -->
-        <springboot.version>3.1.1</springboot.version>
+        <springboot.version>3.1.4</springboot.version>
         <!-- redisson版本 -->
         <redisson.version>3.36.0</redisson.version>
         <!-- mysql驱动版本 -->
@@ -46,10 +46,10 @@
         <!-- webp配合做缩略图处理 -->
         <webp-imageio.version>0.1.6</webp-imageio.version>
         <!-- java -->
-        <java.version>17</java.version>
+        <java.version>21</java.version>
         <!-- maven.compiler -->
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <!-- 项目打包名称 -->
         <project.package.name>minimalist-saas-backend</project.package.name>
         <!-- 编码 -->
