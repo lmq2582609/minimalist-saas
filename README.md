@@ -108,7 +108,7 @@ cd minimalist-saas
 创建 MySQL 数据库 `minimalist`，执行 SQL 脚本：
 
 ```
-resources/sql/mysql/minimalist_全部sql,如果是第一次使用本项目直接执行这个.sql
+resources/sql/mysql/minimalist.sql
 ```
 
 3. **修改配置**
