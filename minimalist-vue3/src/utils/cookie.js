@@ -35,3 +35,6 @@ export function getCookie(key) {
 export function setCookie(key, value) {
     return cookie.set(key, value)
 }
+export function removeCookie(key) {
+    return cookie.remove(key)
+}

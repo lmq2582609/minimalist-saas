@@ -7,6 +7,7 @@ import cn.hutool.extra.servlet.JakartaServletUtil;
 import com.minimalist.basic.config.exception.BusinessException;
 import com.minimalist.basic.config.tenant.TenantIgnore;
 import com.minimalist.basic.entity.enums.UserEnum;
+import com.minimalist.basic.entity.enums.RoleEnum;
 import com.minimalist.basic.entity.vo.config.ConfigVO;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -64,6 +65,12 @@ public class TenantUtil {
                 return loginUserTenantId;
             }
 
+            //非系统管理员不允许租户切换，防止伪造cookie查询其他租户数据，忽略cookie直接返回系统租户ID
+            if (!StpUtil.hasRole(RoleEnum.Role.SYSTEM_ADMIN.getCode())) {
+                log.warn("检测到非系统管理员携带租户切换cookie，loginUserId：{}，changeTenantId：{}，已忽略", StpUtil.getLoginId(), changeTenantId);
+                return loginUserTenantId;
+            }
+
             //租户切换，返回切换后的租户ID，这表示虽然当前登录的是系统租户，但系统租户下要查询其他租户的数据
             return changeTenantId;
         } else {
@@ -78,7 +85,12 @@ public class TenantUtil {
      * @return true是，false否
      */
     public static boolean checkQueryTenantData() {
-        return TenantUtil.getCookieChangeTenantId() != null;
+        //cookie中无切换租户ID，表示未进行租户切换
+        if (ObjectUtil.isNull(TenantUtil.getCookieChangeTenantId())) {
+            return false;
+        }
+        //非系统管理员不允许租户切换，防止伪造cookie查询其他租户数据
+        return StpUtil.hasRole(RoleEnum.Role.SYSTEM_ADMIN.getCode());
     }
 
 

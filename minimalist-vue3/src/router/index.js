@@ -1,5 +1,5 @@
 import {createRouter, createWebHashHistory} from "vue-router";
-import {CHANGE_TENANT_ALLOW, getToken, setCookie} from "~/utils/cookie";
+import {CHANGE_TENANT_ALLOW, CHANGE_TENANT_ID, CHANGE_TENANT_ID_BASE64, getToken, setCookie, removeCookie} from "~/utils/cookie";
 import Container from '~/pages/container.vue'
 import Index from '~/pages/index.vue'
 import UserSetting from '~/pages/basic/user/UserSetting.vue'
@@ -147,6 +147,11 @@ router.beforeEach(async (to, from, next) => {
             if (roles.includes('system_admin')) {
                 //允许操作租户切换
                 setCookie(CHANGE_TENANT_ALLOW, true)
+            } else {
+                //非系统管理员，清除可能残留的租户切换相关cookie（权限标记+切换的租户ID），防止其他账号登录后误显示、误切换
+                removeCookie(CHANGE_TENANT_ALLOW)
+                removeCookie(CHANGE_TENANT_ID)
+                removeCookie(CHANGE_TENANT_ID_BASE64)
             }
         }).catch(res => {
             //401 认证失败，重新登录
